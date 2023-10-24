@@ -1,4 +1,4 @@
-package io.bidapp.ads;
+package io.bidapp.demo;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -8,14 +8,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import java.lang.ref.WeakReference;
 
-import io.bidapp.sdk.AdFormat;
-import io.bidapp.sdk.BIDConfiguration;
-import io.bidapp.sdk.BannerView;
-import io.bidapp.sdk.BidappAds;
-import io.bidapp.sdk.Interstitial;
-import io.bidapp.sdk.Rewarded;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -58,14 +51,14 @@ public class MainActivity extends AppCompatActivity {
         interstitialButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Interstitial.INSTANCE.show(new WeakReference<>(showDelegate));
+                Interstitial.INSTANCE.show(showDelegate);
             }
         });
 
         rewardedButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Rewarded.INSTANCE.show(new WeakReference<>(showDelegate));
+                Rewarded.INSTANCE.show(showDelegate);
             }
         });
 

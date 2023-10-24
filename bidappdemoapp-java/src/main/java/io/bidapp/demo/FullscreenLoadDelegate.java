@@ -1,4 +1,4 @@
-package io.bidapp.ads;
+package io.bidapp.demo;
 
 import android.app.Activity;
 
@@ -6,8 +6,6 @@ import androidx.annotation.Nullable;
 
 import java.lang.ref.WeakReference;
 
-import io.bidapp.sdk.AdInfo;
-import io.bidapp.sdk.BIDFullscreenLoadDelegate;
 
 public class FullscreenLoadDelegate implements BIDFullscreenLoadDelegate {
     private final WeakReference<Activity> activityWeakReference;

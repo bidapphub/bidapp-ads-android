@@ -1,4 +1,4 @@
-package io.bidapp.ads;
+package io.bidapp.demo;
 
 import android.app.Activity;
 
@@ -6,9 +6,7 @@ import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 
-import io.bidapp.sdk.AdInfo;
-import io.bidapp.sdk.BannerView;
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate;
+
 
 public class BannerViewDelegate implements BIDBannerViewDelegate {
     private final WeakReference<Activity> activityWeakReference;

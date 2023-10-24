@@ -4,13 +4,13 @@ plugins {
 }
 
 android {
-    namespace 'io.bidapp.ads'
+    namespace 'io.bidapp.demo'
     compileSdk 34
 
     defaultConfig {
-        applicationId "io.bidapp.ads"
+        applicationId "io.bidapp.demo"
         minSdk 24
-        targetSdk 33
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -30,6 +30,13 @@ android {
 }
 
 dependencies {
+    implementation 'io.bidapp:bidapp-sdk:1.0.0'
+    implementation 'io.bidapp.networks:applovin:1.0.0'
+    implementation 'io.bidapp.networks:applovinmax:1.0.0'
+    implementation 'io.bidapp.networks:unity:1.0.0'
+    implementation 'io.bidapp.networks:liftoff:1.0.0'
+    implementation 'io.bidapp.networks:admob:1.0.0'
+    implementation 'io.bidapp.networks:chartboost:1.0.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.10.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

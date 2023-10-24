@@ -1,4 +1,4 @@
-package io.bidapp.ads;
+package io.bidapp.demo;
 
 import android.app.Activity;
 
@@ -6,9 +6,6 @@ import androidx.annotation.NonNull;
 
 import java.lang.ref.WeakReference;
 
-import io.bidapp.sdk.AdInfo;
-import io.bidapp.sdk.BIDInterstitialDelegate;
-import io.bidapp.sdk.BIDRewardedDelegate;
 
 public class FullscreenShowDelegate implements BIDRewardedDelegate, BIDInterstitialDelegate {
     private String sessionId = "";

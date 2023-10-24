@@ -1,4 +1,4 @@
-package io.bidapp.ads;
+package io.bidapp.demo;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -18,10 +18,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import io.bidapp.sdk.AdFormat;
-import io.bidapp.sdk.AdInfo;
-import io.bidapp.sdk.BannerView;
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate;
+
 
 public class BannerActivity extends AppCompatActivity implements BIDBannerViewDelegate {
     private ProgressBar progressBar;
