@@ -11,7 +11,7 @@ import com.unity3d.ads.UnityAds
 import com.unity3d.ads.UnityAdsShowOptions
 
 @PublishedApi
-internal class BidUnityFullscreen(
+internal class BIDUnityFullscreen(
     val adapter: BIDFullscreenAdapterProtocol? = null,
     val adTag: String?,
     isRewarded: Boolean
