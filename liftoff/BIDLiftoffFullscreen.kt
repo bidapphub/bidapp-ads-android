@@ -33,7 +33,6 @@ internal class BIDLiftoffFullscreen(
 
         override fun onAdEnd(baseAd: BaseAd) {
             BIDLog.d(TAG, "on ad end")
-            adapter?.onHide()
         }
 
         override fun onAdFailedToLoad(baseAd: BaseAd, adError: VungleError) {
