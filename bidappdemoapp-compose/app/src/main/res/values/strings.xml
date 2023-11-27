@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">bidappdemoapp-compose</string>
+    <string name="title_activity_banners">BannersActivity</string>
+</resources>
