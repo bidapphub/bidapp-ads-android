@@ -32,4 +32,4 @@ google-services.json
 # Android Profiling
 *.hprof
 /bidappdemoapp-java
-/bidappdemoapp-kotlin
+/bidappdemoapp-compose
