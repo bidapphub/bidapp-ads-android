@@ -2,7 +2,7 @@ package io.bidapp.networks.liftoff
 
 
 import android.app.Activity
-import android.util.Log
+import android.content.Context
 import com.vungle.ads.AdConfig
 import com.vungle.ads.BaseAd
 import com.vungle.ads.BaseFullscreenAd
@@ -33,6 +33,7 @@ internal class BIDLiftoffFullscreen(
 
         override fun onAdEnd(baseAd: BaseAd) {
             BIDLog.d(TAG, "on ad end")
+            adapter?.onHide()
         }
 
         override fun onAdFailedToLoad(baseAd: BaseAd, adError: VungleError) {
@@ -72,12 +73,12 @@ internal class BIDLiftoffFullscreen(
     }
 
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val load = runCatching {
             if (isRewarded)
                 adTag?.let {
                     ads =
-                        WeakReference(RewardedAd(activity.applicationContext, it, AdConfig().apply {
+                        WeakReference(RewardedAd(context as Context, it, AdConfig().apply {
                         }).apply {
                             adListener = callBack
                             load()
@@ -87,7 +88,7 @@ internal class BIDLiftoffFullscreen(
                 adTag?.let {
                     ads = WeakReference(
                         InterstitialAd(
-                            activity.applicationContext,
+                            context as Context,
                             it,
                             AdConfig().apply {
                             }).apply {
@@ -108,6 +109,11 @@ internal class BIDLiftoffFullscreen(
     override fun activityNeededForShow(): Boolean {
         return false
     }
+
+    override fun activityNeededForLoad(): Boolean {
+        return false
+    }
+
 
     override fun readyToShow(): Boolean {
         return ads?.get()?.canPlayAd() ?: false

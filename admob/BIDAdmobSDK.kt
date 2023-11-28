@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.util.Log
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.initialization.AdapterStatus
 import io.bidapp.sdk.BIDConsent
 import io.bidapp.sdk.BIDLog
@@ -24,21 +25,37 @@ internal class BIDAdmobSDK(
     var isInitializationComplete = false
     val TAG = "Admob SDK"
 
-    override fun setConsent(consent: BIDConsent, activity: Activity?) {
+    override fun setConsent(consent: BIDConsent, context: Context?) {
+        if (consent.COPPA != null){
+            var coppa:Int = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_UNSPECIFIED
+            if (consent.COPPA == true) coppa = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE
+            else if (consent.COPPA == false) coppa = RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_FALSE
+            val requestConfiguration = MobileAds.getRequestConfiguration()
+                .toBuilder()
+                .setTagForChildDirectedTreatment(coppa)
+                .build()
+            MobileAds.setRequestConfiguration(requestConfiguration)
+        }
         currentConsentGDPR = consent.GDPR
-        if (sharedPreferences == null)
-            sharedPreferences = activity?.getSharedPreferences(
-                activity.packageName.toString(),
-                Context.MODE_PRIVATE
-            )
+        if (consent.GDPR != null){
+            var gdpr:Int = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_UNSPECIFIED
+            if (consent.GDPR == true) gdpr = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_TRUE
+            else if (consent.GDPR == false) gdpr = RequestConfiguration.TAG_FOR_UNDER_AGE_OF_CONSENT_FALSE
+            val requestConfiguration = MobileAds.getRequestConfiguration()
+                .toBuilder()
+                .setTagForUnderAgeOfConsent(gdpr)
+                .build()
+            MobileAds.setRequestConfiguration(requestConfiguration)
+        }
         if (consent.CCPA != null) {
-            if (consent.CCPA == true) sharedPreferences?.edit()?.putInt("gad_rdp", 1)?.apply()
+            if (consent.CCPA == false) sharedPreferences?.edit()?.putInt("gad_rdp", 1)?.apply()
             else sharedPreferences?.edit()?.remove("gad_rdp")?.apply()
         }
     }
 
-    override fun initializeSDK(activity: Activity) {
-        if (isInitialized(activity) ||
+    override fun initializeSDK(context: Context) {
+
+        if (isInitialized(context) ||
             null == adapter ||
             adapter.initializationInProgress()
         ) {
@@ -46,7 +63,7 @@ internal class BIDAdmobSDK(
         }
         adapter.onInitializationStart()
         MobileAds.initialize(
-            activity
+            context
         ) { p0 ->
             if (p0.adapterStatusMap[p0.adapterStatusMap.keys.first()]?.initializationState == AdapterStatus.State.READY) {
                 initializationComplete()
@@ -68,14 +85,14 @@ internal class BIDAdmobSDK(
     }
 
 
-    override fun isInitialized(activity: Activity): Boolean {
+    override fun isInitialized(context: Context): Boolean {
         return isInitializationComplete
     }
 
     override fun enableTesting() {
     }
 
-    override fun enableLogging(activity: Activity) {
+    override fun enableLogging(context: Context) {
     }
 
     override fun sharedSDK(): Any? {

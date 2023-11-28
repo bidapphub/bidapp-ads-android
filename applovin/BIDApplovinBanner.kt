@@ -1,6 +1,7 @@
 package io.bidapp.networks.applovin
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
@@ -90,10 +91,10 @@ internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: Strin
         return cachedAd != null
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val load = runCatching {
             if (adView == null) {
-                adView = WeakReference(AppLovinAdView(bannerFormat, activity))
+                adView = WeakReference(AppLovinAdView(bannerFormat, context as Context))
                 adView?.get()?.setAdLoadListener(this)
                 adView?.get()?.setAdDisplayListener(this)
                 adView?.get()?.setAdViewEventListener(this)
@@ -104,14 +105,14 @@ internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: Strin
         if (load.isFailure)  adapter?.onFailedToLoad(Error("Applovin banner loading error"))
     }
 
-    override fun prepareForDealloc() {
-        //  prepareForDealloc
+    override fun destroy() {
+        cachedAd = null
+        adView?.get()?.destroy()
     }
 
-    override fun showOnView(view: WeakReference<View>, activity: Activity): Boolean {
+    override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         BIDLog.d(TAG, "Banner show applovin")
         return try {
-            val density = activity.resources.displayMetrics.density
             val weightAndHeight : Array<Int> = when(adView?.get()?.size.toString()){
                 "MREC" -> arrayOf(300,250)
                 "BANNER" -> arrayOf(320,50)
@@ -127,5 +128,9 @@ internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: Strin
 
     override fun waitForAdToShow(): Boolean {
         return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
+        return false
     }
 }

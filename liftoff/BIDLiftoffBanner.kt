@@ -1,6 +1,7 @@
 package io.bidapp.networks.liftoff
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -43,12 +44,12 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
         return cachedAd != null
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         cachedAd = null
         val load = runCatching {
             if (bannerAd == null)
                 bannerAd =
-                    WeakReference(BannerAd(activity.applicationContext, adTag!!, bannerFormat!!))
+                    WeakReference(BannerAd(context as Context, adTag!!, bannerFormat!!))
             bannerAd?.get()?.adListener = this
             bannerAd?.get()?.load()
         }
@@ -56,13 +57,13 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
     }
 
 
-    override fun prepareForDealloc() {
-        //   prepareForDealloc
+    override fun destroy() {
+       cachedAd = null
+       adView?.get()?.removeAllViews()
     }
 
-    override fun showOnView(view: WeakReference<View>, activity: Activity): Boolean {
+    override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         return try {
-            val density = activity.resources.displayMetrics.density
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 BannerAdSize.VUNGLE_MREC -> arrayOf(300, 250)
                 BannerAdSize.BANNER -> arrayOf(320, 50)
@@ -86,6 +87,10 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
 
     override fun waitForAdToShow(): Boolean {
         return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
+        return false
     }
 
     override fun onAdClicked(baseAd: BaseAd) {

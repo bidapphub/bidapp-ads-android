@@ -1,6 +1,7 @@
 package io.bidapp.networks.chartboost
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.chartboost.sdk.Chartboost
 import com.chartboost.sdk.LoggingLevel
@@ -23,19 +24,19 @@ internal class BIDChartboostSDK(
 
     val TAG = "Chartboost SDK"
 
-    override fun setConsent(consent: BIDConsent, activity: Activity?) {
+    override fun setConsent(consent: BIDConsent, context: Context?) {
         if (consent.GDPR != null) {
             if (consent.GDPR == true) {
                 val dataUseConsent = GDPR(GDPR.GDPR_CONSENT.BEHAVIORAL)
-                activity?.applicationContext?.let {
+                context?.let {
                     Chartboost.addDataUseConsent(
                         it,
                         dataUseConsent
                     )
                 }
-            } else {
+            } else if (consent.GDPR == false) {
                 val dataUseConsent = GDPR(GDPR.GDPR_CONSENT.NON_BEHAVIORAL)
-                activity?.applicationContext?.let {
+                context?.let {
                     Chartboost.addDataUseConsent(
                         it,
                         dataUseConsent
@@ -45,15 +46,15 @@ internal class BIDChartboostSDK(
             if (consent.CCPA != null) {
                 if (consent.CCPA == true) {
                     val dataUseConsent = CCPA(CCPA.CCPA_CONSENT.OPT_IN_SALE)
-                    activity?.applicationContext?.let {
+                    context?.let {
                         Chartboost.addDataUseConsent(
                             it,
                             dataUseConsent
                         )
                     }
-                } else {
+                } else if(consent.CCPA == false){
                     val dataUseConsent = CCPA(CCPA.CCPA_CONSENT.OPT_OUT_SALE)
-                    activity?.applicationContext?.let {
+                    context?.let {
                         Chartboost.addDataUseConsent(
                             it,
                             dataUseConsent
@@ -64,15 +65,15 @@ internal class BIDChartboostSDK(
             if (consent.COPPA != null) {
                 if (consent.COPPA == true) {
                     val dataUseConsent = COPPA(true)
-                    activity?.applicationContext?.let {
+                    context?.let {
                         Chartboost.addDataUseConsent(
                             it,
                             dataUseConsent
                         )
                     }
-                } else {
+                } else if (consent.COPPA == false) {
                     val dataUseConsent = COPPA(false)
-                    activity?.applicationContext?.let {
+                    context?.let {
                         Chartboost.addDataUseConsent(
                             it,
                             dataUseConsent
@@ -83,8 +84,8 @@ internal class BIDChartboostSDK(
         }
     }
 
-    override fun initializeSDK(activity: Activity) {
-        if (isInitialized(activity) ||
+    override fun initializeSDK(context: Context) {
+        if (isInitialized(context) ||
             null == adapter ||
             adapter.initializationInProgress()
         ) {
@@ -94,7 +95,7 @@ internal class BIDChartboostSDK(
         BIDLog.d(TAG, "Chartboost SDK Version - ${Chartboost.getSDKVersion()}")
         val initialization = runCatching {
             Chartboost.startWithAppId(
-                activity.applicationContext, appId, appSignature!!
+                context, appId, appSignature!!
             ) { startError ->
                 if (startError == null) {
                     this@BIDChartboostSDK.initializationComplete()
@@ -116,7 +117,7 @@ internal class BIDChartboostSDK(
         adapter?.onInitializationComplete(false, err)
     }
 
-    override fun isInitialized(activity: Activity): Boolean {
+    override fun isInitialized(context: Context): Boolean {
         return Chartboost.isSdkStarted()
     }
 
@@ -124,7 +125,7 @@ internal class BIDChartboostSDK(
         //enableTesting
     }
 
-    override fun enableLogging(activity: Activity) {
+    override fun enableLogging(context: Context) {
         Chartboost.setLoggingLevel(LoggingLevel.ALL)
     }
 

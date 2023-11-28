@@ -1,7 +1,7 @@
 package io.bidapp.networks.liftoff
 
-import android.app.Activity
-import android.util.Log
+
+import android.content.Context
 import com.vungle.ads.InitializationListener
 import com.vungle.ads.VungleAds
 import com.vungle.ads.VungleError
@@ -23,10 +23,10 @@ internal class BIDLiftoffSDK(
     val TAG = "Liftoff SDK"
     var testMode = false
 
-    override fun enableLogging(activity: Activity) {
+    override fun enableLogging(context: Context) {
     }
 
-    override fun setConsent(consent: BIDConsent, activity: Activity?) {
+    override fun setConsent(consent: BIDConsent, context: Context?) {
         if (consent.GDPR != null) {
             VunglePrivacySettings.setGDPRStatus(consent.GDPR!!, "1.0.0")
         }
@@ -42,9 +42,9 @@ internal class BIDLiftoffSDK(
         testMode = true
     }
 
-    override fun initializeSDK(activity: Activity) {
+    override fun initializeSDK(context: Context) {
         adapter.onInitializationStart()
-        VungleAds.init(activity.applicationContext, appId, object : InitializationListener {
+        VungleAds.init(context, appId, object : InitializationListener {
             override fun onError(vungleError: VungleError) {
                 this@BIDLiftoffSDK.initializationFailed(vungleError.errorMessage)
             }
@@ -64,7 +64,7 @@ internal class BIDLiftoffSDK(
         adapter.onInitializationComplete(false, err)
     }
 
-    override fun isInitialized(activity: Activity): Boolean {
+    override fun isInitialized(context: Context): Boolean {
         return VungleAds.isInitialized()
     }
 

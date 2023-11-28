@@ -1,6 +1,7 @@
 package io.bidapp.networks.applovin
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import com.applovin.adview.AppLovinIncentivizedInterstitial
 import com.applovin.sdk.*
@@ -82,10 +83,10 @@ internal class BIDApplovinRewarded(
     }
 
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val load = runCatching {
             if (incentivizedInterstitial == null) {
-                incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(activity)
+                incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(context as Context)
             }
             if (RewardedOnDisplay.isOnScreen) appLovinAdLoadListener.failedToReceiveAd(0)
             else incentivizedInterstitial?.preload(appLovinAdLoadListener)
@@ -96,7 +97,7 @@ internal class BIDApplovinRewarded(
     override fun show(activity: Activity?) {
         val show = runCatching {
             if (incentivizedInterstitial == null) {
-                incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(activity!!)
+                incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(activity?.applicationContext!!)
             }
             if (incentivizedInterstitial?.isAdReadyToDisplay == true)
                 incentivizedInterstitial!!.show(
@@ -112,6 +113,10 @@ internal class BIDApplovinRewarded(
 
     override fun activityNeededForShow(): Boolean {
         return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
+        return false
     }
 
     override fun readyToShow(): Boolean {

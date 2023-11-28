@@ -1,6 +1,7 @@
 package io.bidapp.networks.admob
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import com.google.ads.mediation.admob.AdMobAdapter
@@ -56,7 +57,7 @@ internal class BIDAdmobRewarded(
             }
         }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val networkExtrasBundle = Bundle()
         var request = AdRequest.Builder().build()
         if (BIDAdmobSDK.getGDPR() != null) {
@@ -69,7 +70,7 @@ internal class BIDAdmobRewarded(
         }
         if (adTag != null) {
             RewardedAd.load(
-                activity.applicationContext,
+                context as Context,
                 adTag,
                 request,
                 object : RewardedAdLoadCallback() {
@@ -101,6 +102,10 @@ internal class BIDAdmobRewarded(
     }
 
     override fun activityNeededForShow(): Boolean {
+        return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
         return false
     }
 

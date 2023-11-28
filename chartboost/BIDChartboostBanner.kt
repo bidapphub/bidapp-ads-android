@@ -1,6 +1,7 @@
 package io.bidapp.networks.chartboost
 
 import android.app.Activity
+import android.content.Context
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
@@ -81,13 +82,13 @@ internal class BIDChartboostBanner(
         return cachedAd != null
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         cachedAd = null
         if (adView == null) {
             val load = runCatching {
                 adView = WeakReference(
                     Banner(
-                        activity.applicationContext,
+                        context as Context,
                         location!!,
                         bannerFormat!!,
                         chartboost
@@ -101,14 +102,13 @@ internal class BIDChartboostBanner(
         }
     }
 
-    override fun prepareForDealloc() {
-        // prepareForDealloc
-
+    override fun destroy() {
+       cachedAd = null
+       adView?.get()?.detach()
     }
 
-    override fun showOnView(view: WeakReference<View>, activity: Activity): Boolean {
+    override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         try {
-            val density = activity.resources.displayMetrics.density
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 Banner.BannerSize.MEDIUM -> arrayOf(300, 250)
                 Banner.BannerSize.STANDARD -> arrayOf(320, 50)
@@ -131,5 +131,9 @@ internal class BIDChartboostBanner(
     }
     override fun waitForAdToShow(): Boolean {
         return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
+        return false
     }
 }

@@ -1,6 +1,8 @@
 package io.bidapp.networks.applovin
 
 import android.app.Activity
+import android.app.Application
+import android.content.Context
 import android.util.Log
 import com.applovin.adview.AppLovinInterstitialAd
 import com.applovin.adview.AppLovinInterstitialAdDialog
@@ -72,14 +74,14 @@ internal class BIDApplovinInterstitial(
         interstitialAdDialog?.setAdVideoPlaybackListener(appLovinAdVideoPlaybackListener)
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val load = runCatching {
             if (interstitialAdDialog == null) {
-                sdk = AppLovinSdk.getInstance(activity)
-                interstitialAdDialog = AppLovinInterstitialAd.create(sdk, activity)
+                sdk = AppLovinSdk.getInstance(context as Context)
+                interstitialAdDialog = AppLovinInterstitialAd.create(sdk, context)
                 init()
             }
-            AppLovinSdk.getInstance(activity).adService.loadNextAd(
+            AppLovinSdk.getInstance(context as Context).adService.loadNextAd(
                 AppLovinAdSize.INTERSTITIAL,
                 appLovinAdLoadListener
             )
@@ -96,6 +98,10 @@ internal class BIDApplovinInterstitial(
 
     override fun activityNeededForShow(): Boolean {
         return false
+    }
+
+    override fun activityNeededForLoad(): Boolean {
+       return false
     }
 
     override fun readyToShow(): Boolean {

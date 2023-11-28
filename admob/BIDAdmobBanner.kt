@@ -1,16 +1,10 @@
 package io.bidapp.networks.admob
 
-import android.app.Activity
-import android.app.Application
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.annotation.RequiresApi
-import androidx.core.view.get
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleObserver
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
@@ -38,8 +32,8 @@ internal class BIDAdmobBanner(
     }
     var adView: WeakReference<AdView>? = null
     var ready = false
-
     val adListener = object : AdListener() {
+
         override fun onAdClicked() {
             super.onAdClicked()
             BIDLog.d(TAG, "on ad clicked")
@@ -90,7 +84,7 @@ internal class BIDAdmobBanner(
         return ready
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val networkExtrasBundle = Bundle()
         var request = AdRequest.Builder().build()
         if (BIDAdmobSDK.getGDPR() != null) {
@@ -103,7 +97,7 @@ internal class BIDAdmobBanner(
         }
             val loading = runCatching {
                 if (adView == null) {
-                    adView = WeakReference(AdView(activity.applicationContext))
+                    adView = WeakReference(AdView(context as Context))
                     adView!!.get()!!.setAdSize(bannerFormat!!)
                     adView!!.get()!!.adUnitId = adTag!!
                     adView!!.get()!!.adListener = adListener
@@ -114,14 +108,14 @@ internal class BIDAdmobBanner(
 
     }
 
-    override fun prepareForDealloc() {
-        //   prepareForDealloc
+    override fun destroy() {
+        ready = false
+        adView?.get()?.destroy()
     }
 
 
-    override fun showOnView(view: WeakReference<View>, activity: Activity): Boolean {
+    override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         try {
-            val density = activity.resources.displayMetrics.density
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 AdSize.MEDIUM_RECTANGLE -> arrayOf(300, 250)
                 AdSize.BANNER -> arrayOf(320, 50)
@@ -144,6 +138,10 @@ internal class BIDAdmobBanner(
 
     override fun waitForAdToShow(): Boolean {
         return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
+        return false
     }
 
 

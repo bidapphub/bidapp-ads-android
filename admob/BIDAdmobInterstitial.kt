@@ -1,8 +1,8 @@
 package io.bidapp.networks.admob
 
 import android.app.Activity
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -51,7 +51,7 @@ internal class BIDAdmobInterstitial(val adapter: BIDFullscreenAdapterProtocol? =
         }
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val networkExtrasBundle = Bundle()
         var request = AdRequest.Builder().build()
         if (BIDAdmobSDK.getGDPR() != null) {
@@ -63,7 +63,7 @@ internal class BIDAdmobInterstitial(val adapter: BIDFullscreenAdapterProtocol? =
             }
         }
             if (adTag != null) {
-                InterstitialAd.load(activity.applicationContext, adTag, request, object : InterstitialAdLoadCallback(){
+                InterstitialAd.load(context as Context, adTag, request, object : InterstitialAdLoadCallback(){
                     override fun onAdFailedToLoad(p0: LoadAdError) {
                         super.onAdFailedToLoad(p0)
                         BIDLog.d(TAG, "Failed To Receive Ad error ${p0.message}")
@@ -87,6 +87,10 @@ internal class BIDAdmobInterstitial(val adapter: BIDFullscreenAdapterProtocol? =
     }
 
     override fun activityNeededForShow(): Boolean {
+        return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
         return false
     }
 

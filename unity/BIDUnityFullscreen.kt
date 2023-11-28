@@ -1,7 +1,6 @@
 package io.bidapp.networks.unity
 
 import android.app.Activity
-import android.util.Log
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
@@ -65,7 +64,7 @@ internal class BIDUnityFullscreen(
         }
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val load = runCatching {
             UnityAds.load(adTag, loadListener)
         }
@@ -86,6 +85,10 @@ internal class BIDUnityFullscreen(
 
     override fun activityNeededForShow(): Boolean {
         return true
+    }
+
+    override fun activityNeededForLoad(): Boolean {
+        return false
     }
 
     override fun readyToShow(): Boolean {

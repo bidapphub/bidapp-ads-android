@@ -81,7 +81,7 @@ internal class BIDChartboostRewarded(
         }
     }
 
-    override fun load(activity: Activity) {
+    override fun load(context: Any) {
         val load = runCatching {
             chartboostRewarded!!.cache()
         }
@@ -95,6 +95,10 @@ internal class BIDChartboostRewarded(
     }
 
     override fun activityNeededForShow(): Boolean {
+        return false
+    }
+
+    override fun activityNeededForLoad(): Boolean {
         return false
     }
 

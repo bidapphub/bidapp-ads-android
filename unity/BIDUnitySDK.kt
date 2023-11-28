@@ -1,15 +1,14 @@
 package io.bidapp.networks.unity
 
-import android.app.Activity
-import android.util.Log
-import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
-import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
+import android.content.Context
 import com.unity3d.ads.IUnityAdsInitializationListener
 import com.unity3d.ads.UnityAds
 import com.unity3d.ads.metadata.MetaData
 import io.bidapp.sdk.BIDConsent
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.ConsentListener
+import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
+import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 @PublishedApi
 internal class BIDUnitySDK(
@@ -20,12 +19,12 @@ internal class BIDUnitySDK(
     var testMode = false
     val TAG = "Unity SDK"
 
-    override fun enableLogging(activity: Activity) {
+    override fun enableLogging(context: Context) {
         UnityAds.setDebugMode(true)
     }
 
-    override fun setConsent(consent: BIDConsent, activity: Activity?) {
-        val privacyConsentMetaData = MetaData(activity)
+    override fun setConsent(consent: BIDConsent, context: Context?) {
+        val privacyConsentMetaData = MetaData(context)
         consent.let {
             if (consent.GDPR != null) {
                 privacyConsentMetaData.set("gdpr.consent", consent.GDPR)
@@ -48,11 +47,11 @@ internal class BIDUnitySDK(
         testMode = true
     }
 
-    override fun initializeSDK(activity: Activity) {
-        if (!this.isInitialized(activity)) {
+    override fun initializeSDK(context: Context) {
+        if (!this.isInitialized(context)) {
             adapter?.onInitializationStart()
             UnityAds.initialize(
-                activity,
+                context.applicationContext,
                 gameId,
                 testMode,
                 object : IUnityAdsInitializationListener {
@@ -80,7 +79,7 @@ internal class BIDUnitySDK(
         adapter?.onInitializationComplete(false, err)
     }
 
-    override fun isInitialized(activity: Activity): Boolean {
+    override fun isInitialized(context: Context): Boolean {
         return UnityAds.isInitialized()
     }
 
