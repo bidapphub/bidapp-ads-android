@@ -1,10 +1,5 @@
-package io.bidapp.demo;
+package com.bidapp.demo;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
-
-import android.app.Activity;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
@@ -12,13 +7,20 @@ import android.widget.ProgressBar;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
-
+import io.bidapp.sdk.AdFormat;
+import io.bidapp.sdk.AdInfo;
+import io.bidapp.sdk.BannerView;
+import io.bidapp.sdk.protocols.BIDBannerViewDelegate;
 
 public class BannerActivity extends AppCompatActivity implements BIDBannerViewDelegate {
     private ProgressBar progressBar;
@@ -29,6 +31,7 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
     private TableLayout tableLayout;
     private int bannerCount = 0;
     private boolean isAfterDelete = false;
+    private ArrayList<BannerView> allBannersArray = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,8 +49,10 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
     private void addOneMoreBanner() {
         if (pendingBanners.size() < 2) {
             AdFormat format = (new Random().nextInt(2) == 0) ? AdFormat.banner_320x50 : AdFormat.banner_300x250;
-            BannerView banner = new BannerView(this).banner(this, format);
+            BannerView banner = new BannerView(this).banner(format);
+            banner.setBannerViewDelegate(this);
             pendingBanners.add(banner);
+            allBannersArray.add(banner);
             scheduleAddOneMoreBanner();
         }
     }
@@ -100,6 +105,10 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
         }
         dataSource.clear();
         isAfterDelete = false;
+
+        for (BannerView banner : allBannersArray) {
+            banner.destroy();
+        }
         for (int i = 0; i < tableLayout.getChildCount(); i++) {
             View child = tableLayout.getChildAt(i);
             if (child instanceof TableRow) {
@@ -176,35 +185,35 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
     @Override
     public void adViewReadyToRefresh(@NonNull BannerView adView, AdInfo adInfo) {
         System.out.println("App - adViewReadyToRefresh. AdView: " + adView + ", AdInfo: " + adInfo);
-        if (adInfo.getFormat() != null) {
-            addAdToSuperviewIfNeeded(adView, (AdFormat) adInfo.getFormat());
+        assert adInfo != null;
+        if (adInfo.getAdFormat() != null) {
+            addAdToSuperviewIfNeeded(adView, adInfo.getAdFormat());
         }
         adView.refreshAd();
     }
 
     @Override
-    public void adViewDidDisplayAd(@NonNull BannerView adView, @NonNull AdInfo adInfo) {
+    public void adViewDidDisplayAd(@NonNull BannerView adView, AdInfo adInfo) {
         System.out.println("App - didDisplayAd. AdView: " + adView + ", AdInfo: " + adInfo);
     }
 
     @Override
-    public void adViewDidFailToDisplayAd(@NonNull BannerView adView, @NonNull AdInfo adInfo, Error errors) {
+    public void adViewDidFailToDisplayAd(@NonNull BannerView adView, AdInfo adInfo, Error errors) {
         System.out.println("App - didFailToDisplayAd. AdView: " + adView + ", Error: " + errors.getLocalizedMessage());
     }
 
     @Override
-    public void adViewClicked(@NonNull BannerView adView, @NonNull AdInfo adInfo) {
+    public void adViewClicked(@NonNull BannerView adView, AdInfo adInfo) {
         System.out.println("App - didClicked. AdView: " + adView + ", AdInfo: " + adInfo);
     }
 
-    @Override
-    public Activity activityForShowAd() {
-        return this;
-    }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        for (BannerView banner : allBannersArray) {
+            banner.destroy();
+        }
         if (generateBannerTimer != null) {
             generateBannerTimer.cancel();
         }

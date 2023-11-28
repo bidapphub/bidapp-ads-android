@@ -1,20 +1,15 @@
-package io.bidapp.demo;
-
-import android.app.Activity;
+package com.bidapp.demo;
 
 import androidx.annotation.NonNull;
 
-import java.lang.ref.WeakReference;
-
+import io.bidapp.sdk.AdInfo;
+import io.bidapp.sdk.BIDInterstitialDelegate;
+import io.bidapp.sdk.BIDRewardedDelegate;
 
 public class FullscreenShowDelegate implements BIDRewardedDelegate, BIDInterstitialDelegate {
     private String sessionId = "";
     private String waterfallId = "";
-    private final WeakReference<Activity> activityWeakReference;
 
-    public FullscreenShowDelegate(Activity activity) {
-        this.activityWeakReference = new WeakReference<>(activity);
-    }
 
     @Override
     public void didDisplayAd(AdInfo adInfo) {
@@ -54,10 +49,7 @@ public class FullscreenShowDelegate implements BIDRewardedDelegate, BIDInterstit
         System.out.println("Bidapp fullscreen didRewardUser");
     }
 
-    @Override
-    public Activity activityForShowAd() {
-        return activityWeakReference.get();
-    }
+
 
 
 }

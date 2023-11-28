@@ -1,9 +1,9 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.BidappAds" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.Bidappdemoappjava" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
     </style>
 
-    <style name="Theme.BidappAds" parent="Base.Theme.BidappAds" />
+    <style name="Theme.Bidappdemoappjava" parent="Base.Theme.Bidappdemoappjava" />
 </resources>
