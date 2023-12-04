@@ -1,9 +1,7 @@
 package io.bidapp.networks.applovinmax
 
 
-import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import com.applovin.mediation.MaxAd
@@ -20,8 +18,8 @@ import java.lang.ref.WeakReference
 @PublishedApi
 internal class BIDApplovinMaxBanner(adapter: BIDBannerAdapterProtocol, adTag: String, format: AdFormat) : BIDBannerAdapterDelegateProtocol, MaxAdViewAdListener {
     val TAG = "Banner Max"
-    val bannerFormat = if (format.isbanner_320x50) MaxAdFormat.BANNER
-    else if (format.isbanner_300x250) MaxAdFormat.MREC
+    val bannerFormat = if (format.isBanner_320x50) MaxAdFormat.BANNER
+    else if (format.isBanner_300x250) MaxAdFormat.MREC
     else {
         BIDLog.d(TAG, "Unsuported applovin MAX banner format: $format")
         null

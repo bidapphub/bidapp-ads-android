@@ -3,8 +3,9 @@ package com.bidapp.demo;
 import androidx.annotation.NonNull;
 
 import io.bidapp.sdk.AdInfo;
+import io.bidapp.sdk.BIDBannerViewDelegate;
 import io.bidapp.sdk.BannerView;
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate;
+
 
 public class BannerViewDelegate implements BIDBannerViewDelegate {
 

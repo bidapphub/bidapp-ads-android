@@ -12,8 +12,8 @@ import androidx.core.view.children
 import androidx.core.view.get
 import io.bidapp.sdk.AdFormat
 import io.bidapp.sdk.AdInfo
+import io.bidapp.sdk.BIDBannerViewDelegate
 import io.bidapp.sdk.BannerView
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.concurrent.schedule
@@ -121,7 +121,7 @@ class BannerActivity : AppCompatActivity(), BIDBannerViewDelegate {
 
         adView.setBackgroundColor(Color.MAGENTA)
         val density = this.resources.displayMetrics.density
-        if (adFormat.isbanner_320x50)
+        if (adFormat.isBanner_320x50)
             constraintLayout.addView(adView, (320 * density).toInt(), (50 * density).toInt())
         else
             constraintLayout.addView(adView, (300 * density).toInt(), (250 * density).toInt())

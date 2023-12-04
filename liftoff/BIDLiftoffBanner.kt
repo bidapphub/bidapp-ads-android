@@ -1,8 +1,6 @@
 package io.bidapp.networks.liftoff
 
-import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -28,8 +26,8 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
     var adView: WeakReference<BannerView>? = null
     var cachedAd: String? = null
     val TAG = "Banner Liftoff"
-    val bannerFormat = if (format.isbanner_320x50) BannerAdSize.BANNER
-    else if (format.isbanner_300x250) BannerAdSize.VUNGLE_MREC
+    val bannerFormat = if (format.isBanner_320x50) BannerAdSize.BANNER
+    else if (format.isBanner_300x250) BannerAdSize.VUNGLE_MREC
     else {
         BIDLog.d(TAG, "Unsuported Liftoff banner format: $format")
         null
@@ -55,6 +53,7 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
         }
         if (load.isFailure) adapter?.onFailedToLoad(Error("banner loading error"))
     }
+
 
 
     override fun destroy() {
@@ -131,6 +130,10 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
     override fun onAdStart(baseAd: BaseAd) {
         BIDLog.d(TAG, "shown")
         adapter?.onDisplay()
+    }
+
+    override fun revenue(): Double? {
+        return null
     }
 }
 

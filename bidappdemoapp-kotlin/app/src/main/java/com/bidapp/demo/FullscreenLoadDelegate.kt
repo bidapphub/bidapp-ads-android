@@ -1,6 +1,5 @@
 package com.bidapp.demo
 
-import android.util.Log
 import io.bidapp.sdk.AdInfo
 import io.bidapp.sdk.BIDFullscreenLoadDelegate
 

@@ -98,4 +98,8 @@ internal class BIDUnityFullscreen(
     override fun shouldWaitForAdToDisplay(): Boolean {
         return true
     }
+
+    override fun revenue(): Double? {
+        return null
+    }
 }

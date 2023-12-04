@@ -111,4 +111,8 @@ internal class BIDApplovinInterstitial(
     override fun shouldWaitForAdToDisplay(): Boolean {
         return true
     }
+
+    override fun revenue(): Double? {
+        return null
+    }
 }

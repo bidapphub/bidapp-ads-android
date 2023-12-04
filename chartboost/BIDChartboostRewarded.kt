@@ -109,4 +109,8 @@ internal class BIDChartboostRewarded(
     override fun shouldWaitForAdToDisplay(): Boolean {
         return true
     }
+
+    override fun revenue(): Double? {
+        return null
+    }
 }

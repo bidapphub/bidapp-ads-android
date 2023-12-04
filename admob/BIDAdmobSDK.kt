@@ -1,9 +1,7 @@
 package io.bidapp.networks.admob
 
-import android.app.Activity
 import android.content.Context
 import android.content.SharedPreferences
-import android.util.Log
 import com.google.android.gms.ads.MobileAds
 import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.ads.initialization.AdapterStatus

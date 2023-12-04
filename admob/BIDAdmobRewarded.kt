@@ -3,7 +3,6 @@ package io.bidapp.networks.admob
 import android.app.Activity
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdError
 import com.google.android.gms.ads.AdRequest
@@ -18,8 +17,8 @@ import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
 @PublishedApi
 internal class BIDAdmobRewarded(
     val adapter: BIDFullscreenAdapterProtocol? = null,
-    val adTag: String? = null,
-    var isReward: Boolean
+    val adTag: String?,
+    val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
     val TAG = "Rewarded Admob"
     private var loadedAd: RewardedAd? = null
@@ -115,5 +114,9 @@ internal class BIDAdmobRewarded(
 
     override fun shouldWaitForAdToDisplay(): Boolean {
         return true
+    }
+
+    override fun revenue(): Double? {
+        return null
     }
 }

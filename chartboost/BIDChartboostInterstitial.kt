@@ -101,4 +101,8 @@ internal class BIDChartboostInterstitial(
     override fun shouldWaitForAdToDisplay(): Boolean {
         return true
     }
+
+    override fun revenue(): Double? {
+        return null
+    }
 }

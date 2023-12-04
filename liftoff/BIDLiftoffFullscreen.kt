@@ -23,6 +23,7 @@ internal class BIDLiftoffFullscreen(
     val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
 
+
     val TAG = if (isRewarded) "Reward Liftoff" else "Full Liftoff"
     var ads: WeakReference<BaseFullscreenAd>? = null
     val callBack = object : RewardedAdListener {
@@ -73,6 +74,7 @@ internal class BIDLiftoffFullscreen(
     }
 
 
+
     override fun load(context: Any) {
         val load = runCatching {
             if (isRewarded)
@@ -121,5 +123,9 @@ internal class BIDLiftoffFullscreen(
 
     override fun shouldWaitForAdToDisplay(): Boolean {
         return true
+    }
+
+    override fun revenue(): Double? {
+        return null
     }
 }

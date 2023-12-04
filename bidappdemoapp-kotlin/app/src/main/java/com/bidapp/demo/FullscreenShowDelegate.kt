@@ -1,11 +1,10 @@
 package com.bidapp.demo
 
-import android.util.Log
 import io.bidapp.sdk.AdInfo
 import io.bidapp.sdk.BIDInterstitialDelegate
 import io.bidapp.sdk.BIDRewardedDelegate
 
-class FullscreenShowDelegate() : BIDRewardedDelegate, BIDInterstitialDelegate {
+class FullscreenShowDelegate : BIDRewardedDelegate, BIDInterstitialDelegate {
     var sessionId:String = ""
     var waterfallId:String = ""
 

@@ -1,6 +1,5 @@
 package io.bidapp.networks.applovin
 
-import android.app.Activity
 import android.content.Context
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 

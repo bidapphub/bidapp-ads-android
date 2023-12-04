@@ -1,8 +1,6 @@
 package io.bidapp.networks.chartboost
 
-import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -29,8 +27,8 @@ internal class BIDChartboostBanner(
     format: AdFormat?
 ) : BIDBannerAdapterDelegateProtocol {
     val TAG = "Banner Chartboost"
-    val bannerFormat = if (format?.isbanner_320x50 == true) Banner.BannerSize.STANDARD
-    else if (format?.isbanner_300x250 == true) Banner.BannerSize.MEDIUM
+    val bannerFormat = if (format?.isBanner_320x50 == true) Banner.BannerSize.STANDARD
+    else if (format?.isBanner_300x250 == true) Banner.BannerSize.MEDIUM
     else {
         BIDLog.d(TAG, "Unsuported Chartboost banner format: $format")
         null
@@ -135,5 +133,9 @@ internal class BIDChartboostBanner(
 
     override fun activityNeededForLoad(): Boolean {
         return false
+    }
+
+    override fun revenue(): Double? {
+        return null
     }
 }

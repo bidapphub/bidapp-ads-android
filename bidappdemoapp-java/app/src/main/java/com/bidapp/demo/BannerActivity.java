@@ -19,8 +19,9 @@ import java.util.TimerTask;
 
 import io.bidapp.sdk.AdFormat;
 import io.bidapp.sdk.AdInfo;
+import io.bidapp.sdk.BIDBannerViewDelegate;
 import io.bidapp.sdk.BannerView;
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate;
+
 
 public class BannerActivity extends AppCompatActivity implements BIDBannerViewDelegate {
     private ProgressBar progressBar;
@@ -158,7 +159,7 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
         adView.setBackgroundColor(Color.MAGENTA);
         float density = getResources().getDisplayMetrics().density;
         int width, height;
-        if (adFormat.isbanner_320x50) {
+        if (adFormat.isBanner_320x50) {
             width = (int) (320 * density);
             height = (int) (50 * density);
         } else {

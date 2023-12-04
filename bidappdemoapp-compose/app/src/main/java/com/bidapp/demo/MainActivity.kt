@@ -158,7 +158,6 @@ class MainActivity : ComponentActivity() {
         return banner
     }
 
-
 }
 
 

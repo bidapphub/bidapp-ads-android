@@ -1,8 +1,6 @@
 package io.bidapp.networks.chartboost
 
-import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.chartboost.sdk.Chartboost
 import com.chartboost.sdk.LoggingLevel
 import com.chartboost.sdk.privacy.model.CCPA

@@ -1,8 +1,6 @@
 package io.bidapp.networks.applovin
 
-import android.app.Activity
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import com.applovin.adview.AppLovinAdView
@@ -24,8 +22,8 @@ import java.lang.ref.WeakReference
 internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: String, format: AdFormat) : BIDBannerAdapterDelegateProtocol, AppLovinAdLoadListener, AppLovinAdDisplayListener,
     AppLovinAdViewEventListener, AppLovinAdClickListener {
     val TAG = "Banner Applovin"
-    val bannerFormat = if (format.isbanner_320x50) AppLovinAdSize.BANNER
-    else if (format.isbanner_300x250) AppLovinAdSize.MREC
+    val bannerFormat = if (format.isBanner_320x50) AppLovinAdSize.BANNER
+    else if (format.isBanner_300x250) AppLovinAdSize.MREC
     else {
         BIDLog.d(TAG, "Unsuported applovin banner format: $format")
         null
@@ -132,5 +130,9 @@ internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: Strin
 
     override fun activityNeededForLoad(): Boolean {
         return false
+    }
+
+    override fun revenue(): Double? {
+        return null
     }
 }

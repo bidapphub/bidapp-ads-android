@@ -1,7 +1,6 @@
 package io.bidapp.networks.applovin
 
 
-import android.app.Activity
 import android.content.Context
 import com.applovin.sdk.AppLovinPrivacySettings
 import com.applovin.sdk.AppLovinSdk
@@ -9,6 +8,7 @@ import io.bidapp.sdk.BIDConsent
 import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
+
 @PublishedApi
 internal class BIDApplovinSDK(
     val adapter: BIDNetworkAdapterProtocol? = null,

@@ -16,6 +16,7 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "bidappdemo"
-include ':bidappdemoapp-java'
+
+
 
 

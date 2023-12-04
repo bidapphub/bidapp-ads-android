@@ -1,10 +1,11 @@
 package com.bidapp.demo
 
 import io.bidapp.sdk.AdInfo
+import io.bidapp.sdk.BIDBannerViewDelegate
 import io.bidapp.sdk.BannerView
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate
 
-class BannerViewDelegate() : BIDBannerViewDelegate {
+
+class BannerViewDelegate : BIDBannerViewDelegate {
 
     override fun adViewReadyToRefresh(adView: BannerView, adInfo: AdInfo?) {
         print("App - adViewReadyToRefresh. AdView: $adView, AdInfo: $adInfo")

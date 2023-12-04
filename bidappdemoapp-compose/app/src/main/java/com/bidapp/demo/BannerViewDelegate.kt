@@ -1,11 +1,10 @@
 package com.bidapp.demo
 
-import android.app.Activity
-import android.util.Log
+
 import io.bidapp.sdk.AdInfo
+import io.bidapp.sdk.BIDBannerViewDelegate
 import io.bidapp.sdk.BannerView
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate
-import java.lang.ref.WeakReference
+
 
 class BannerViewDelegate() : BIDBannerViewDelegate {
 

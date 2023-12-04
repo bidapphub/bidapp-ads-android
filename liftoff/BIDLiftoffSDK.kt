@@ -2,6 +2,7 @@ package io.bidapp.networks.liftoff
 
 
 import android.content.Context
+import android.util.Log
 import com.vungle.ads.InitializationListener
 import com.vungle.ads.VungleAds
 import com.vungle.ads.VungleError
@@ -27,6 +28,7 @@ internal class BIDLiftoffSDK(
     }
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
+        Log.d("mylog", "concest set")
         if (consent.GDPR != null) {
             VunglePrivacySettings.setGDPRStatus(consent.GDPR!!, "1.0.0")
         }

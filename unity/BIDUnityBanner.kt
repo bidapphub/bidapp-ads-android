@@ -2,12 +2,9 @@ package io.bidapp.networks.unity
 
 
 import android.app.Activity
-import android.content.Context
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-import androidx.core.view.forEach
 
 import com.unity3d.services.banners.BannerErrorInfo
 import com.unity3d.services.banners.BannerView
@@ -28,8 +25,8 @@ internal class BIDUnityBanner(
 
     val TAG = "Banner Unity"
 
-    val bannerFormat = if (format?.isbanner_320x50 == true) UnityBannerSize(320, 50)
-    else if (format?.isbanner_300x250 == true) UnityBannerSize(300, 250)
+    val bannerFormat = if (format?.isBanner_320x50 == true) UnityBannerSize(320, 50)
+    else if (format?.isBanner_300x250 == true) UnityBannerSize(300, 250)
     else {
         BIDLog.d(TAG, "Unsuported banner format: $format")
         null
@@ -114,6 +111,10 @@ internal class BIDUnityBanner(
     override fun onBannerLeftApplication(bannerView: BannerView?) {
         BIDLog.d(TAG, "banner left application")
         adapter?.onHide()
+    }
+
+    override fun revenue(): Double? {
+        return null
     }
 }
 

@@ -1,7 +1,6 @@
 package com.bidapp.demo
 
 import android.os.Bundle
-import android.util.Log
 import android.widget.FrameLayout
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -31,15 +30,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
-
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import io.bidapp.sdk.AdFormat
 import io.bidapp.sdk.AdInfo
+import io.bidapp.sdk.BIDBannerViewDelegate
 import io.bidapp.sdk.BannerView
-import io.bidapp.sdk.protocols.BIDBannerViewDelegate
 import java.util.Timer
 import java.util.TimerTask
 import kotlin.concurrent.schedule
@@ -146,7 +144,7 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
 
         adView.setBackgroundColor(android.graphics.Color.MAGENTA)
         val density = this.resources.displayMetrics.density
-        if (adFormat.isbanner_320x50) {
+        if (adFormat.isBanner_320x50) {
             targetRow.height.value = 80.dp
             targetRow.width.value = 320.dp
             targetRow.view.value.addView(adView, (320 * density).toInt(), (50 * density).toInt())

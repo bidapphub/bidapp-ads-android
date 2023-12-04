@@ -24,8 +24,8 @@ internal class BIDAdmobBanner(
     format: AdFormat?
 ) : BIDBannerAdapterDelegateProtocol {
     val TAG = "Banner Admob"
-    val bannerFormat = if (format?.isbanner_320x50 == true) AdSize.BANNER
-    else if (format?.isbanner_300x250 == true) AdSize.MEDIUM_RECTANGLE
+    val bannerFormat = if (format?.isBanner_320x50 == true) AdSize.BANNER
+    else if (format?.isBanner_300x250 == true) AdSize.MEDIUM_RECTANGLE
     else {
         BIDLog.d(TAG, "Unsuported Admob banner format: $format")
         null
@@ -144,6 +144,8 @@ internal class BIDAdmobBanner(
         return false
     }
 
-
+    override fun revenue(): Double? {
+        return null
+    }
 }
 
