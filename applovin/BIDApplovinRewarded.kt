@@ -16,6 +16,7 @@ internal class BIDApplovinRewarded(
 ) : BIDFullscreenAdapterDelegateProtocol {
 
     val TAG = "Reward Applovin"
+    var isGrantedReward = false
 
     private var incentivizedInterstitial: AppLovinIncentivizedInterstitial? = null
 
@@ -41,6 +42,9 @@ internal class BIDApplovinRewarded(
 
         override fun adHidden(p0: AppLovinAd?) {
             BIDLog.d(TAG, "adHidden")
+            if (isGrantedReward){
+                adapter?.onReward()
+            }
             adapter?.onHide()
             RewardedOnDisplay.isOnScreen = false
         }
@@ -53,61 +57,60 @@ internal class BIDApplovinRewarded(
 
     private val appLovinAdVideoPlaybackListener = object : AppLovinAdVideoPlaybackListener {
         override fun videoPlaybackBegan(p0: AppLovinAd?) {
-        BIDLog.d(TAG, "ad video playback listener")
+            BIDLog.d(TAG, "ad video playback listener")
         }
 
         override fun videoPlaybackEnded(p0: AppLovinAd?, p1: Double, p2: Boolean) {
-        BIDLog.d(TAG, "ad video playback ended")
+            BIDLog.d(TAG, "ad video playback ended")
         }
     }
 
     private val appLovinAdRewardListener = object : AppLovinAdRewardListener {
         override fun userRewardVerified(p0: AppLovinAd?, p1: MutableMap<String, String>?) {
-         BIDLog.d(TAG, "userRewardVerified")
-         adapter?.onReward()
+            BIDLog.d(TAG, "userRewardVerified")
+            isGrantedReward = true
         }
 
         override fun userOverQuota(p0: AppLovinAd?, p1: MutableMap<String, String>?) {
-        BIDLog.d(TAG, "user over quota")
+            BIDLog.d(TAG, "user over quota")
         }
 
         override fun userRewardRejected(p0: AppLovinAd?, p1: MutableMap<String, String>?) {
-        BIDLog.d(TAG, "user reward rejected")
+            BIDLog.d(TAG, "user reward rejected")
         }
 
         override fun validationRequestFailed(p0: AppLovinAd?, p1: Int) {
-        BIDLog.d(TAG, "Validation Request Failed : $p1")
-        adapter?.onFailedToDisplay("Validation Request Failed : $p1")
+            BIDLog.d(TAG, "Validation Request Failed : $p1")
+            adapter?.onFailedToDisplay("Validation Request Failed : $p1")
         }
     }
 
 
     override fun load(context: Any) {
-        val load = runCatching {
-            if (incentivizedInterstitial == null) {
-                incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(context as Context)
-            }
-            if (RewardedOnDisplay.isOnScreen) appLovinAdLoadListener.failedToReceiveAd(0)
-            else incentivizedInterstitial?.preload(appLovinAdLoadListener)
+        if (context as? Context == null) {
+            adapter?.onAdFailedToLoadWithError("Error Failed To ReceiveAd")
+            return
         }
-        if (load.isFailure) adapter?.onAdFailedToLoadWithError("Error Failed To ReceiveAd")
+        if (incentivizedInterstitial == null) {
+            incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(context)
+        }
+        if (RewardedOnDisplay.isOnScreen) appLovinAdLoadListener.failedToReceiveAd(0)
+        else incentivizedInterstitial?.preload(appLovinAdLoadListener)
     }
 
+
     override fun show(activity: Activity?) {
-        val show = runCatching {
-            if (incentivizedInterstitial == null) {
-                incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(activity?.applicationContext!!)
-            }
-            if (incentivizedInterstitial?.isAdReadyToDisplay == true)
-                incentivizedInterstitial!!.show(
-                    activity!!,
-                    appLovinAdRewardListener,
-                    appLovinAdVideoPlaybackListener,
-                    appLovinAdDisplayListener,
-                    appLovinAdClickListener
-                )
+        if (activity == null || incentivizedInterstitial == null || incentivizedInterstitial?.isAdReadyToDisplay == false) {
+            adapter?.onFailedToDisplay("Error show ad")
+            return
         }
-        if (show.isFailure) adapter?.onFailedToDisplay("Error show ad")
+        incentivizedInterstitial?.show(
+            activity.applicationContext,
+            appLovinAdRewardListener,
+            appLovinAdVideoPlaybackListener,
+            appLovinAdDisplayListener,
+            appLovinAdClickListener
+        )
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -128,6 +131,10 @@ internal class BIDApplovinRewarded(
 
     override fun revenue(): Double? {
         return null
+    }
+
+    override fun destroy() {
+        incentivizedInterstitial = null
     }
 }
 

@@ -1,6 +1,7 @@
 package io.bidapp.networks.applovin
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import com.applovin.adview.AppLovinAdView
@@ -19,7 +20,7 @@ import java.lang.ref.WeakReference
 
 
 @PublishedApi
-internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: String, format: AdFormat) : BIDBannerAdapterDelegateProtocol, AppLovinAdLoadListener, AppLovinAdDisplayListener,
+internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: String? = null, format: AdFormat) : BIDBannerAdapterDelegateProtocol, AppLovinAdLoadListener, AppLovinAdDisplayListener,
     AppLovinAdViewEventListener, AppLovinAdClickListener {
     val TAG = "Banner Applovin"
     val bannerFormat = if (format.isBanner_320x50) AppLovinAdSize.BANNER
@@ -28,26 +29,25 @@ internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: Strin
         BIDLog.d(TAG, "Unsuported applovin banner format: $format")
         null
     }
-    var adapter : BIDBannerAdapterProtocol? = adapter
     var adView : WeakReference<AppLovinAdView>? = null
     var cachedAd: AppLovinAd? = null
 
 
     override fun adClicked(p0: AppLovinAd?) {
-        BIDLog.d(TAG, "Ad clicked")
-        adapter?.onClick()
+        BIDLog.d(TAG, "ad clicked ")
+        adapter.onClick()
     }
 
     override fun adOpenedFullscreen(p0: AppLovinAd?, p1: AppLovinAdView?) {
-        BIDLog.d(TAG, "Ad open fullscreen")
+        BIDLog.d(TAG, "ad open fullscreen")
     }
 
     override fun adClosedFullscreen(p0: AppLovinAd?, p1: AppLovinAdView?) {
-        BIDLog.d(TAG, "Ad closed fullscreen")
+        BIDLog.d(TAG, "ad closed fullscreen")
     }
 
     override fun adLeftApplication(p0: AppLovinAd?, p1: AppLovinAdView?) {
-        BIDLog.d(TAG, "Ad left application")
+        BIDLog.d(TAG, "ad left application")
     }
 
     override fun adFailedToDisplay(
@@ -55,29 +55,30 @@ internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: Strin
         p1: AppLovinAdView?,
         p2: AppLovinAdViewDisplayErrorCode?
     ) {
-        adapter?.onFailedToDisplay(Error(p2?.toString()))
-        BIDLog.d(TAG, "AppLovin failed to display ad. Error: ${p2?.toString()}")
+        val errorCode = p2 ?: "Unknown code"
+        adapter.onFailedToDisplay(Error("$errorCode"))
+        BIDLog.d(TAG, "AppLovin failed to display ad. Error: $errorCode")
     }
 
     override fun adDisplayed(p0: AppLovinAd?) {
-        BIDLog.d(TAG, "display")
-        adapter?.onDisplay()
+        BIDLog.d(TAG, "ad display")
+        adapter.onDisplay()
     }
 
     override fun adHidden(p0: AppLovinAd?) {
-        BIDLog.d(TAG, "hide")
-        adapter?.onHide()
+        BIDLog.d(TAG, "ad hide")
+        adapter.onHide()
     }
 
     override fun adReceived(ad: AppLovinAd?) {
         cachedAd = ad
-        adapter?.onLoad()
-        BIDLog.d(TAG, "load")
+        adapter.onLoad()
+        BIDLog.d(TAG, "ad load")
     }
 
     override fun failedToReceiveAd(p0: Int) {
-        BIDLog.d(TAG, "failed to load ad. Error: ${p0}")
-        adapter?.onFailedToLoad(Error(p0.toString()))
+        BIDLog.d(TAG, "ad failed to load. Error: $p0")
+        adapter.onFailedToLoad(Error(p0.toString()))
     }
 
 
@@ -90,33 +91,37 @@ internal class BIDApplovinBanner(adapter: BIDBannerAdapterProtocol, adTag: Strin
     }
 
     override fun load(context: Any) {
-        val load = runCatching {
-            if (adView == null) {
-                adView = WeakReference(AppLovinAdView(bannerFormat, context as Context))
-                adView?.get()?.setAdLoadListener(this)
-                adView?.get()?.setAdDisplayListener(this)
-                adView?.get()?.setAdViewEventListener(this)
-                adView?.get()?.setAdClickListener(this)
-            }
-            adView?.get()?.loadNextAd()
+        cachedAd = null
+        if (bannerFormat == null || context as? Context == null){
+            adapter.onFailedToLoad(Error("Applovin banner loading error"))
+            return
         }
-        if (load.isFailure)  adapter?.onFailedToLoad(Error("Applovin banner loading error"))
+            if (adView?.get() == null) {
+                adView = WeakReference(AppLovinAdView(bannerFormat, context))
+            }
+            adView?.get()?.setAdLoadListener(this)
+            adView?.get()?.setAdDisplayListener(this)
+            adView?.get()?.setAdViewEventListener(this)
+            adView?.get()?.setAdClickListener(this)
+            adView?.get()?.loadNextAd()
+
     }
 
     override fun destroy() {
         cachedAd = null
         adView?.get()?.destroy()
+        adView?.clear()
     }
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         BIDLog.d(TAG, "Banner show applovin")
         return try {
-            val weightAndHeight : Array<Int> = when(adView?.get()?.size.toString()){
+            val weightAndHeight : Array<Int> = when(adView!!.get()!!.size.toString()){
                 "MREC" -> arrayOf(300,250)
                 "BANNER" -> arrayOf(320,50)
                 else -> arrayOf(0,0)
             }
-            (view.get() as FrameLayout).addView(adView?.get(), (weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())
+            (view.get() as FrameLayout).addView(adView!!.get(), (weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())
             true
         } catch (e: Exception){
             BIDLog.d(TAG, "Show on view is failed")

@@ -2,6 +2,7 @@ package com.bidapp.demo
 
 import android.graphics.Color
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.TableLayout
@@ -47,6 +48,8 @@ class BannerActivity : AppCompatActivity(), BIDBannerViewDelegate {
             banner.setBannerViewDelegate(this)
             pendingBanners.add(banner)
             allBannersArray.add(banner)
+            banner.refreshAd()
+            addAdToSuperviewIfNeeded(banner, format)
             scheduleAddOneMoreBanner()
         }
     }
@@ -137,18 +140,16 @@ class BannerActivity : AppCompatActivity(), BIDBannerViewDelegate {
     }
 
 
-    override fun adViewReadyToRefresh(adView: BannerView, adInfo: AdInfo?) {
-        print("App - adViewReadyToRefresh. AdView: $adView, AdInfo: $adInfo")
-        adInfo?.adFormat?.let { addAdToSuperviewIfNeeded(adView, adInfo.adFormat as AdFormat) }
-        adView.refreshAd()
-    }
-
     override fun adViewDidDisplayAd(adView: BannerView, adInfo: AdInfo?) {
         print("App - didDisplayAd. AdView: $adView, AdInfo: $adInfo")
     }
 
     override fun adViewDidFailToDisplayAd(adView: BannerView, adInfo: AdInfo?, errors: Error) {
         print("App - didFailToDisplayAd. AdView: $adView, Error:${errors.localizedMessage}")
+    }
+
+    override fun allNetworksFailedToDisplayAd(adView: BannerView) {
+        print("App - didFailToDisplayAd. AdView: $adView")
     }
 
     override fun adViewClicked(adView: BannerView, adInfo: AdInfo?) {

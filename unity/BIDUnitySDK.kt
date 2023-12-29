@@ -20,7 +20,7 @@ internal class BIDUnitySDK(
     val TAG = "Unity SDK"
 
     override fun enableLogging(context: Context) {
-        UnityAds.setDebugMode(true)
+        UnityAds.debugMode = true
     }
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
@@ -48,7 +48,14 @@ internal class BIDUnitySDK(
     }
 
     override fun initializeSDK(context: Context) {
-        if (!this.isInitialized(context)) {
+        if (isInitialized(context) || adapter?.initializationInProgress() == true)
+        {
+            return
+        }
+        if (gameId == null){
+            initializationFailed("Unity gameId is null")
+            return
+        }
             adapter?.onInitializationStart()
             UnityAds.initialize(
                 context.applicationContext,
@@ -66,7 +73,6 @@ internal class BIDUnitySDK(
                         initializationFailed(error?.name.toString())
                     }
                 })
-        }
     }
 
     fun initializationComplete() {
@@ -80,7 +86,7 @@ internal class BIDUnitySDK(
     }
 
     override fun isInitialized(context: Context): Boolean {
-        return UnityAds.isInitialized()
+        return UnityAds.isInitialized
     }
 
     override fun sharedSDK(): Any? {

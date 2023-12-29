@@ -22,76 +22,91 @@ import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
 @PublishedApi
 internal class BIDChartboostRewarded(
     val adapter: BIDFullscreenAdapterProtocol? = null,
-    location: String? = null,
+    val location: String? = null,
     var isReward: Boolean
 ) :
     BIDFullscreenAdapterDelegateProtocol {
     val TAG = "Rewarded Chartboost"
     var chartboostRewarded: Rewarded? = null
+    var isRewardGranted = false
 
 
-    init {
+    fun init() {
         chartboostRewarded = location?.let {
             Rewarded(it, object : RewardedCallback {
                 override fun onAdClicked(event: ClickEvent, error: ClickError?) {
-                    BIDLog.d(TAG, "ad clicked")
-                    adapter?.onClick()
+                    if (error == null) {
+                        BIDLog.d(TAG, "ad clicked. location: ($location)")
+                        adapter?.onClick()
+                        return
+                    }
+                    BIDLog.d(TAG, "ad clicked is failure. location: ($location)")
                 }
 
                 override fun onAdDismiss(event: DismissEvent) {
+                    if (isRewardGranted){
+                        adapter?.onReward()
+                    }
                     adapter?.onHide()
-                    BIDLog.d(TAG, "ad hidden")
+                    BIDLog.d(TAG, "ad hidden. location: ($location)")
                 }
 
                 override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
                     if (error == null && event.ad.isCached()) {
-                        BIDLog.d(TAG, "loaded Ad")
+                        BIDLog.d(TAG, "loaded Ad. location: ($location)")
                         adapter?.onAdLoaded()
                     } else {
                         BIDLog.d(
                             TAG,
-                            "failed to receive ad error ${error?.exception?.message.toString()}"
+                            "failed to receive ad error ${error?.code?.name.toString()} location: ($location)"
                         )
-                        adapter?.onAdFailedToLoadWithError(error?.exception?.message.toString())
+                        adapter?.onAdFailedToLoadWithError(error?.code?.name.toString())
                     }
                 }
 
                 override fun onAdRequestedToShow(event: ShowEvent) {
-                    BIDLog.d(TAG, "on ad requested to show")
+                    BIDLog.d(TAG, "ad requested to show. location: ($location)")
                 }
 
                 override fun onAdShown(event: ShowEvent, error: ShowError?) {
                     if (error == null) {
-                        adapter?.onDisplay()
-                        BIDLog.d(TAG, "on display")
+                        BIDLog.d(TAG, "ad display. location: ($location)")
                     } else {
-                        BIDLog.d(TAG, "failed to display ${error.exception?.message}")
+                        BIDLog.d(TAG, "ad failed to display ${error.exception?.message} location: ($location)")
                         adapter?.onFailedToDisplay(error.exception?.message.toString())
                     }
                 }
 
                 override fun onImpressionRecorded(event: ImpressionEvent) {
+                    BIDLog.d(TAG, "ad impression recorded. location: ($location)")
+                    adapter?.onDisplay()
                 }
 
                 override fun onRewardEarned(event: RewardEvent) {
-                    BIDLog.d(TAG, "on reward earned")
-                    adapter?.onReward()
+                    BIDLog.d(TAG, "on reward earned. location: ($location)")
+                    isRewardGranted = true
                 }
             }, null)
         }
     }
 
     override fun load(context: Any) {
-        val load = runCatching {
-            chartboostRewarded!!.cache()
+        if (location == null) {
+            adapter?.onAdFailedToLoadWithError("Chartboost rewarded location is null")
+            return
         }
-        if (load.isFailure) adapter?.onAdFailedToLoadWithError("Chart boost loading rewarded is failure")
+        if (chartboostRewarded == null) {
+            init()
+        }
+        chartboostRewarded?.cache()
     }
 
     override fun show(activity: Activity?) {
-        if (chartboostRewarded != null && chartboostRewarded!!.isCached()) {
-            chartboostRewarded!!.show()
-        } else adapter?.onFailedToDisplay("Chart boost showing rewarded is failure")
+        if (chartboostRewarded == null || chartboostRewarded?.isCached() == false) {
+            adapter?.onFailedToDisplay("Chart boost showing rewarded is failure")
+            return
+        }
+        chartboostRewarded?.show()
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -103,7 +118,7 @@ internal class BIDChartboostRewarded(
     }
 
     override fun readyToShow(): Boolean {
-        return chartboostRewarded != null && chartboostRewarded!!.isCached()
+        return chartboostRewarded?.isCached() ?: false
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
@@ -112,5 +127,10 @@ internal class BIDChartboostRewarded(
 
     override fun revenue(): Double? {
         return null
+    }
+
+    override fun destroy() {
+        chartboostRewarded?.clearCache()
+        chartboostRewarded = null
     }
 }

@@ -13,8 +13,8 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 @PublishedApi
 internal class BIDAdmobSDK(
-    private val adapter: BIDNetworkAdapterProtocol?,
-    appId: String,
+    private val adapter: BIDNetworkAdapterProtocol,
+    appId: String?,
     appSignature: String?
 ) :
     BIDNetworkAdapterDelegateProtocol, ConsentListener {
@@ -52,17 +52,12 @@ internal class BIDAdmobSDK(
     }
 
     override fun initializeSDK(context: Context) {
-
-        if (isInitialized(context) ||
-            null == adapter ||
-            adapter.initializationInProgress()
-        ) {
+        if (isInitialized(context) || adapter.initializationInProgress())
+        {
             return
         }
         adapter.onInitializationStart()
-        MobileAds.initialize(
-            context
-        ) { p0 ->
+        MobileAds.initialize(context) { p0 ->
             if (p0.adapterStatusMap[p0.adapterStatusMap.keys.first()]?.initializationState == AdapterStatus.State.READY) {
                 initializationComplete()
                 isInitializationComplete = true
@@ -74,12 +69,12 @@ internal class BIDAdmobSDK(
 
     fun initializationComplete() {
         BIDLog.d(TAG, "Initialization complete")
-        adapter?.onInitializationComplete(true, null)
+        adapter.onInitializationComplete(true, null)
     }
 
     fun initializationFailed(err: String) {
         BIDLog.d(TAG, "Initialization failed. Error: $err")
-        adapter?.onInitializationComplete(false, err)
+        adapter.onInitializationComplete(false, err)
     }
 
 

@@ -2,6 +2,7 @@ package io.bidapp.networks.unity
 
 
 import android.app.Activity
+import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -45,31 +46,40 @@ internal class BIDUnityBanner(
 
     override fun load(context: Any) {
         cachedAd = null
-        val load = runCatching {
-            adView = WeakReference(BannerView(context as Activity, adTag!!, bannerFormat))
+        if (context as? Activity == null || bannerFormat == null){
+            adapter?.onFailedToLoad(Error("Unity banner loading error"))
+            return
+        }
+        if (adTag == null){
+            adapter?.onFailedToLoad(Error("Unity banner adtag is null"))
+            return
+        }
+            adView = WeakReference(BannerView(context, adTag, bannerFormat))
             adView?.get()?.listener = this
             adView?.get()?.load()
-        }
-        if (load.isFailure) adapter?.onFailedToLoad(Error("Unity banner loading error"))
     }
 
     override fun destroy() {
+       cachedAd?.get()?.removeAllViews()
+       cachedAd?.get()?.destroy()
        cachedAd = null
+       adView?.get()?.removeAllViews()
        adView?.get()?.destroy()
+       adView = null
     }
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         return try {
             val weightAndHeight =
-                if (bannerFormat?.height == 50 && bannerFormat.width == 320) arrayOf(
+                if (bannerFormat!!.height == 50 && bannerFormat.width == 320) arrayOf(
                     320,
                     50
-                ) else if (bannerFormat?.height == 250 && bannerFormat.width == 300) arrayOf(
+                ) else if (bannerFormat.height == 250 && bannerFormat.width == 300) arrayOf(
                     300,
                     250
                 ) else arrayOf(0, 0)
             (view.get() as FrameLayout).addView(
-                adView?.get(),0, ViewGroup.LayoutParams((weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())
+                adView!!.get(),0, ViewGroup.LayoutParams((weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())
             )
             true
         } catch (e: Exception) {
@@ -90,16 +100,16 @@ internal class BIDUnityBanner(
     override fun onBannerLoaded(ad: BannerView?) {
         cachedAd = WeakReference(ad)
         adapter?.onLoad()
-        BIDLog.d(TAG, "load")
+        BIDLog.d(TAG, "ad load. adtag: ($adTag)")
     }
 
     override fun onBannerShown(bannerAdView: BannerView?) {
-        BIDLog.d(TAG, "show")
+        BIDLog.d(TAG, "ad show. adtag: ($adTag)")
         adapter?.onDisplay()
     }
 
     override fun onBannerClick(bannerAdView: BannerView?) {
-        BIDLog.d(TAG, "click")
+        BIDLog.d(TAG, "ad click. adtag: ($adTag)")
         adapter?.onClick()
     }
 
@@ -109,8 +119,7 @@ internal class BIDUnityBanner(
     }
 
     override fun onBannerLeftApplication(bannerView: BannerView?) {
-        BIDLog.d(TAG, "banner left application")
-        adapter?.onHide()
+        BIDLog.d(TAG, "banner left application. adtag: ($adTag)")
     }
 
     override fun revenue(): Double? {

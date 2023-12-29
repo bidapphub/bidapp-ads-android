@@ -69,6 +69,14 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
             val banner = BannerView(this).banner(format)
             banner.setBannerViewDelegate(this)
             pendingBanners.add(banner)
+            val addBanner = runCatching {
+                banner.refreshAd()
+                addAdToSuperviewIfNeeded(banner, format)
+            }
+            if (addBanner.isFailure) {
+                print("Failure add banner")
+                banner.destroy()
+            }
             scheduleAddOneMoreBanner()
         }
     }
@@ -170,8 +178,8 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
     fun Main() {
         DisposableEffect(Unit) {
             onDispose {
-               generateBannerTimer?.cancel()
-               removeBannerTimer?.cancel()
+                generateBannerTimer?.cancel()
+                removeBannerTimer?.cancel()
             }
         }
         Column(
@@ -259,9 +267,11 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
                 factory = {
                     cellModel.view.value
                 },
-                update ={
+                update = {
                     if (it.getChildAt(0) != null) {
-                        if (((it.getChildAt(0) as? BannerView)?.getChildAt(0)).toString().contains("isDestroyed=true")) {
+                        if (((it.getChildAt(0) as? BannerView)?.getChildAt(0)).toString()
+                                .contains("isDestroyed=true")
+                        ) {
                             (it.getChildAt(0) as? BannerView)?.destroy()
                             (it.getChildAt(0) as? BannerView)?.refreshAd()
                         }
@@ -281,18 +291,6 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
         }
     }
 
-    override fun adViewReadyToRefresh(adView: BannerView, adInfo: AdInfo?) {
-        val addBanner = runCatching {
-            print("App - adViewReadyToRefresh. AdView: $adView, AdInfo: $adInfo")
-            addAdToSuperviewIfNeeded(adView, adInfo?.adFormat as AdFormat)
-            adView.refreshAd()
-        }
-        if (addBanner.isFailure) {
-            print("Failure add banner")
-            adView.destroy()
-        }
-
-    }
 
     override fun adViewDidDisplayAd(adView: BannerView, adInfo: AdInfo?) {
         print("App - didDisplayAd. AdView: $adView, AdInfo: $adInfo")
@@ -300,6 +298,10 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
 
     override fun adViewDidFailToDisplayAd(adView: BannerView, adInfo: AdInfo?, errors: Error) {
         print("App - didFailToDisplayAd. AdView: $adView, Error:${errors.localizedMessage}")
+    }
+
+    override fun allNetworksFailedToDisplayAd(adView: BannerView) {
+        print("App - didFailToDisplayAd. AdView: $adView")
     }
 
     override fun adViewClicked(adView: BannerView, adInfo: AdInfo?) {

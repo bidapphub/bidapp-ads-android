@@ -16,7 +16,7 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 @PublishedApi
 internal class BIDChartboostSDK(
     private val adapter: BIDNetworkAdapterProtocol?,
-    val appId: String,
+    val appId: String?,
     val appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
@@ -50,7 +50,7 @@ internal class BIDChartboostSDK(
                             dataUseConsent
                         )
                     }
-                } else if(consent.CCPA == false){
+                } else if (consent.CCPA == false) {
                     val dataUseConsent = CCPA(CCPA.CCPA_CONSENT.OPT_OUT_SALE)
                     context?.let {
                         Chartboost.addDataUseConsent(
@@ -89,28 +89,27 @@ internal class BIDChartboostSDK(
         ) {
             return
         }
-        adapter.onInitializationStart()
-        BIDLog.d(TAG, "Chartboost SDK Version - ${Chartboost.getSDKVersion()}")
-        val initialization = runCatching {
-            Chartboost.startWithAppId(
-                context, appId, appSignature!!
-            ) { startError ->
-                if (startError == null) {
-                    this@BIDChartboostSDK.initializationComplete()
-                } else this@BIDChartboostSDK.initializationFailed(startError.exception.toString())
-            }
+        if (appId == null || appSignature == null) {
+            initializationFailed("Chartboost initialization is failure. appId or appSignature is null")
+            return
         }
-        if (initialization.isFailure) initializationFailed("Chartboost initialization is failure")
-
+        adapter.onInitializationStart()
+        Chartboost.startWithAppId(
+            context, appId, appSignature
+        ) { startError ->
+            if (startError == null) {
+                this@BIDChartboostSDK.initializationComplete()
+            } else this@BIDChartboostSDK.initializationFailed(startError.exception.toString())
+        }
     }
 
 
-    fun initializationComplete() {
+    private fun initializationComplete() {
         BIDLog.d(TAG, "initialization complete")
         adapter?.onInitializationComplete(true, null)
     }
 
-    fun initializationFailed(err: String) {
+    private fun initializationFailed(err: String) {
         BIDLog.d(TAG, "initialization failed. Error:$err")
         adapter?.onInitializationComplete(false, err)
     }
@@ -119,9 +118,7 @@ internal class BIDChartboostSDK(
         return Chartboost.isSdkStarted()
     }
 
-    override fun enableTesting() {
-        //enableTesting
-    }
+    override fun enableTesting() {}
 
     override fun enableLogging(context: Context) {
         Chartboost.setLoggingLevel(LoggingLevel.ALL)

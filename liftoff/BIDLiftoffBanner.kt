@@ -18,9 +18,8 @@ import java.lang.ref.WeakReference
 
 
 @PublishedApi
-internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String, format: AdFormat) :
+internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat) :
     BIDBannerAdapterDelegateProtocol, BannerAdListener {
-    var adTag: String? = adTag
     var adapter: BIDBannerAdapterProtocol? = adapter
     var bannerAd: WeakReference<BannerAd>? = null
     var adView: WeakReference<BannerView>? = null
@@ -44,14 +43,20 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
 
     override fun load(context: Any) {
         cachedAd = null
-        val load = runCatching {
-            if (bannerAd == null)
-                bannerAd =
-                    WeakReference(BannerAd(context as Context, adTag!!, bannerFormat!!))
+        if (context as? Context == null || bannerFormat == null){
+            adapter?.onFailedToLoad(Error("banner loading error"))
+            return
+        }
+        if (adTag == null){
+            adapter?.onFailedToLoad(Error("Liftoff banner adtag is null"))
+            return
+        }
+        if (bannerAd == null) {
+            bannerAd = WeakReference(BannerAd(context, adTag!!, bannerFormat))
+        }
             bannerAd?.get()?.adListener = this
             bannerAd?.get()?.load()
-        }
-        if (load.isFailure) adapter?.onFailedToLoad(Error("banner loading error"))
+
     }
 
 
@@ -68,9 +73,9 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
                 BannerAdSize.BANNER -> arrayOf(320, 50)
                 else -> arrayOf(0, 0)
             }
-            adView = WeakReference(bannerAd?.get()?.getBannerView())
+            adView = WeakReference(bannerAd!!.get()!!.getBannerView())
             (view.get() as FrameLayout).addView(
-                adView?.get(),
+                adView!!.get(),
                 0,
                 ViewGroup.LayoutParams(
                     (weightAndHeight[0] * density).toInt(),
@@ -93,43 +98,43 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, adTag: String
     }
 
     override fun onAdClicked(baseAd: BaseAd) {
-        BIDLog.d(TAG, "on click")
+        BIDLog.d(TAG, "ad click. adtag: ($adTag)")
         adapter?.onClick()
     }
 
     override fun onAdEnd(baseAd: BaseAd) {
-        BIDLog.d(TAG, "on ad end")
+        BIDLog.d(TAG, "ad end. adtag: ($adTag)")
+        adapter?.onHide()
         cachedAd = null
     }
 
     override fun onAdFailedToLoad(baseAd: BaseAd, adError: VungleError) {
-        BIDLog.d(TAG, "failed to load ad. Error: ${adError.message}")
+        BIDLog.d(TAG, "failed to load ad. Error: ${adError.message} adtag: ($adTag)")
         adapter?.onFailedToLoad(Error(adError.message))
     }
 
     override fun onAdFailedToPlay(baseAd: BaseAd, adError: VungleError) {
-        BIDLog.d(TAG, "failed to play ${adError.message}")
+        BIDLog.d(TAG, "failed to play ${adError.message} adtag: ($adTag)")
         adapter?.onFailedToDisplay(Error(adError.message))
     }
 
     override fun onAdImpression(baseAd: BaseAd) {
-        BIDLog.d(TAG, "on ad impression")
+        BIDLog.d(TAG, "ad displayed. adtag: ($adTag)")
+        adapter?.onDisplay()
     }
 
     override fun onAdLeftApplication(baseAd: BaseAd) {
         cachedAd = null
-        BIDLog.d(TAG, "hide")
-        adapter?.onHide()
+        BIDLog.d(TAG, "ad left application. adtag: ($adTag)")
     }
     override fun onAdLoaded(baseAd: BaseAd) {
         cachedAd = baseAd.placementId
         adapter?.onLoad()
-        BIDLog.d(TAG, "loaded")
+        BIDLog.d(TAG, "ad loaded. adtag: ($adTag)")
     }
 
     override fun onAdStart(baseAd: BaseAd) {
-        BIDLog.d(TAG, "shown")
-        adapter?.onDisplay()
+        BIDLog.d(TAG, "ad start. adtag: ($adTag)")
     }
 
     override fun revenue(): Double? {

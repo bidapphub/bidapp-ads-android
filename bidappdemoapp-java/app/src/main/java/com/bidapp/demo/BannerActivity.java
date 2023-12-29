@@ -54,6 +54,8 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
             banner.setBannerViewDelegate(this);
             pendingBanners.add(banner);
             allBannersArray.add(banner);
+            banner.refreshAd();
+            addAdToSuperviewIfNeeded(banner, format);
             scheduleAddOneMoreBanner();
         }
     }
@@ -183,15 +185,7 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
     }
 
 
-    @Override
-    public void adViewReadyToRefresh(@NonNull BannerView adView, AdInfo adInfo) {
-        System.out.println("App - adViewReadyToRefresh. AdView: " + adView + ", AdInfo: " + adInfo);
-        assert adInfo != null;
-        if (adInfo.getAdFormat() != null) {
-            addAdToSuperviewIfNeeded(adView, adInfo.getAdFormat());
-        }
-        adView.refreshAd();
-    }
+
 
     @Override
     public void adViewDidDisplayAd(@NonNull BannerView adView, AdInfo adInfo) {
@@ -208,6 +202,10 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
         System.out.println("App - didClicked. AdView: " + adView + ", AdInfo: " + adInfo);
     }
 
+    @Override
+    public void allNetworksFailedToDisplayAd(@NonNull BannerView adView) {
+        System.out.println("App - didClicked. AdView: " + adView);
+    }
 
     @Override
     protected void onDestroy() {

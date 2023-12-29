@@ -1,6 +1,7 @@
 package io.bidapp.networks.unity
 
 import android.app.Activity
+import android.media.AudioManager
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
@@ -18,7 +19,7 @@ internal class BIDUnityFullscreen(
     BIDFullscreenAdapterDelegateProtocol {
     val TAG = if (isRewarded) "Reward Unity" else "Full Unity"
     var ready = false
-    val loadListener: IUnityAdsLoadListener = object : IUnityAdsLoadListener {
+    private val loadListener: IUnityAdsLoadListener = object : IUnityAdsLoadListener {
         override fun onUnityAdsAdLoaded(placementId: String) {
             BIDLog.d(TAG, "onUnityAdsAdLoaded: $placementId")
             ready = true
@@ -34,7 +35,7 @@ internal class BIDUnityFullscreen(
             adapter?.onAdFailedToLoadWithError(error.name)
         }
     }
-    val showListener: IUnityAdsShowListener = object : IUnityAdsShowListener {
+    private val showListener: IUnityAdsShowListener = object : IUnityAdsShowListener {
 
         override fun onUnityAdsShowFailure(
             placementId: String,
@@ -60,27 +61,35 @@ internal class BIDUnityFullscreen(
             state: UnityAds.UnityAdsShowCompletionState
         ) {
             BIDLog.d(TAG, "onUnityAdsShowComplete: $placementId state: $state")
-            adapter?.onHide()
+            if (state == UnityAds.UnityAdsShowCompletionState.COMPLETED && isRewarded) {
+                BIDLog.d(TAG, "on ad rewarded $placementId")
+                adapter?.onReward()
+                adapter?.onHide()
+            } else {
+                adapter?.onHide()
+            }
         }
     }
 
     override fun load(context: Any) {
-        val load = runCatching {
-            UnityAds.load(adTag, loadListener)
+        if (adTag == null) {
+            adapter?.onAdFailedToLoadWithError("Unity fullscreen adtag is null")
+            return
         }
-        if (load.isFailure) adapter?.onAdFailedToLoadWithError("Unity fullscreen loading error")
+        UnityAds.load(adTag, loadListener)
     }
 
     override fun show(activity: Activity?) {
-        val show = runCatching {
-            UnityAds.show(
-                activity!!,
-                adTag,
-                UnityAdsShowOptions(),
-                showListener
-            )
+        if (adTag == null || activity == null) {
+            adapter?.onFailedToDisplay("Unity fullscreen showing is failure")
+            return
         }
-        if (show.isFailure) adapter?.onFailedToDisplay("on unity ads show failure")
+        UnityAds.show(
+            activity,
+            adTag,
+            UnityAdsShowOptions(),
+            showListener
+        )
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -102,4 +111,6 @@ internal class BIDUnityFullscreen(
     override fun revenue(): Double? {
         return null
     }
+
+    override fun destroy() {}
 }

@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.bidapp.demo"
-        minSdk = 24
+        minSdk = 22
         targetSdk = 34
         versionCode = 1
         versionName = "1.0"
@@ -47,16 +47,23 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+
+
 }
 
+
+
 dependencies {
-    implementation ("io.bidapp.networks:applovin:1.0.0")
-    implementation ("io.bidapp.networks:applovinmax:1.0.0")
-    implementation ("io.bidapp.networks:unity:1.0.0")
-    implementation ("io.bidapp.networks:liftoff:1.0.0")
-    implementation ("io.bidapp.networks:chartboost:1.0.0")
-    implementation ("io.bidapp.networks:admob:1.0.0")
-    implementation ("io.bidapp:sdk:1.0.0")
+    implementation ("io.bidapp:sdk:1.0.1")
+    implementation ("io.bidapp.networks:applovin:1.0.1")
+    implementation ("io.bidapp.networks:applovinmax:1.0.1")
+    implementation ("io.bidapp.networks:unity:1.0.1")
+    implementation ("io.bidapp.networks:liftoff:1.0.1")
+    implementation ("io.bidapp.networks:admob:1.0.1")
+    implementation ("io.bidapp.networks:chartboost:1.0.1")
+    implementation ("io.bidapp.networks:digitalturbine:1.0.1")
+    implementation ("io.bidapp.networks:facebook:1.0.1")
+    implementation ("io.bidapp.networks:startIo:1.0.1")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.1")

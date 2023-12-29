@@ -19,71 +19,81 @@ import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
 @PublishedApi
 internal class BIDChartboostInterstitial(
     val adapter: BIDFullscreenAdapterProtocol? = null,
-    location: String? = null
+    val location: String? = null
 ) :
     BIDFullscreenAdapterDelegateProtocol {
 
     val TAG = "interstitial Chartboost"
     var chartboostInterstitial: Interstitial? = null
 
-    init {
+    fun init() {
         chartboostInterstitial = location?.let {
             Interstitial(it, object : InterstitialCallback {
                 override fun onAdClicked(event: ClickEvent, error: ClickError?) {
-                    BIDLog.d(TAG, "ad clicked")
-                    adapter?.onClick()
+                    if (error == null) {
+                        BIDLog.d(TAG, "ad clicked. location: ($location)")
+                        adapter?.onClick()
+                        return
+                    }
+                    BIDLog.d(TAG, "ad clicked is failure. location: ($location)")
                 }
 
                 override fun onAdDismiss(event: DismissEvent) {
                     adapter?.onHide()
-                    BIDLog.d(TAG, "hide")
+                    BIDLog.d(TAG, "ad hide. location: ($location)")
                 }
 
                 override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
                     if (error == null && event.ad.isCached()) {
-                        BIDLog.d(TAG, "loaded")
+                        BIDLog.d(TAG, "ad loaded. location: ($location)")
                         adapter?.onAdLoaded()
                     } else {
                         BIDLog.d(
                             TAG,
-                            "Failed To Receive Ad error ${error?.exception?.message.toString()}"
+                            "ad Failed To Receive Ad error ${error?.code?.name.toString()} location: ($location)"
                         )
-                        adapter?.onAdFailedToLoadWithError(error?.exception?.message.toString())
+                        adapter?.onAdFailedToLoadWithError(error?.code?.name.toString())
                     }
                 }
 
                 override fun onAdRequestedToShow(event: ShowEvent) {
-                    BIDLog.d(TAG, "on ad requested to show")
+                    BIDLog.d(TAG, "ad requested to show. location: ($location)")
                 }
 
                 override fun onAdShown(event: ShowEvent, error: ShowError?) {
                     if (error == null) {
-                        adapter?.onDisplay()
-                        BIDLog.d(TAG, "on display")
+                        BIDLog.d(TAG, "ad display. location: ($location)")
                     } else {
-                        BIDLog.d(TAG, "failed to display ${error.exception?.message}")
+                        BIDLog.d(TAG, "ad failed to display ${error.exception?.message} location: ($location)")
                         adapter?.onFailedToDisplay(error.exception?.message.toString())
                     }
                 }
 
                 override fun onImpressionRecorded(event: ImpressionEvent) {
-                    BIDLog.d(TAG, "on impression recorded")
+                    BIDLog.d(TAG, "ad impression recorded. location: ($location)")
+                    adapter?.onDisplay()
                 }
             }, null)
         }
     }
 
     override fun load(context: Any) {
-        val load = runCatching {
-            chartboostInterstitial!!.cache()
+        if (location == null) {
+            adapter?.onAdFailedToLoadWithError("Chartboost interstitial location is null")
+            return
         }
-        if (load.isFailure) adapter?.onAdFailedToLoadWithError("Chart boost loading interstitial is failure")
+        if (chartboostInterstitial == null) {
+            init()
+        }
+        chartboostInterstitial?.cache()
     }
 
     override fun show(activity: Activity?) {
-        if (chartboostInterstitial != null && chartboostInterstitial!!.isCached()) {
-            chartboostInterstitial!!.show()
-        } else adapter?.onFailedToDisplay("Chart boost showing interstitial is failure")
+        if (chartboostInterstitial == null || chartboostInterstitial?.isCached() == false) {
+            adapter?.onFailedToDisplay("Chart boost showing interstitial is failure")
+            return
+        }
+        chartboostInterstitial?.show()
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -95,7 +105,7 @@ internal class BIDChartboostInterstitial(
     }
 
     override fun readyToShow(): Boolean {
-        return chartboostInterstitial != null && chartboostInterstitial!!.isCached()
+        return chartboostInterstitial?.isCached() ?: false
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
@@ -104,5 +114,10 @@ internal class BIDChartboostInterstitial(
 
     override fun revenue(): Double? {
         return null
+    }
+
+    override fun destroy() {
+        chartboostInterstitial?.clearCache()
+        chartboostInterstitial = null
     }
 }

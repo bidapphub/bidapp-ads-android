@@ -16,47 +16,54 @@ import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
 
 @PublishedApi
 internal class BIDAdmobRewarded(
-    val adapter: BIDFullscreenAdapterProtocol? = null,
+    val adapter: BIDFullscreenAdapterProtocol,
     val adTag: String?,
     val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
     val TAG = "Rewarded Admob"
-    private var loadedAd: RewardedAd? = null
+    private var rewardedAd: RewardedAd? = null
+    private var isRewardGranted = false
 
 
     val fullScreenContentCallback: FullScreenContentCallback =
         object : FullScreenContentCallback() {
             override fun onAdClicked() {
-                super.onAdClicked()
-                BIDLog.d(TAG, "ad clicked")
-                adapter?.onClick()
+                BIDLog.d(TAG, "ad clicked. adtag: ($adTag)")
+                adapter.onClick()
             }
 
             override fun onAdDismissedFullScreenContent() {
-                super.onAdDismissedFullScreenContent()
-                adapter?.onHide()
-                BIDLog.d(TAG, "ad hidden")
+                if (isRewardGranted){
+                    adapter.onReward()
+                }
+                adapter.onHide()
+                BIDLog.d(TAG, "ad hidden. adtag: ($adTag)")
             }
 
             override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                super.onAdFailedToShowFullScreenContent(p0)
-                BIDLog.d(TAG, "failed to display")
-                adapter?.onFailedToDisplay(p0.message)
+                BIDLog.d(TAG, "ad failed to display. adtag: ($adTag)")
+                adapter.onFailedToDisplay(p0.message)
             }
 
             override fun onAdImpression() {
-                super.onAdImpression()
-                BIDLog.d(TAG, "on ad impression")
+                adapter.onDisplay()
+                BIDLog.d(TAG, "ad show. adtag: ($adTag)")
             }
 
             override fun onAdShowedFullScreenContent() {
-                super.onAdShowedFullScreenContent()
-                adapter?.onDisplay()
-                BIDLog.d(TAG, "on display")
+                BIDLog.d(TAG, "ad on display. adtag: ($adTag)")
             }
         }
 
     override fun load(context: Any) {
+        if (context as? Context == null) {
+            adapter.onAdFailedToLoadWithError("Admob rewarded loading error")
+            return
+        }
+        if (adTag == null) {
+            adapter.onAdFailedToLoadWithError("Admob rewarded adtag is null")
+            return
+        }
         val networkExtrasBundle = Bundle()
         var request = AdRequest.Builder().build()
         if (BIDAdmobSDK.getGDPR() != null) {
@@ -67,37 +74,36 @@ internal class BIDAdmobRewarded(
                     .build()
             }
         }
-        if (adTag != null) {
             RewardedAd.load(
-                context as Context,
+                context,
                 adTag,
                 request,
                 object : RewardedAdLoadCallback() {
                     override fun onAdFailedToLoad(p0: LoadAdError) {
-                        super.onAdFailedToLoad(p0)
-                        BIDLog.d(TAG, "Failed To Receive Ad error ${p0.message}")
-                        adapter?.onAdFailedToLoadWithError(p0.message)
+                        BIDLog.d(TAG, "Failed To Receive Ad error ${p0.message} adtag: ($adTag)")
+                        adapter.onAdFailedToLoadWithError(p0.message)
                     }
 
                     override fun onAdLoaded(p0: RewardedAd) {
-                        super.onAdLoaded(p0)
-                        loadedAd = p0
-                        loadedAd?.fullScreenContentCallback =
+                        rewardedAd = p0
+                        rewardedAd?.fullScreenContentCallback =
                             this@BIDAdmobRewarded.fullScreenContentCallback
-                        BIDLog.d(TAG, "loaded Ad")
-                        adapter?.onAdLoaded()
+                        BIDLog.d(TAG, "ad loaded. adtag: ($adTag)")
+                        adapter.onAdLoaded()
                     }
                 })
-        }
     }
 
     override fun show(activity: Activity?) {
-        val showing = runCatching {
-            loadedAd?.show(
-                activity!!
-            ) { adapter?.onReward() } ?: { BIDLog.d(TAG, "The rewarded ad wasn't ready yet.") }
+        if (activity == null || rewardedAd == null){
+            adapter.onFailedToDisplay("Error Admob showing rewarded. adtag: ($adTag)")
+            return
         }
-        if (showing.isFailure) adapter?.onFailedToDisplay("Error Admob showing interstitial")
+            rewardedAd?.show(activity) {
+                isRewardGranted = true
+            } ?: {
+                BIDLog.d(TAG, "The rewarded ad wasn't ready yet.")
+            }
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -109,7 +115,7 @@ internal class BIDAdmobRewarded(
     }
 
     override fun readyToShow(): Boolean {
-        return loadedAd != null
+        return rewardedAd != null
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
@@ -118,5 +124,10 @@ internal class BIDAdmobRewarded(
 
     override fun revenue(): Double? {
         return null
+    }
+
+    override fun destroy() {
+        rewardedAd?.fullScreenContentCallback = null
+        rewardedAd = null
     }
 }

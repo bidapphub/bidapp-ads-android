@@ -57,8 +57,7 @@ class MainActivity : ComponentActivity() {
         config.enableTestMode()
         config.enableInterstitialAds()
         config.enableRewardedAds()
-        config.enableBannerAds_300x250()
-        config.enableBannerAds_320x50()
+        config.enableBannerAds()
 
         interstitial = Interstitial(this)
         interstitial.setLoadDelegate(loadDelegate)
@@ -114,16 +113,16 @@ class MainActivity : ComponentActivity() {
             Box(
                 modifier = Modifier
                     .width(320.dp)
+                    .height(50.dp)
                     .fillMaxWidth()
             ) {
                 AndroidView(
-                    factory = {
-                        val view = FrameLayout(this@MainActivity)
+                    factory = { context ->
+                        val view = FrameLayout(context)
                         view.removeAllViews()
                         view.addView(banner)
                         view
-                    },
-                    modifier = Modifier.matchParentSize()
+                    }
                 )
             }
         }
@@ -155,6 +154,7 @@ class MainActivity : ComponentActivity() {
     fun addBanner_320x50(bannerShowDelegate: BannerViewDelegate): BannerView {
         val banner = BannerView(this).banner(AdFormat.banner_320x50)
         banner.setBannerViewDelegate(bannerShowDelegate)
+        banner.startAutoRefresh(30.0)
         return banner
     }
 

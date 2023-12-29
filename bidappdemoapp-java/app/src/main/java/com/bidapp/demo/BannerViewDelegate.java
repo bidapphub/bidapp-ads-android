@@ -10,11 +10,7 @@ import io.bidapp.sdk.BannerView;
 public class BannerViewDelegate implements BIDBannerViewDelegate {
 
 
-    @Override
-    public void adViewReadyToRefresh(BannerView adView, AdInfo adInfo) {
-        System.out.println("App - adViewReadyToRefresh. AdView: " + adView + ", AdInfo: " + adInfo);
-        adView.refreshAd();
-    }
+
 
     @Override
     public void adViewDidDisplayAd(@NonNull BannerView adView, AdInfo adInfo) {
@@ -31,4 +27,8 @@ public class BannerViewDelegate implements BIDBannerViewDelegate {
         System.out.println("App - didClicked. AdView: " + adView + ", AdInfo: " + adInfo);
     }
 
+    @Override
+    public void allNetworksFailedToDisplayAd(@NonNull BannerView adView) {
+        System.out.println("App - didClicked. AdView: " + adView);
+    }
 }

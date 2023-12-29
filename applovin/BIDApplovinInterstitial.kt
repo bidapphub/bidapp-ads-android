@@ -75,25 +75,28 @@ internal class BIDApplovinInterstitial(
     }
 
     override fun load(context: Any) {
-        val load = runCatching {
-            if (interstitialAdDialog == null) {
-                sdk = AppLovinSdk.getInstance(context as Context)
+        if (context as? Context == null){
+            adapter?.onAdFailedToLoadWithError("Error Failed To ReceiveAd")
+            return
+        }
+         if (interstitialAdDialog == null) {
+                sdk = AppLovinSdk.getInstance(context)
                 interstitialAdDialog = AppLovinInterstitialAd.create(sdk, context)
-                init()
             }
-            AppLovinSdk.getInstance(context as Context).adService.loadNextAd(
+            init()
+            AppLovinSdk.getInstance(context).adService.loadNextAd(
                 AppLovinAdSize.INTERSTITIAL,
                 appLovinAdLoadListener
             )
-        }
-        if (load.isFailure) adapter?.onAdFailedToLoadWithError("Error Failed To ReceiveAd")
     }
 
     override fun show(activity: Activity?) {
         BIDLog.d(TAG, "show")
-        currentAd?.let {
-            interstitialAdDialog?.showAndRender(it)
+        if (currentAd == null || interstitialAdDialog == null){
+            adapter?.onFailedToDisplay("Error showing ad")
+            return
         }
+        interstitialAdDialog?.showAndRender(currentAd)
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -114,5 +117,11 @@ internal class BIDApplovinInterstitial(
 
     override fun revenue(): Double? {
         return null
+    }
+
+    override fun destroy() {
+        interstitialAdDialog?.setAdDisplayListener(null)
+        interstitialAdDialog?.setAdClickListener(null)
+        interstitialAdDialog = null
     }
 }

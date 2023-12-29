@@ -26,14 +26,20 @@ internal class BIDLiftoffFullscreen(
 
     val TAG = if (isRewarded) "Reward Liftoff" else "Full Liftoff"
     var ads: WeakReference<BaseFullscreenAd>? = null
+    var isRewardGranted = false
     val callBack = object : RewardedAdListener {
         override fun onAdClicked(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad click")
+            BIDLog.d(TAG, "on ad click. ${baseAd.placementId}")
             adapter?.onClick()
         }
 
         override fun onAdEnd(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad end")
+            BIDLog.d(TAG, "on ad end. ${baseAd.placementId}")
+            if (isRewarded) {
+                if (isRewardGranted) {
+                    adapter?.onReward()
+                }
+            }
             adapter?.onHide()
         }
 
@@ -48,64 +54,64 @@ internal class BIDLiftoffFullscreen(
         }
 
         override fun onAdImpression(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad impression")
+            BIDLog.d(TAG, "on ad impression ${baseAd.placementId}")
+            adapter?.onDisplay()
         }
 
         override fun onAdLeftApplication(baseAd: BaseAd) {
             BIDLog.d(TAG, "on ad left application ${baseAd.placementId}")
-            adapter?.onHide()
         }
 
         override fun onAdLoaded(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on dd load ${baseAd.placementId}")
+            BIDLog.d(TAG, "on ad load ${baseAd.placementId}")
             adapter?.onAdLoaded()
         }
 
         override fun onAdRewarded(baseAd: BaseAd) {
             BIDLog.d(TAG, "on ad rewarded ${baseAd.placementId}")
-            adapter?.onReward()
+            if(isRewarded) isRewardGranted = true
         }
 
         override fun onAdStart(baseAd: BaseAd) {
             BIDLog.d(TAG, "on ad viewed ${baseAd.placementId}")
-            adapter?.onDisplay()
         }
 
     }
 
-
-
     override fun load(context: Any) {
-        val load = runCatching {
-            if (isRewarded)
-                adTag?.let {
-                    ads =
-                        WeakReference(RewardedAd(context as Context, it, AdConfig().apply {
-                        }).apply {
-                            adListener = callBack
-                            load()
-                        })
-                }
-            else
-                adTag?.let {
-                    ads = WeakReference(
-                        InterstitialAd(
-                            context as Context,
-                            it,
-                            AdConfig().apply {
-                            }).apply {
-                            adListener = callBack
-                            load()
-                        })
-                }
+        if (context as? Context == null) {
+            adapter?.onAdFailedToLoadWithError("Liftoff fullscreen loading error")
+            return
         }
-        if (load.isFailure) adapter?.onAdFailedToLoadWithError("Liftoff fullscreen loading error")
+        if (adTag == null) {
+            adapter?.onAdFailedToLoadWithError("Liftoff fullscreen adtag is null")
+            return
+        }
+        if (isRewarded)
+            ads =
+                WeakReference(RewardedAd(context, adTag, AdConfig().apply {
+                }).apply {
+                    adListener = callBack
+                    load()
+                })
+        else
+            ads = WeakReference(
+                InterstitialAd(
+                    context,
+                    adTag,
+                    AdConfig().apply {
+                    }).apply {
+                    adListener = callBack
+                    load()
+                })
     }
 
     override fun show(activity: Activity?) {
-        if ((ads?.get() as BaseFullscreenAd).canPlayAd()) {
-            (ads?.get() as BaseFullscreenAd).play()
+        if (ads?.get() == null || ads?.get()?.canPlayAd() == false) {
+            adapter?.onFailedToDisplay("Failed to display")
+            return
         }
+        (ads?.get() as BaseFullscreenAd).play()
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -127,5 +133,10 @@ internal class BIDLiftoffFullscreen(
 
     override fun revenue(): Double? {
         return null
+    }
+
+    override fun destroy() {
+        ads?.get()?.adListener = null
+        ads?.clear()
     }
 }

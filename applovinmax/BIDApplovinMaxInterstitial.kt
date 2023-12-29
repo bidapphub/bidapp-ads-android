@@ -1,7 +1,6 @@
 package io.bidapp.networks.applovinmax
 
 import android.app.Activity
-import android.util.Log
 import com.applovin.mediation.MaxAd
 import com.applovin.mediation.MaxAdListener
 import com.applovin.mediation.MaxError
@@ -22,62 +21,65 @@ internal class BIDApplovinMaxInterstitial(
     private var ad:MaxAd? = null
     private val interstitialListener = object : MaxAdListener {
         override fun onAdLoaded(maxAd: MaxAd) {
-            BIDLog.d(TAG, "onAdLoaded")
+            BIDLog.d(TAG, "onAdLoaded. adtag: ($adTag)")
             ad = maxAd
             adapter?.onAdLoaded()
         }
 
         override fun onAdDisplayed(maxAd: MaxAd) {
-            BIDLog.d(TAG, "onAdDisplayed")
+            BIDLog.d(TAG, "onAdDisplayed. adtag: ($adTag)")
             adapter?.onDisplay()
         }
 
         override fun onAdHidden(maxAd: MaxAd) {
-            BIDLog.d(TAG, "onAdHidden")
+            BIDLog.d(TAG, "onAdHidden. adtag: ($adTag)")
             adapter?.onHide()
         }
 
         override fun onAdClicked(maxAd: MaxAd) {
-            BIDLog.d(TAG, "onAdClicked")
+            BIDLog.d(TAG, "onAdClicked. adtag: ($adTag)")
             adapter?.onClick()
         }
 
         override fun onAdLoadFailed(p0: String, p1: MaxError) {
             val errorDescription = p1.toString()
-            BIDLog.d(TAG, "onAdLoadFailed error $errorDescription")
+            BIDLog.d(TAG, "onAdLoadFailed error $errorDescription adtag: ($adTag)")
             adapter?.onAdFailedToLoadWithError(errorDescription)
         }
 
         override fun onAdDisplayFailed(maxAd: MaxAd, p1: MaxError) {
-            val errorDescription = p1.toString()
-            BIDLog.d(TAG, "onAdDisplayFailed error $errorDescription")
-            adapter?.onFailedToDisplay(p1.toString())
+            val errorDescription = p1.message.toString()
+            BIDLog.d(TAG, "onAdDisplayFailed error $errorDescription adtag: ($adTag)" )
+            adapter?.onFailedToDisplay(p1.message.toString())
         }
     }
 
-    fun init() {
+    fun setListener() {
         interstitialAd?.setListener(interstitialListener)
     }
 
     override fun load(context: Any) {
-        BIDLog.d(TAG, "Max interstitial load")
-        val load = runCatching {
-            if (interstitialAd == null) {
-                interstitialAd = MaxInterstitialAd(adTag, context as Activity)
-                init()
-            }
-            interstitialAd?.loadAd()
-        }
-        if(load.isFailure) {
+        if (context as? Activity == null) {
             adapter?.onAdFailedToLoadWithError("Max interstitial loading error")
+            return
         }
+        if (adTag == null) {
+            adapter?.onAdFailedToLoadWithError("Max interstitial adtag is null")
+            return
+        }
+            if (interstitialAd == null) {
+                interstitialAd = MaxInterstitialAd(adTag, context)
+            }
+            setListener()
+            interstitialAd?.loadAd()
     }
 
     override fun show(activity: Activity?) {
-        BIDLog.d(TAG, "Max interstitial show")
-        if (interstitialAd?.isReady == true) {
-            interstitialAd!!.showAd()
+        if (interstitialAd == null || interstitialAd?.isReady == false){
+            adapter?.onFailedToDisplay("Max interstitial showing error")
+            return
         }
+        interstitialAd?.showAd()
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -101,5 +103,12 @@ internal class BIDApplovinMaxInterstitial(
             return ad?.revenue
         }
         return null
+    }
+
+    override fun destroy() {
+        interstitialAd?.setListener(null)
+        interstitialAd?.destroy()
+        interstitialAd = null
+        ad = null
     }
 }

@@ -10,6 +10,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 
 import io.bidapp.sdk.AdFormat;
 import io.bidapp.sdk.BIDConfiguration;
+import io.bidapp.sdk.BIDNetworkId;
 import io.bidapp.sdk.BannerView;
 import io.bidapp.sdk.BidappAds;
 import io.bidapp.sdk.Interstitial;
@@ -38,8 +39,7 @@ public class MainActivity extends AppCompatActivity {
         rewarded.setLoadDelegate(loadDelegate);
 
 
-        banner = new BannerView(this).banner(AdFormat.banner_320x50);
-        banner.setBannerViewDelegate(bannerShowDelegate);
+
         BIDConfiguration bidConfig = new BIDConfiguration();
 
 
@@ -49,13 +49,17 @@ public class MainActivity extends AppCompatActivity {
         bidConfig.enableLogging();
         bidConfig.enableInterstitialAds();
         bidConfig.enableRewardedAds();
-        bidConfig.enableBannerAds_300x250();
-        bidConfig.enableBannerAds_320x50();
+        bidConfig.enableBannerAds();
+
 
 
         String pubid = "15ddd248-7acc-46ce-a6fd-e6f6543d22cd";
 
         BidappAds.start(pubid, bidConfig, this);
+
+        banner = new BannerView(this).banner(AdFormat.banner_320x50);
+        banner.setBannerViewDelegate(bannerShowDelegate);
+        banner.startAutoRefresh(30.0);
 
         interstitialButton.setOnClickListener(new View.OnClickListener() {
             @Override

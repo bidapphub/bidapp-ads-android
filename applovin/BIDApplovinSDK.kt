@@ -41,7 +41,6 @@ internal class BIDApplovinSDK(
             adapter.initializationInProgress() ) {
             return
         }
-
         adapter.onInitializationStart()
         ApplovinInitializer.start(adapter,context)
     }

@@ -16,7 +16,11 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
 @PublishedApi
-internal class BIDApplovinMaxBanner(adapter: BIDBannerAdapterProtocol, adTag: String, format: AdFormat) : BIDBannerAdapterDelegateProtocol, MaxAdViewAdListener {
+internal class BIDApplovinMaxBanner(
+    adapter: BIDBannerAdapterProtocol,
+    val adTag: String?,
+    format: AdFormat
+) : BIDBannerAdapterDelegateProtocol, MaxAdViewAdListener {
     val TAG = "Banner Max"
     val bannerFormat = if (format.isBanner_320x50) MaxAdFormat.BANNER
     else if (format.isBanner_300x250) MaxAdFormat.MREC
@@ -24,9 +28,8 @@ internal class BIDApplovinMaxBanner(adapter: BIDBannerAdapterProtocol, adTag: St
         BIDLog.d(TAG, "Unsuported applovin MAX banner format: $format")
         null
     }
-    var adTag : String? = adTag
-    var adapter : BIDBannerAdapterProtocol? = adapter
-    var adView : WeakReference<MaxAdView>? = null
+    var adapter: BIDBannerAdapterProtocol? = adapter
+    var adView: WeakReference<MaxAdView>? = null
     var cachedAd: MaxAd? = null
 
     override fun nativeAdView(): WeakReference<View> {
@@ -38,33 +41,43 @@ internal class BIDApplovinMaxBanner(adapter: BIDBannerAdapterProtocol, adTag: St
     }
 
     override fun load(context: Any) {
-        val load = runCatching {
-            if (adView == null) {
-                adView = WeakReference(MaxAdView(adTag, bannerFormat, context as Context))
-                adView?.get()?.setListener(this as MaxAdViewAdListener)
-                adView?.get()?.stopAutoRefresh()
-            }
-            adView?.get()?.loadAd()
+        cachedAd = null
+        if (bannerFormat == null || context as? Context == null) {
+            adapter?.onFailedToLoad(Error("Max banner loading error"))
+            return
         }
-        if(load.isFailure) adapter?.onFailedToLoad(Error("Max banner loading error"))
+        if (adTag == null) {
+            adapter?.onFailedToLoad(Error("Max banner adtag is null"))
+            return
+        }
+        if (adView?.get() == null) {
+            adView = WeakReference(MaxAdView(adTag, bannerFormat, context))
+            adView?.get()?.stopAutoRefresh()
+        }
+        adView?.get()?.setListener(this as MaxAdViewAdListener)
+        adView?.get()?.loadAd()
     }
 
 
     override fun destroy() {
-       cachedAd = null
-       adView?.get()?.destroy()
+        cachedAd = null
+        adView?.get()?.destroy()
     }
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         return try {
-            val weightAndHeight : Array<Int> = when(adView?.get()?.adFormat){
-                MaxAdFormat.MREC -> arrayOf(300,250)
-                MaxAdFormat.BANNER -> arrayOf(320,50)
-                else -> arrayOf(0,0)
+            val weightAndHeight: Array<Int> = when (adView!!.get()!!.adFormat) {
+                MaxAdFormat.MREC -> arrayOf(300, 250)
+                MaxAdFormat.BANNER -> arrayOf(320, 50)
+                else -> arrayOf(0, 0)
             }
-            (view.get() as FrameLayout).addView(adView?.get(), (weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())
-             true
-        } catch (e: Exception){
+            (view.get() as FrameLayout).addView(
+                adView!!.get(),
+                (weightAndHeight[0] * density).toInt(),
+                (weightAndHeight[1] * density).toInt()
+            )
+            true
+        } catch (e: Exception) {
             BIDLog.d(TAG, "Show on view is failed")
             false
         }
@@ -77,47 +90,48 @@ internal class BIDApplovinMaxBanner(adapter: BIDBannerAdapterProtocol, adTag: St
     override fun onAdLoaded(p0: MaxAd) {
         cachedAd = p0
         adapter?.onLoad()
-        BIDLog.d(TAG, "loaded")
+        BIDLog.d(TAG, "ad loaded. adtag: ($adTag)")
     }
 
-    private fun onFailedToLoad(error: MaxError) {
-        BIDLog.d(TAG, "AppLovin MAX failed to load ad. Error: ${error.message}")
-        adapter?.onFailedToLoad(Error(error.message))
+    private fun onFailedToLoad(error: String) {
+        BIDLog.d(TAG, "AppLovin MAX failed to load ad. Error: $error adtag: ($adTag)")
+        adapter?.onFailedToLoad(Error(error))
     }
 
     override fun onAdDisplayed(p0: MaxAd) {
-        BIDLog.d(TAG, "ad displayed")
+        BIDLog.d(TAG, "ad displayed. adtag: ($adTag)")
         adapter?.onDisplay()
     }
 
     override fun onAdHidden(p0: MaxAd) {
-        BIDLog.d(TAG, "hide")
+        BIDLog.d(TAG, "ad hide. adtag: ($adTag)")
         cachedAd = null
         adapter?.onHide()
         adView?.get()?.destroy()
     }
 
     override fun onAdClicked(p0: MaxAd) {
-        BIDLog.d(TAG, "clicked")
+        BIDLog.d(TAG, " ad clicked. adtag: ($adTag)")
         adapter?.onClick()
     }
 
     override fun onAdLoadFailed(p0: String, p1: MaxError) {
-        BIDLog.d(TAG, "ad load failed. Error:${p1.message}")
-        p1.let { onFailedToLoad(it) }
+        val error = p1.message ?: "Unknown error"
+        BIDLog.d(TAG, "ad load failed. Error:${error}")
+        onFailedToLoad(error)
     }
 
     override fun onAdExpanded(p0: MaxAd) {
-        BIDLog.d(TAG, "ad expanded")
+        BIDLog.d(TAG, "ad expanded. adtag: ($adTag)")
     }
 
     override fun onAdCollapsed(p0: MaxAd) {
-        BIDLog.d(TAG, "collapsed")
+        BIDLog.d(TAG, "ad collapsed. adtag: ($adTag)")
     }
 
     override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
         adapter?.onFailedToDisplay(kotlin.Error(p1.message))
-        BIDLog.d(TAG, "AppLovin MAX failed to display ad. Error: ${p1.message}")
+        BIDLog.d(TAG, "failed to display ad. Error: ${p1.message} adtag: ($adTag)")
     }
 
 

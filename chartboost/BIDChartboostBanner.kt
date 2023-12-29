@@ -27,48 +27,51 @@ internal class BIDChartboostBanner(
     format: AdFormat?
 ) : BIDBannerAdapterDelegateProtocol {
     val TAG = "Banner Chartboost"
-    val bannerFormat = if (format?.isBanner_320x50 == true) Banner.BannerSize.STANDARD
+    private val bannerFormat = if (format?.isBanner_320x50 == true) Banner.BannerSize.STANDARD
     else if (format?.isBanner_300x250 == true) Banner.BannerSize.MEDIUM
     else {
         BIDLog.d(TAG, "Unsuported Chartboost banner format: $format")
         null
     }
-    var adView: WeakReference<Banner>? = null
+    private var adView: WeakReference<Banner>? = null
     var cachedAd: WeakReference<Ad>? = null
 
-    val chartboost = object : BannerCallback {
+    private val chartboostCallback = object : BannerCallback {
         override fun onAdClicked(event: ClickEvent, error: ClickError?) {
-            BIDLog.d(TAG, "on ad click")
-            adapter?.onClick()
+            if (error == null) {
+                BIDLog.d(TAG, "ad click. location: ($location)")
+                adapter?.onClick()
+            }
+            else BIDLog.d(TAG, "ad click is failure. location: ($location) Error: ${error.exception}")
         }
 
         override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
             if (error == null) {
                 cachedAd = WeakReference(event.ad)
                 adapter?.onLoad()
-                BIDLog.d(TAG, "loaded")
+                BIDLog.d(TAG, "ad loaded. location: ($location)")
             } else {
-                BIDLog.d(TAG, "Chartboost failed to load ad. Error: ${error.exception}")
+                BIDLog.d(TAG, "Chartboost failed to load ad. Error: ${error.exception} location: ($location)")
                 adapter?.onFailedToLoad(Error(error.exception))
             }
         }
 
         override fun onAdRequestedToShow(event: ShowEvent) {
-            BIDLog.d(TAG, "on ad requested to show")
+            BIDLog.d(TAG, "ad requested to show. location: ($location)")
         }
 
         override fun onAdShown(event: ShowEvent, error: ShowError?) {
-            if (error == null) {
-                BIDLog.d(TAG, "show")
-                adapter?.onDisplay()
-            } else {
-                BIDLog.d(TAG, "Admob failed to show ad. Error: ${error.exception?.message}")
+            if (error != null) {
+                BIDLog.d(TAG, "Chartboost failed to show ad. Error: ${error.exception?.message} location: ($location)")
                 adapter?.onFailedToDisplay(Error(error.exception?.message))
+                return
             }
+            BIDLog.d(TAG, "ad show. location: ($location)")
         }
 
         override fun onImpressionRecorded(event: ImpressionEvent) {
-            BIDLog.d(TAG, "on impression recorded")
+            BIDLog.d(TAG, "ad impression recorded. location: ($location)")
+            adapter?.onDisplay()
         }
     }
 
@@ -77,32 +80,36 @@ internal class BIDChartboostBanner(
     }
 
     override fun isAdReady(): Boolean {
-        return cachedAd != null
+        return cachedAd?.get() != null
     }
 
     override fun load(context: Any) {
-        cachedAd = null
-        if (adView == null) {
-            val load = runCatching {
-                adView = WeakReference(
-                    Banner(
-                        context as Context,
-                        location!!,
-                        bannerFormat!!,
-                        chartboost
-                    )
-                )
-                adView!!.get()!!.cache()
-            }
-            if (load.isFailure) {
-                adapter?.onFailedToLoad(Error("Banner load Chartboost is failure"))
-            }
+        cachedAd?.clear()
+        if (bannerFormat == null || context as? Context == null) {
+            adapter?.onFailedToLoad(Error("Chartboost banner loading error"))
+            return
         }
+        if (location == null) {
+            adapter?.onFailedToLoad(Error("Chartboost banner location is null"))
+            return
+        }
+        if (adView?.get() == null) {
+            adView = WeakReference(
+                Banner(
+                    context,
+                    location!!,
+                    bannerFormat,
+                    chartboostCallback
+                )
+            )
+        }
+        adView?.get()?.cache()
     }
 
     override fun destroy() {
-       cachedAd = null
-       adView?.get()?.detach()
+        cachedAd = null
+        adView?.get()?.detach()
+        adView?.clear()
     }
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
@@ -127,6 +134,7 @@ internal class BIDChartboostBanner(
             return false
         }
     }
+
     override fun waitForAdToShow(): Boolean {
         return true
     }
