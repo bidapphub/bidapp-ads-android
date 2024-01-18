@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     var banner : BannerView? = null
     val showDelegate = FullscreenShowDelegate()
     val loadDelegate = FullscreenLoadDelegate()
-    val bannerShowDelegate = BannerViewDelegate()
+    var bannerShowDelegate : BannerViewDelegate? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -32,14 +32,11 @@ class MainActivity : AppCompatActivity() {
         val rewardedButton = findViewById<TextView>(R.id.reward)
         val bannersButton = findViewById<TextView>(R.id.banners)
         val bannerMain = findViewById<ConstraintLayout>(R.id.bannerMain)
-
         val interstitial = Interstitial(this)
         val rewarded = Rewarded(this)
         interstitial.setLoadDelegate(loadDelegate)
         rewarded.setLoadDelegate(loadDelegate)
-        interstitial.setAutoload(false)
-        interstitial.setAutoload(true)
-        interstitial.load()
+
 
         val bidConfig = BIDConfiguration()
 
@@ -53,11 +50,9 @@ class MainActivity : AppCompatActivity() {
         BidappAds.start(pubid, bidConfig, this)
 
         banner = BannerView(this).banner(AdFormat.banner_320x50)
-        banner?.setBannerViewDelegate(bannerShowDelegate)
+        bannerShowDelegate = BannerViewDelegate(bannerMain)
+        banner?.setBannerViewDelegate(bannerShowDelegate!!)
         banner?.startAutoRefresh(30.0)
-
-
-
 
 
         interstitialButton.setOnClickListener {
@@ -72,7 +67,7 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, BannerActivity::class.java)
             startActivity(intent)
         }
-        bannerMain.addView(banner)
+
     }
 
     override fun onDestroy() {

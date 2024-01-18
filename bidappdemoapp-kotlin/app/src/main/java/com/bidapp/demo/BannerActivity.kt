@@ -49,7 +49,6 @@ class BannerActivity : AppCompatActivity(), BIDBannerViewDelegate {
             pendingBanners.add(banner)
             allBannersArray.add(banner)
             banner.refreshAd()
-            addAdToSuperviewIfNeeded(banner, format)
             scheduleAddOneMoreBanner()
         }
     }
@@ -139,12 +138,17 @@ class BannerActivity : AppCompatActivity(), BIDBannerViewDelegate {
         }
     }
 
+    override fun adViewDidLoadAd(adView: BannerView, adInfo: AdInfo?) {
+        addAdToSuperviewIfNeeded(adView, adInfo?.adFormat ?: AdFormat.banner_320x50)
+        print("App - adViewDidLoadAd. AdView: $adView, AdInfo: $adInfo")
+    }
 
     override fun adViewDidDisplayAd(adView: BannerView, adInfo: AdInfo?) {
         print("App - didDisplayAd. AdView: $adView, AdInfo: $adInfo")
     }
 
     override fun adViewDidFailToDisplayAd(adView: BannerView, adInfo: AdInfo?, errors: Error) {
+        adView.destroy()
         print("App - didFailToDisplayAd. AdView: $adView, Error:${errors.localizedMessage}")
     }
 

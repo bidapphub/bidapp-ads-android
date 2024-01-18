@@ -54,7 +54,7 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, f
 
 
     override fun nativeAdView(): WeakReference<View>? {
-        return WeakReference(adView?.get())
+        return WeakReference(adView?.get() as? View)
     }
 
     override fun isAdReady(): Boolean {

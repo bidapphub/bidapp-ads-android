@@ -34,7 +34,7 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
 
 
     override fun nativeAdView(): WeakReference<View> {
-        return WeakReference(adView?.get())
+        return WeakReference(adView?.get() as? View)
     }
 
     override fun isAdReady(): Boolean {

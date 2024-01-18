@@ -58,6 +58,7 @@ public class MainActivity extends AppCompatActivity {
         BidappAds.start(pubid, bidConfig, this);
 
         banner = new BannerView(this).banner(AdFormat.banner_320x50);
+        bannerShowDelegate.setContainer(bannerMain);
         banner.setBannerViewDelegate(bannerShowDelegate);
         banner.startAutoRefresh(30.0);
 
@@ -82,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        bannerMain.addView(banner);
+
     }
 
     @Override

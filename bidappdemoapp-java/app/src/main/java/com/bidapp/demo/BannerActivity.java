@@ -8,6 +8,7 @@ import android.widget.TableLayout;
 import android.widget.TableRow;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -55,7 +56,6 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
             pendingBanners.add(banner);
             allBannersArray.add(banner);
             banner.refreshAd();
-            addAdToSuperviewIfNeeded(banner, format);
             scheduleAddOneMoreBanner();
         }
     }
@@ -185,7 +185,16 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
     }
 
 
-
+    @Override
+    public void adViewDidLoadAd(@NonNull BannerView bannerView, @Nullable AdInfo adInfo) {
+        System.out.println("App - adViewDidLoadAd. AdView: " + bannerView + ", AdInfo: " + adInfo);
+        if (adInfo == null || adInfo.getAdFormat() == null) {
+            addAdToSuperviewIfNeeded(bannerView, AdFormat.banner_320x50);
+        }
+        else {
+            addAdToSuperviewIfNeeded(bannerView, adInfo.getAdFormat());
+        }
+    }
 
     @Override
     public void adViewDidDisplayAd(@NonNull BannerView adView, AdInfo adInfo) {
@@ -194,6 +203,7 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
 
     @Override
     public void adViewDidFailToDisplayAd(@NonNull BannerView adView, AdInfo adInfo, Error errors) {
+        adView.destroy();
         System.out.println("App - didFailToDisplayAd. AdView: " + adView + ", Error: " + errors.getLocalizedMessage());
     }
 
@@ -220,4 +230,6 @@ public class BannerActivity extends AppCompatActivity implements BIDBannerViewDe
             removeBannerTimer.cancel();
         }
     }
+
+
 }

@@ -54,7 +54,7 @@ android {
 
 
 dependencies {
-    implementation ("io.bidapp:sdk:1.0.1")
+    implementation ("io.bidapp:sdk:1.0.3")
     implementation ("io.bidapp.networks:applovin:1.0.1")
     implementation ("io.bidapp.networks:applovinmax:1.0.1")
     implementation ("io.bidapp.networks:unity:1.0.1")

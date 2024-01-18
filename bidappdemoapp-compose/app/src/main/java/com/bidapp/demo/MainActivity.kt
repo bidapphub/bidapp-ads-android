@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -50,6 +51,7 @@ class MainActivity : ComponentActivity() {
     var banner: BannerView? = null
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val config = BIDConfiguration()
@@ -65,16 +67,13 @@ class MainActivity : ComponentActivity() {
         rewarded = Rewarded(this)
         rewarded.setLoadDelegate(loadDelegate)
 
-        banner = addBanner_320x50(bannerShowDelegate)
-
-
-
         val pubid = "15ddd248-7acc-46ce-a6fd-e6f6543d22cd"
         BidappAds.start(pubid, config, this)
-
         setContent {
               Main()
         }
+
+        banner = addBanner_320x50(bannerShowDelegate)
     }
 
     @Composable
@@ -119,8 +118,7 @@ class MainActivity : ComponentActivity() {
                 AndroidView(
                     factory = { context ->
                         val view = FrameLayout(context)
-                        view.removeAllViews()
-                        view.addView(banner)
+                        bannerShowDelegate.setView(view)
                         view
                     }
                 )

@@ -83,7 +83,7 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
 
 
     override fun nativeAdView(): WeakReference<View> {
-        return WeakReference(adView?.get() as View)
+        return WeakReference(adView?.get() as? View)
     }
 
     override fun isAdReady(): Boolean {

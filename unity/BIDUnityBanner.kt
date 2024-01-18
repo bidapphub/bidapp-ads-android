@@ -37,7 +37,7 @@ internal class BIDUnityBanner(
 
 
     override fun nativeAdView(): WeakReference<View>? {
-        return WeakReference(adView?.get() as View)
+        return WeakReference(adView?.get() as? View)
     }
 
     override fun isAdReady(): Boolean {

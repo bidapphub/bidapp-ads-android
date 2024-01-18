@@ -69,14 +69,7 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
             val banner = BannerView(this).banner(format)
             banner.setBannerViewDelegate(this)
             pendingBanners.add(banner)
-            val addBanner = runCatching {
-                banner.refreshAd()
-                addAdToSuperviewIfNeeded(banner, format)
-            }
-            if (addBanner.isFailure) {
-                print("Failure add banner")
-                banner.destroy()
-            }
+            banner.refreshAd()
             scheduleAddOneMoreBanner()
         }
     }
@@ -297,7 +290,13 @@ class BannersActivity : ComponentActivity(), BIDBannerViewDelegate {
     }
 
     override fun adViewDidFailToDisplayAd(adView: BannerView, adInfo: AdInfo?, errors: Error) {
+        adView.destroy()
         print("App - didFailToDisplayAd. AdView: $adView, Error:${errors.localizedMessage}")
+    }
+
+    override fun adViewDidLoadAd(adView: BannerView, adInfo: AdInfo?) {
+        addAdToSuperviewIfNeeded(adView, adInfo?.adFormat ?: AdFormat.banner_320x50)
+        print("App - adViewDidLoadAd. AdView: $adView, AdInfo: $adInfo")
     }
 
     override fun allNetworksFailedToDisplayAd(adView: BannerView) {
