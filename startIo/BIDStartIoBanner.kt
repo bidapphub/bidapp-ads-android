@@ -54,7 +54,7 @@ class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, fo
 
     }
 
-    override fun nativeAdView(): WeakReference<View>? {
+    override fun nativeAdView() : WeakReference<View>? {
         return cachedAd
     }
 
