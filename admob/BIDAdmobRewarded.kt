@@ -35,6 +35,7 @@ internal class BIDAdmobRewarded(
             override fun onAdDismissedFullScreenContent() {
                 if (isRewardGranted){
                     adapter.onReward()
+                    isRewardGranted = false
                 }
                 adapter.onHide()
                 BIDLog.d(TAG, "ad hidden. adtag: ($adTag)")
@@ -80,6 +81,7 @@ internal class BIDAdmobRewarded(
                 request,
                 object : RewardedAdLoadCallback() {
                     override fun onAdFailedToLoad(p0: LoadAdError) {
+                        rewardedAd = null
                         BIDLog.d(TAG, "Failed To Receive Ad error ${p0.message} adtag: ($adTag)")
                         adapter.onAdFailedToLoadWithError(p0.message)
                     }

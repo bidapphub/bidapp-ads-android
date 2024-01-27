@@ -46,6 +46,7 @@ internal class BIDChartboostRewarded(
                 override fun onAdDismiss(event: DismissEvent) {
                     if (isRewardGranted){
                         adapter?.onReward()
+                        isRewardGranted = false
                     }
                     adapter?.onHide()
                     BIDLog.d(TAG, "ad hidden. location: ($location)")

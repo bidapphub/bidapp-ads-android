@@ -54,7 +54,7 @@ internal class BIDApplovinMaxInterstitial(
         }
     }
 
-    fun setListener() {
+    private fun setListener() {
         interstitialAd?.setListener(interstitialListener)
     }
 

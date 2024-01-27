@@ -2,6 +2,7 @@ package io.bidapp.networks.facebook
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.facebook.ads.Ad
 import com.facebook.ads.AdError
 import com.facebook.ads.RewardedInterstitialAd
@@ -18,7 +19,7 @@ internal class BIDFacebookRewarded(
 ) : BIDFullscreenAdapterDelegateProtocol {
 
     val TAG = "Rewarded Facebook"
-    var grantedReward = false
+    var isGrantedReward = false
     private var rewardedAd: RewardedInterstitialAd? = null
 
 
@@ -46,16 +47,17 @@ internal class BIDFacebookRewarded(
 
         override fun onRewardedInterstitialCompleted() {
             BIDLog.d(TAG, "ad complete $adTag")
-            grantedReward = true
+            isGrantedReward = true
         }
 
         override fun onRewardedInterstitialClosed() {
-            if (!grantedReward) {
+            if (!isGrantedReward) {
                 BIDLog.d(TAG, "ad hide $adTag")
                 adapter?.onHide()
             } else {
                 BIDLog.d(TAG, "ad rewarded $adTag")
                 adapter?.onReward()
+                isGrantedReward = false
                 BIDLog.d(TAG, "ad hide $adTag")
                 adapter?.onHide()
             }

@@ -30,7 +30,7 @@ internal class BIDChartboostBanner(
     private val bannerFormat = if (format?.isBanner_320x50 == true) Banner.BannerSize.STANDARD
     else if (format?.isBanner_300x250 == true) Banner.BannerSize.MEDIUM
     else {
-        BIDLog.d(TAG, "Unsuported Chartboost banner format: $format")
+        BIDLog.d(TAG, "Unsupported Chartboost banner format: $format")
         null
     }
     private var adView: WeakReference<Banner>? = null

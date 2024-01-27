@@ -25,10 +25,10 @@ class BIDDigitalTurbineFullscreen(
 ) : BIDFullscreenAdapterDelegateProtocol {
     val TAG = if (isRewarded) "Reward Digital Turbine" else "Full Digital Turbine"
     var isGrantedReward = false
-    var fullscreenSpot: WeakReference<InneractiveAdSpot>? = null
+    private var fullscreenSpot: InneractiveAdSpot? = null
 
 
-    val showEventListener = object : InneractiveFullscreenAdEventsListenerWithImpressionData {
+    private val showEventListener = object : InneractiveFullscreenAdEventsListenerWithImpressionData {
         override fun onAdImpression(p0: InneractiveAdSpot?, p1: ImpressionData?) {
             BIDLog.d(TAG, "ad displayed $adTag")
             adapter?.onDisplay()
@@ -61,6 +61,7 @@ class BIDDigitalTurbineFullscreen(
                 if (isGrantedReward) {
                     BIDLog.d(TAG, "rewarded $adTag")
                     adapter?.onReward()
+                    isGrantedReward = false
                 }
             } else {
                 BIDLog.d(TAG, "ad hide $adTag")
@@ -96,6 +97,7 @@ class BIDDigitalTurbineFullscreen(
             BIDLog.d(TAG, "rewarded ad on complete $adTag")
         }
 
+        @Deprecated("Deprecated in Java")
         override fun onPlayerError() {
             BIDLog.d(TAG, "rewarded ad error $adTag")
             adapter?.onFailedToDisplay("rewarded ad error")
@@ -117,28 +119,28 @@ class BIDDigitalTurbineFullscreen(
         var videoContentController : InneractiveFullscreenVideoContentController? = null
         var controller : InneractiveFullscreenUnitController? = null
         val load = runCatching {
-            if (fullscreenSpot?.get() == null) {
+            if (fullscreenSpot == null) {
                 videoContentController = InneractiveFullscreenVideoContentController()
                 controller = InneractiveFullscreenUnitController()
                 controller?.addContentController(videoContentController)
-                fullscreenSpot = WeakReference(InneractiveAdSpotManager.get().createSpot())
+                fullscreenSpot = InneractiveAdSpotManager.get().createSpot()
             }
             if (isRewarded) {
                 controller?.rewardedListener = rewardEventListener
                 videoContentController?.eventsListener = contentEventListener
             }
             controller?.eventsListener = showEventListener
-            fullscreenSpot?.get()?.addUnitController(controller)
-            fullscreenSpot?.get()?.setRequestListener(loadEventListener)
+            fullscreenSpot?.addUnitController(controller)
+            fullscreenSpot?.setRequestListener(loadEventListener)
             val fullscreenAdRequest = InneractiveAdRequest(adTag)
-            fullscreenSpot?.get()?.requestAd(fullscreenAdRequest)
+            fullscreenSpot?.requestAd(fullscreenAdRequest)
         }
         if (load.isFailure) adapter?.onAdFailedToLoadWithError("Unknown error")
     }
 
     override fun show(activity: Activity?) {
         val showController =
-            (fullscreenSpot?.get()?.selectedUnitController as? InneractiveFullscreenUnitController)
+            (fullscreenSpot?.selectedUnitController as? InneractiveFullscreenUnitController)
         if (activity == null || showController == null) {
             adapter?.onFailedToDisplay("Digital turbine showing ad is failure")
             return
@@ -155,7 +157,7 @@ class BIDDigitalTurbineFullscreen(
     }
 
     override fun readyToShow(): Boolean {
-        return fullscreenSpot?.get()?.isReady ?: false
+        return fullscreenSpot?.isReady ?: false
     }
 
     override fun revenue(): Double? {
@@ -163,7 +165,7 @@ class BIDDigitalTurbineFullscreen(
     }
 
     override fun destroy() {
-        fullscreenSpot?.get()?.destroy()
+        fullscreenSpot?.destroy()
         fullscreenSpot = null
     }
 

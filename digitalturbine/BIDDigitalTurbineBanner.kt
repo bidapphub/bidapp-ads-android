@@ -1,6 +1,7 @@
 package io.bidapp.networks.digitalturbine
 
 import android.content.Context
+import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import com.fyber.inneractive.sdk.external.ImpressionData
@@ -32,7 +33,8 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             adapter.onDisplay()
         }
 
-        override fun onAdImpression(p0: InneractiveAdSpot?) {}
+        override fun onAdImpression(p0: InneractiveAdSpot?) {
+        }
 
         override fun onAdClicked(p0: InneractiveAdSpot?) {
             BIDLog.d(TAG, "ad clicked. adtag: ($adTag)")
@@ -52,7 +54,8 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             adapter.onFailedToDisplay(Error(error))
         }
 
-        override fun onAdExpanded(p0: InneractiveAdSpot?) {}
+        override fun onAdExpanded(p0: InneractiveAdSpot?) {
+        }
 
         override fun onAdResized(p0: InneractiveAdSpot?) {}
 
@@ -116,12 +119,12 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
     override fun destroy() {
         adViewSpot?.get()?.destroy()
         adViewSpot = null
-        (view?.get() as FrameLayout).removeAllViews()
+        (view?.get() as? FrameLayout)?.removeAllViews()
         view?.clear()
     }
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
-        try {
+        return try {
             val weightAndHeight: Array<Int> = when (format.isBanner_320x50()) {
                 false -> arrayOf(300, 250)
                 true -> arrayOf(320, 50)
@@ -129,11 +132,11 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             (view.get() as FrameLayout).layoutParams.width = (weightAndHeight[0] * density).toInt()
             (view.get() as FrameLayout).layoutParams.height = (weightAndHeight[1] * density).toInt()
             controller!!.bindView(view.get() as FrameLayout)
-            this.view = WeakReference(view.get() as FrameLayout)
-            return true
+            this.view = view
+            true
         } catch (e: Exception) {
             BIDLog.d(TAG, "Show on view is failed ${e.message}")
-            return false
+            false
         }
     }
 

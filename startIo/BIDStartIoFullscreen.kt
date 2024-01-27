@@ -2,6 +2,7 @@ package io.bidapp.networks.startIo
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.startapp.sdk.adsbase.Ad
 import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
@@ -51,6 +52,7 @@ internal class BIDStartIoFullscreen(
             BIDLog.d(TAG, "ad hide $adTag")
             if (isRewarded && isRewardGranted) {
                 adapter?.onReward()
+                isRewardGranted = false
             }
             adapter?.onHide()
         }

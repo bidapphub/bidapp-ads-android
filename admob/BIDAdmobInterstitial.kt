@@ -75,6 +75,7 @@ internal class BIDAdmobInterstitial(
             request,
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(p0: LoadAdError) {
+                    interstitialAd = null
                     BIDLog.d(TAG, "failed to receive ad error ${p0.message} adtag: ($adTag)")
                     adapter.onAdFailedToLoadWithError(p0.message)
                 }

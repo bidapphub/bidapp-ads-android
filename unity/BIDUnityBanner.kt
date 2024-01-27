@@ -29,7 +29,7 @@ internal class BIDUnityBanner(
     val bannerFormat = if (format?.isBanner_320x50 == true) UnityBannerSize(320, 50)
     else if (format?.isBanner_300x250 == true) UnityBannerSize(300, 250)
     else {
-        BIDLog.d(TAG, "Unsuported banner format: $format")
+        BIDLog.d(TAG, "Unsupported banner format: $format")
         null
     }
     var adView: WeakReference<BannerView>? = null

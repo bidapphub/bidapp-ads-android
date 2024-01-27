@@ -1,7 +1,6 @@
 package io.bidapp.networks.unity
 
 import android.app.Activity
-import android.media.AudioManager
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
@@ -76,6 +75,7 @@ internal class BIDUnityFullscreen(
             adapter?.onAdFailedToLoadWithError("Unity fullscreen adtag is null")
             return
         }
+        ready = false
         UnityAds.load(adTag, loadListener)
     }
 

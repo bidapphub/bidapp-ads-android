@@ -2,7 +2,6 @@ package io.bidapp.networks.admob
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -28,7 +27,7 @@ internal class BIDAdmobBanner(
     val bannerFormat = if (format?.isBanner_320x50 == true) AdSize.BANNER
     else if (format?.isBanner_300x250 == true) AdSize.MEDIUM_RECTANGLE
     else {
-        BIDLog.d(TAG, "Unsuported Admob banner format: $format")
+        BIDLog.d(TAG, "Unsupported Admob banner format: $format")
         null
     }
     var adView: WeakReference<AdView>? = null
@@ -45,7 +44,7 @@ internal class BIDAdmobBanner(
         }
 
         override fun onAdFailedToLoad(p0: LoadAdError) {
-
+            ready = false
             BIDLog.d(TAG, "Admob failed to load ad. adtag: ($adTag) Error: ${p0.message}")
             adapter.onFailedToLoad(Error(p0.message))
         }

@@ -20,7 +20,7 @@ internal class BIDApplovinMaxRewarded(
     val TAG = "Reward Max"
     private var rewardedAd: MaxRewardedAd? = null
     private var ad:MaxAd? = null
-
+    var isGrantedReward = false
     private val rewardedListener = object : MaxRewardedAdListener {
 
         override fun onAdLoaded(maxAd: MaxAd) {
@@ -37,6 +37,10 @@ internal class BIDApplovinMaxRewarded(
 
         override fun onAdHidden(maxAd: MaxAd) {
             BIDLog.d(TAG, "ad hidden. adtag: ($adTag)")
+            if (isGrantedReward){
+                adapter?.onReward()
+                isGrantedReward = false
+            }
             adapter?.onHide()
             RewardedOnDisplay.isOnScreen = false
         }
@@ -60,7 +64,7 @@ internal class BIDApplovinMaxRewarded(
 
         override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
             BIDLog.d(TAG, "on user rewarded adtag: ($adTag)")
-            adapter?.onReward()
+            isGrantedReward = true
         }
 
         @Deprecated("Deprecated in Java")

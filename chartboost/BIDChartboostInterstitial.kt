@@ -1,7 +1,6 @@
 package io.bidapp.networks.chartboost
 
 import android.app.Activity
-import android.util.Log
 import com.chartboost.sdk.ads.Interstitial
 import com.chartboost.sdk.callbacks.InterstitialCallback
 import com.chartboost.sdk.events.CacheError
@@ -24,9 +23,9 @@ internal class BIDChartboostInterstitial(
     BIDFullscreenAdapterDelegateProtocol {
 
     val TAG = "interstitial Chartboost"
-    var chartboostInterstitial: Interstitial? = null
+    private var chartboostInterstitial: Interstitial? = null
 
-    fun init() {
+    private fun init() {
         chartboostInterstitial = location?.let {
             Interstitial(it, object : InterstitialCallback {
                 override fun onAdClicked(event: ClickEvent, error: ClickError?) {

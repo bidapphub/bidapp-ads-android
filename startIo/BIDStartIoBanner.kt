@@ -26,7 +26,7 @@ class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, fo
     var bannerFormat = if (format.isBanner_320x50) "banner"
     else if (format.isBanner_300x250) "mrec"
     else {
-        adapter.onFailedToLoad(Error("Unsuported Liftoff banner format"))
+        adapter.onFailedToLoad(Error("Unsupported Liftoff banner format"))
         null
     }
 
@@ -54,8 +54,8 @@ class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, fo
 
     }
 
-    override fun nativeAdView() : WeakReference<View>? {
-        return cachedAd
+    override fun nativeAdView(): WeakReference<View>? {
+        return WeakReference(cachedAd?.get())
     }
 
     override fun isAdReady(): Boolean {

@@ -28,12 +28,12 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     val bannerFormat = if (format.isBanner_320x50) BannerAdSize.BANNER
     else if (format.isBanner_300x250) BannerAdSize.VUNGLE_MREC
     else {
-        BIDLog.d(TAG, "Unsuported Liftoff banner format: $format")
+        BIDLog.d(TAG, "Unsupported Liftoff banner format: $format")
         null
     }
 
 
-    override fun nativeAdView(): WeakReference<View> {
+    override fun nativeAdView(): WeakReference<View>? {
         return WeakReference(adView?.get() as? View)
     }
 

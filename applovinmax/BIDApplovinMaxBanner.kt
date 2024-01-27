@@ -25,7 +25,7 @@ internal class BIDApplovinMaxBanner(
     val bannerFormat = if (format.isBanner_320x50) MaxAdFormat.BANNER
     else if (format.isBanner_300x250) MaxAdFormat.MREC
     else {
-        BIDLog.d(TAG, "Unsuported applovin MAX banner format: $format")
+        BIDLog.d(TAG, "Unsupported applovin MAX banner format: $format")
         null
     }
     var adapter: BIDBannerAdapterProtocol? = adapter
@@ -94,6 +94,7 @@ internal class BIDApplovinMaxBanner(
     }
 
     private fun onFailedToLoad(error: String) {
+        cachedAd = null
         BIDLog.d(TAG, "AppLovin MAX failed to load ad. Error: $error adtag: ($adTag)")
         adapter?.onFailedToLoad(Error(error))
     }

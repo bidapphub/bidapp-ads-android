@@ -26,7 +26,7 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
     val bannerFormat = if (format.isBanner_320x50) AppLovinAdSize.BANNER
     else if (format.isBanner_300x250) AppLovinAdSize.MREC
     else {
-        BIDLog.d(TAG, "Unsuported applovin banner format: $format")
+        BIDLog.d(TAG, "Unsupported applovin banner format: $format")
         null
     }
     var adView : WeakReference<AppLovinAdView>? = null
@@ -77,6 +77,7 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
     }
 
     override fun failedToReceiveAd(p0: Int) {
+        cachedAd = null
         BIDLog.d(TAG, "ad failed to load. Error: $p0")
         adapter.onFailedToLoad(Error(p0.toString()))
     }

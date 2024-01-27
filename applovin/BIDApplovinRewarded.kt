@@ -2,6 +2,7 @@ package io.bidapp.networks.applovin
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.applovin.adview.AppLovinIncentivizedInterstitial
 import com.applovin.sdk.*
 import io.bidapp.sdk.BIDLog
@@ -44,6 +45,7 @@ internal class BIDApplovinRewarded(
             BIDLog.d(TAG, "adHidden")
             if (isGrantedReward){
                 adapter?.onReward()
+                isGrantedReward = false
             }
             adapter?.onHide()
             RewardedOnDisplay.isOnScreen = false

@@ -3,6 +3,7 @@ package io.bidapp.networks.liftoff
 
 import android.app.Activity
 import android.content.Context
+import android.util.Log
 import com.vungle.ads.AdConfig
 import com.vungle.ads.BaseAd
 import com.vungle.ads.BaseFullscreenAd
@@ -25,7 +26,7 @@ internal class BIDLiftoffFullscreen(
 
 
     val TAG = if (isRewarded) "Reward Liftoff" else "Full Liftoff"
-    var ads: WeakReference<BaseFullscreenAd>? = null
+    var ads: BaseFullscreenAd? = null
     var isRewardGranted = false
     val callBack = object : RewardedAdListener {
         override fun onAdClicked(baseAd: BaseAd) {
@@ -38,6 +39,7 @@ internal class BIDLiftoffFullscreen(
             if (isRewarded) {
                 if (isRewardGranted) {
                     adapter?.onReward()
+                    isRewardGranted = false
                 }
             }
             adapter?.onHide()
@@ -89,29 +91,27 @@ internal class BIDLiftoffFullscreen(
         }
         if (isRewarded)
             ads =
-                WeakReference(RewardedAd(context, adTag, AdConfig().apply {
-                }).apply {
+                RewardedAd(context, adTag, AdConfig()).apply {
                     adListener = callBack
                     load()
-                })
+                }
         else
-            ads = WeakReference(
-                InterstitialAd(
+            ads = InterstitialAd(
                     context,
                     adTag,
-                    AdConfig().apply {
-                    }).apply {
+                    AdConfig()).apply {
                     adListener = callBack
                     load()
-                })
+                }
     }
 
     override fun show(activity: Activity?) {
-        if (ads?.get() == null || ads?.get()?.canPlayAd() == false) {
+        Log.d("mylog", "show")
+        if (ads == null || ads?.canPlayAd() == false) {
             adapter?.onFailedToDisplay("Failed to display")
             return
         }
-        (ads?.get() as BaseFullscreenAd).play()
+        (ads as? BaseFullscreenAd)?.play()
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -124,7 +124,7 @@ internal class BIDLiftoffFullscreen(
 
 
     override fun readyToShow(): Boolean {
-        return ads?.get()?.canPlayAd() ?: false
+        return ads?.canPlayAd() ?: false
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
@@ -136,7 +136,7 @@ internal class BIDLiftoffFullscreen(
     }
 
     override fun destroy() {
-        ads?.get()?.adListener = null
-        ads?.clear()
+        ads?.adListener = null
+        ads = null
     }
 }

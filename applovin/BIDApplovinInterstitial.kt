@@ -31,6 +31,7 @@ internal class BIDApplovinInterstitial(
         }
 
         override fun failedToReceiveAd(p0: Int) {
+            currentAd = null
             BIDLog.d(TAG, "failedToReceiveAd errorCode $p0")
             adapter?.onAdFailedToLoadWithError("Error Failed To ReceiveAd : $p0")
         }
