@@ -3,7 +3,6 @@ package io.bidapp.networks.liftoff
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.vungle.ads.AdConfig
 import com.vungle.ads.BaseAd
 import com.vungle.ads.BaseFullscreenAd
@@ -14,21 +13,21 @@ import com.vungle.ads.VungleError
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
-import java.lang.ref.WeakReference
+
 
 
 @PublishedApi
 internal class BIDLiftoffFullscreen(
     val adapter: BIDFullscreenAdapterProtocol? = null,
-    val adTag: String?,
+    private val adTag: String?,
     val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
 
 
     val TAG = if (isRewarded) "Reward Liftoff" else "Full Liftoff"
-    var ads: BaseFullscreenAd? = null
+    private var ads: BaseFullscreenAd? = null
     var isRewardGranted = false
-    val callBack = object : RewardedAdListener {
+    private val callBack = object : RewardedAdListener {
         override fun onAdClicked(baseAd: BaseAd) {
             BIDLog.d(TAG, "on ad click. ${baseAd.placementId}")
             adapter?.onClick()
@@ -106,12 +105,11 @@ internal class BIDLiftoffFullscreen(
     }
 
     override fun show(activity: Activity?) {
-        Log.d("mylog", "show")
         if (ads == null || ads?.canPlayAd() == false) {
             adapter?.onFailedToDisplay("Failed to display")
             return
         }
-        (ads as? BaseFullscreenAd)?.play()
+        (ads)?.play()
     }
 
     override fun activityNeededForShow(): Boolean {

@@ -3,6 +3,7 @@ package io.bidapp.networks.facebook
 import android.content.Context
 import com.facebook.ads.AdSettings
 import com.facebook.ads.AudienceNetworkAds
+import com.facebook.ads.BidderTokenProvider
 import io.bidapp.sdk.BIDConsent
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.ConsentListener
@@ -10,12 +11,12 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 class BIDFacebookSDK(
-    val adapter: BIDNetworkAdapterProtocol? = null,
+    private val adapter: BIDNetworkAdapterProtocol? = null,
     val appId: String? = null,
     appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
-    val TAG = "Facebook SDK"
+    private val TAG = "Facebook SDK"
     private var isInitialize = false
     private val initializeListener = AudienceNetworkAds.InitListener { p0 ->
         if(p0?.isSuccess == true){

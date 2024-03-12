@@ -13,12 +13,12 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
-class BIDMyTargetBanner(val adapter: BIDBannerAdapterProtocol, val slotId: String?, format: AdFormat) :
+class BIDMyTargetBanner(private val adapter: BIDBannerAdapterProtocol, private val slotId: String?, format: AdFormat) :
     BIDBannerAdapterDelegateProtocol, MyTargetView.MyTargetViewListener {
-    val slotIdToInt = slotId?.toIntOrNull()
-    var adView: WeakReference<MyTargetView>? = null
-    var cachedAd: WeakReference<MyTargetView>? = null
-    val TAG = "Banner MyTarget"
+    private val slotIdToInt = slotId?.toIntOrNull()
+    private var adView: WeakReference<MyTargetView>? = null
+    private var cachedAd: WeakReference<MyTargetView>? = null
+    private val TAG = "Banner MyTarget"
     private val bannerFormat = if (format.isBanner_320x50) AdSize.ADSIZE_320x50
     else if (format.isBanner_300x250) AdSize.ADSIZE_300x250
     else {
@@ -43,7 +43,7 @@ class BIDMyTargetBanner(val adapter: BIDBannerAdapterProtocol, val slotId: Strin
             return
         }
         if (slotIdToInt == null){
-            adapter.onFailedToLoad(Error("MyTarget banner adtag is null or incorrect format"))
+            adapter.onFailedToLoad(Error("MyTarget banner slotId is null or incorrect format"))
             return
         }
         if (adView?.get() == null) {

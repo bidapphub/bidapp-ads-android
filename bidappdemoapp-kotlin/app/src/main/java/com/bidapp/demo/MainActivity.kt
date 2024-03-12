@@ -50,8 +50,9 @@ class MainActivity : AppCompatActivity() {
         BidappAds.start(pubid, bidConfig, this)
 
         banner = BannerView(this).banner(AdFormat.banner_320x50)
-        bannerShowDelegate = BannerViewDelegate(bannerMain)
+        bannerShowDelegate = BannerViewDelegate()
         banner?.setBannerViewDelegate(bannerShowDelegate!!)
+        bannerMain.addView(banner)
         banner?.startAutoRefresh(30.0)
 
 

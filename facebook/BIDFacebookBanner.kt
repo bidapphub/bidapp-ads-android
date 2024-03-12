@@ -74,7 +74,7 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, f
         if (adView?.get() == null) {
             adView = WeakReference(AdView(context, adTag, bannerFormat))
         }
-            adView?.get()?.loadAd(adView?.get()?.buildLoadAdConfig()?.withAdListener(bannerListener)?.build())
+             adView?.get()?.loadAd(adView?.get()?.buildLoadAdConfig()?.withAdListener(bannerListener)?.build())
     }
 
     override fun destroy() {

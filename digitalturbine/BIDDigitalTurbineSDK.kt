@@ -11,21 +11,23 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 class BIDDigitalTurbineSDK(
     private val adapter: BIDNetworkAdapterProtocol?,
-    val appId: String?,
+    private val appId: String?,
     appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
-    val TAG = "DigitalTurbine SDK"
-    var isInitializationComplete = false
+    private val TAG = "DigitalTurbine SDK"
+    private var isInitializationComplete = false
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
         if (consent.GDPR != null) {
             InneractiveAdManager.setGdprConsent(consent.GDPR!!)
         }
         if (consent.CCPA != null) {
-            if (consent.CCPA == true) InneractiveAdManager.setUSPrivacyString("1YNN")
-            else if (consent.CCPA == false) InneractiveAdManager.setUSPrivacyString("1YYN")
-            else InneractiveAdManager.setUSPrivacyString("1---")
+            when (consent.CCPA) {
+                true -> InneractiveAdManager.setUSPrivacyString("1YNN")
+                false -> InneractiveAdManager.setUSPrivacyString("1YYN")
+                else -> InneractiveAdManager.setUSPrivacyString("1---")
+            }
         }
         if (consent.COPPA != null && consent.COPPA == true) {
             InneractiveAdManager.currentAudienceAppliesToCoppa()
@@ -66,12 +68,12 @@ class BIDDigitalTurbineSDK(
         return null
     }
 
-    fun initializationComplete() {
+    private fun initializationComplete() {
         BIDLog.d(TAG, "Initialization complete")
         adapter?.onInitializationComplete(true, null)
     }
 
-    fun initializationFailed(err: String) {
+    private fun initializationFailed(err: String) {
         BIDLog.d(TAG, "Initialization failed. Error:$err")
         adapter?.onInitializationComplete(false, err)
     }

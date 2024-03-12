@@ -20,12 +20,12 @@ import java.lang.ref.WeakReference
 @PublishedApi
 internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat) :
     BIDBannerAdapterDelegateProtocol, BannerAdListener {
-    var adapter: BIDBannerAdapterProtocol? = adapter
-    var bannerAd: WeakReference<BannerAd>? = null
-    var adView: WeakReference<BannerView>? = null
-    var cachedAd: String? = null
-    val TAG = "Banner Liftoff"
-    val bannerFormat = if (format.isBanner_320x50) BannerAdSize.BANNER
+    private var adapter: BIDBannerAdapterProtocol? = adapter
+    private var bannerAd: WeakReference<BannerAd>? = null
+    private var adView: WeakReference<BannerView>? = null
+    private var cachedAd: String? = null
+    private val TAG = "Banner Liftoff"
+    private val bannerFormat = if (format.isBanner_320x50) BannerAdSize.BANNER
     else if (format.isBanner_300x250) BannerAdSize.VUNGLE_MREC
     else {
         BIDLog.d(TAG, "Unsupported Liftoff banner format: $format")
@@ -48,11 +48,11 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
             return
         }
         if (adTag == null){
-            adapter?.onFailedToLoad(Error("Liftoff banner adtag is null"))
+            adapter?.onFailedToLoad(Error("Liftoff banner adTag is null"))
             return
         }
         if (bannerAd == null) {
-            bannerAd = WeakReference(BannerAd(context, adTag!!, bannerFormat))
+            bannerAd = WeakReference(BannerAd(context, adTag, bannerFormat))
         }
             bannerAd?.get()?.adListener = this
             bannerAd?.get()?.load()
@@ -98,23 +98,23 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     }
 
     override fun onAdClicked(baseAd: BaseAd) {
-        BIDLog.d(TAG, "ad click. adtag: ($adTag)")
+        BIDLog.d(TAG, "ad click. adTag: ($adTag)")
         adapter?.onClick()
     }
 
     override fun onAdEnd(baseAd: BaseAd) {
-        BIDLog.d(TAG, "ad end. adtag: ($adTag)")
+        BIDLog.d(TAG, "ad end. adTag: ($adTag)")
         adapter?.onHide()
         cachedAd = null
     }
 
     override fun onAdFailedToLoad(baseAd: BaseAd, adError: VungleError) {
-        BIDLog.d(TAG, "failed to load ad. Error: ${adError.message} adtag: ($adTag)")
+        BIDLog.d(TAG, "failed to load ad. Error: ${adError.message} adTag: ($adTag)")
         adapter?.onFailedToLoad(Error(adError.message))
     }
 
     override fun onAdFailedToPlay(baseAd: BaseAd, adError: VungleError) {
-        BIDLog.d(TAG, "failed to play ${adError.message} adtag: ($adTag)")
+        BIDLog.d(TAG, "failed to play ${adError.message} adTag: ($adTag)")
         adapter?.onFailedToDisplay(Error(adError.message))
     }
 

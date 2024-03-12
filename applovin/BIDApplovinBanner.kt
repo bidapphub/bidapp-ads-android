@@ -98,7 +98,7 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
             return
         }
             if (adView?.get() == null) {
-                adView = WeakReference(AppLovinAdView(bannerFormat, context))
+                adView = WeakReference(AppLovinAdView(BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext), bannerFormat, context))
             }
             adView?.get()?.setAdLoadListener(this)
             adView?.get()?.setAdDisplayListener(this)

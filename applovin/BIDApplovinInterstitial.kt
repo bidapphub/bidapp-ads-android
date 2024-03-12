@@ -18,9 +18,7 @@ internal class BIDApplovinInterstitial(
 ) : BIDFullscreenAdapterDelegateProtocol {
 
     val TAG = "interstitial Applovin"
-
     private var currentAd: AppLovinAd? = null
-    var sdk: AppLovinSdk? = null
     var interstitialAdDialog: AppLovinInterstitialAdDialog? = null
 
     private val appLovinAdLoadListener = object : AppLovinAdLoadListener {
@@ -81,11 +79,10 @@ internal class BIDApplovinInterstitial(
             return
         }
          if (interstitialAdDialog == null) {
-                sdk = AppLovinSdk.getInstance(context)
-                interstitialAdDialog = AppLovinInterstitialAd.create(sdk, context)
+                interstitialAdDialog = AppLovinInterstitialAd.create(BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext), context)
             }
             init()
-            AppLovinSdk.getInstance(context).adService.loadNextAd(
+            BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext).adService.loadNextAd(
                 AppLovinAdSize.INTERSTITIAL,
                 appLovinAdLoadListener
             )

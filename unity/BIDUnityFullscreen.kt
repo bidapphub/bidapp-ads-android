@@ -12,7 +12,7 @@ import com.unity3d.ads.UnityAdsShowOptions
 @PublishedApi
 internal class BIDUnityFullscreen(
     val adapter: BIDFullscreenAdapterProtocol? = null,
-    val adTag: String?,
+    private val adTag: String?,
     isRewarded: Boolean
 ) :
     BIDFullscreenAdapterDelegateProtocol {
@@ -72,7 +72,7 @@ internal class BIDUnityFullscreen(
 
     override fun load(context: Any) {
         if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Unity fullscreen adtag is null")
+            adapter?.onAdFailedToLoadWithError("Unity fullscreen adTag is null")
             return
         }
         ready = false

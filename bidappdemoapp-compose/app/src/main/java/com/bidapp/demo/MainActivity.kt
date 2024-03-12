@@ -72,7 +72,6 @@ class MainActivity : ComponentActivity() {
         setContent {
               Main()
         }
-
         banner = addBanner_320x50(bannerShowDelegate)
     }
 
@@ -118,7 +117,7 @@ class MainActivity : ComponentActivity() {
                 AndroidView(
                     factory = { context ->
                         val view = FrameLayout(context)
-                        bannerShowDelegate.setView(view)
+                        view.addView(banner)
                         view
                     }
                 )

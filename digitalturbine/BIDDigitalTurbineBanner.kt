@@ -1,7 +1,6 @@
 package io.bidapp.networks.digitalturbine
 
 import android.content.Context
-import android.util.Log
 import android.view.View
 import android.widget.FrameLayout
 import com.fyber.inneractive.sdk.external.ImpressionData
@@ -25,11 +24,11 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
     private var adViewSpot : WeakReference<InneractiveAdSpot>? = null
     var ready = false
     var view : WeakReference<View>? = null
-    var controller : InneractiveAdViewUnitController? = null
+    private var controller : InneractiveAdViewUnitController? = null
 
-    val bannerEventListener = object : InneractiveAdViewEventsListenerWithImpressionData{
+    private val bannerEventListener = object : InneractiveAdViewEventsListenerWithImpressionData{
         override fun onAdImpression(p0: InneractiveAdSpot?, p1: ImpressionData?) {
-            BIDLog.d(TAG, "ad show adtag: ($adTag)")
+            BIDLog.d(TAG, "ad show adTag: ($adTag)")
             adapter.onDisplay()
         }
 
@@ -37,7 +36,7 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
         }
 
         override fun onAdClicked(p0: InneractiveAdSpot?) {
-            BIDLog.d(TAG, "ad clicked. adtag: ($adTag)")
+            BIDLog.d(TAG, "ad clicked. adTag: ($adTag)")
             adapter.onClick()
         }
 
@@ -63,10 +62,10 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
 
     }
 
-    val bannerLoadListener = object : InneractiveAdSpot.RequestListener{
+    private val bannerLoadListener = object : InneractiveAdSpot.RequestListener{
         override fun onInneractiveSuccessfulAdRequest(p0: InneractiveAdSpot?) {
             ready = true
-            BIDLog.d(TAG, "ad loaded adtag: ($adTag)")
+            BIDLog.d(TAG, "ad loaded adTag: ($adTag)")
             adapter.onLoad()
         }
 
@@ -75,7 +74,7 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             p1: InneractiveErrorCode?
         ) {
             val error = p1 ?: "Unknown Error"
-            BIDLog.d(TAG, "Admob failed to load ad. adtag: ($adTag) Error: ${error}")
+            BIDLog.d(TAG, "Admob failed to load ad. adTag: ($adTag) Error: $error")
             adapter.onFailedToLoad(Error(error.toString()))
             ready = false
         }

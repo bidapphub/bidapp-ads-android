@@ -9,10 +9,10 @@ android {
 
     defaultConfig {
         applicationId = "com.bidapp.demo"
-        minSdk = 22
+        minSdk = 24
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -54,20 +54,18 @@ android {
 
 
 dependencies {
-    implementation ("io.bidapp:sdk:1.0.4")
-    implementation ("io.bidapp.networks:applovin:1.0.2")
-    implementation ("io.bidapp.networks:applovinmax:1.0.2")
-    implementation ("io.bidapp.networks:unity:1.0.2")
-    implementation ("io.bidapp.networks:liftoff:1.0.2")
-    implementation ("io.bidapp.networks:admob:1.0.2")
-    implementation ("io.bidapp.networks:chartboost:1.0.2")
-    implementation ("io.bidapp.networks:digitalturbine:1.0.2")
-    implementation ("io.bidapp.networks:facebook:1.0.2")
-    implementation ("io.bidapp.networks:startIo:1.0.2")
-    implementation ("io.bidapp.networks:facebook:1.0.2")
-    implementation ("io.bidapp.networks:startIo:1.0.2")
-    implementation ("io.bidapp.networks:yandex:1.0.2")
-    implementation ("io.bidapp.networks:mytarget:1.0.2")
+    implementation ("io.bidapp:sdk:1.0.5")
+    implementation ("io.bidapp.networks:applovin:1.0.3")
+    implementation ("io.bidapp.networks:applovinmax:1.0.3")
+    implementation ("io.bidapp.networks:unity:1.0.3")
+    implementation ("io.bidapp.networks:liftoff:1.0.3")
+    implementation ("io.bidapp.networks:admob:1.0.3")
+    implementation ("io.bidapp.networks:chartboost:1.0.3")
+    implementation ("io.bidapp.networks:digitalturbine:1.0.3")
+    implementation ("io.bidapp.networks:facebook:1.0.3")
+    implementation ("io.bidapp.networks:startIo:1.0.3")
+    implementation ("io.bidapp.networks:yandex:1.0.3")
+    implementation ("io.bidapp.networks:mytarget:1.0.3")
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.8.1")

@@ -2,7 +2,6 @@ package io.bidapp.networks.startIo
 
 import android.app.Activity
 import android.content.Context
-import android.util.Log
 import com.startapp.sdk.adsbase.Ad
 import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.adlisteners.AdDisplayListener
@@ -18,7 +17,7 @@ internal class BIDStartIoFullscreen(
     val adapter: BIDFullscreenAdapterProtocol? = null,
     val adTag: String?,
     val isRewarded: Boolean,
-    val ecpm: Double
+    private val ecpm: Double
 ) :
     BIDFullscreenAdapterDelegateProtocol {
     val TAG = if (isRewarded) "Reward StartIo" else "Full StartIo"
@@ -88,7 +87,7 @@ internal class BIDStartIoFullscreen(
         }
         init()
         startAppAdPreferences = AdPreferences()
-        if (adTag == null) BIDLog.d(TAG, "StartIo adtag is null")
+        if (adTag == null) BIDLog.d(TAG, "StartIo adTag is null")
         else startAppAdPreferences?.adTag = adTag
         startAppAdPreferences?.minCpm = ecpm
         if (isRewarded) {

@@ -1,7 +1,6 @@
 package io.bidapp.networks.startIo
 
 import android.app.Activity
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
@@ -15,22 +14,22 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
-class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat, val ecpm : Double) :
+class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat, private val ecpm : Double) :
     BIDBannerAdapterDelegateProtocol {
 
     val TAG = "Banner StartIo"
-    var adapter: BIDBannerAdapterProtocol? = adapter
-    var startAppAdPreferences: AdPreferences? = null
+    private var adapter: BIDBannerAdapterProtocol? = adapter
+    private var startAppAdPreferences: AdPreferences? = null
     var cachedAd: WeakReference<View>? = null
-    var adView: WeakReference<Any>? = null
-    var bannerFormat = if (format.isBanner_320x50) "banner"
+    private var adView: WeakReference<Any>? = null
+    private var bannerFormat = if (format.isBanner_320x50) "banner"
     else if (format.isBanner_300x250) "mrec"
     else {
         adapter.onFailedToLoad(Error("Unsupported Liftoff banner format"))
         null
     }
 
-    val bannerListener = object : BannerListener {
+    private val bannerListener = object : BannerListener {
         override fun onReceiveAd(p0: View?) {
             cachedAd = WeakReference(p0)
             adapter.onLoad()

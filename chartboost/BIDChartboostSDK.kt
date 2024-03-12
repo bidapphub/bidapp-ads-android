@@ -16,11 +16,11 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 @PublishedApi
 internal class BIDChartboostSDK(
     private val adapter: BIDNetworkAdapterProtocol?,
-    val appId: String?,
-    val appSignature: String?
+    private val appId: String?,
+    private val appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
-    val TAG = "Chartboost SDK"
+    private val TAG = "Chartboost SDK"
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
         if (consent.GDPR != null) {

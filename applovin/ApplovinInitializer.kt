@@ -14,9 +14,9 @@ internal object ApplovinInitializer : IApplovinInitializer {
     fun doStart(listener: BIDNetworkAdapterProtocol, context: Context) {
            startSDKWaiters.add(WeakReference(listener))
         if (1 == startSDKWaiters.size) {
-            AppLovinSdk.getInstance(context).mediationProvider = "max"
-            AppLovinSdk.getInstance(context).initializeSdk {
-                val success = AppLovinSdk.getInstance(context).isInitialized
+            BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).mediationProvider = "max"
+            BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).initializeSdk {
+                val success = BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).isInitialized
                 dispatch_main {
                     if (!success) {
                         startSDKWaiters.forEach {

@@ -91,7 +91,7 @@ internal class BIDApplovinMaxRewarded(
             return
         }
             if (rewardedAd == null) {
-                rewardedAd = MaxRewardedAd.getInstance(adTag, context)
+                rewardedAd = MaxRewardedAd.getInstance(adTag,BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK((context as Activity).applicationContext), context)
             }
             if (RewardedOnDisplay.isOnScreen) adapter?.onAdFailedToLoadWithError("Max rewarded loading error")
             else {

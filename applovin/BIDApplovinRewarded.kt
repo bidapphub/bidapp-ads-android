@@ -18,7 +18,6 @@ internal class BIDApplovinRewarded(
 
     val TAG = "Reward Applovin"
     var isGrantedReward = false
-
     private var incentivizedInterstitial: AppLovinIncentivizedInterstitial? = null
 
 
@@ -94,7 +93,7 @@ internal class BIDApplovinRewarded(
             return
         }
         if (incentivizedInterstitial == null) {
-            incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(context)
+            incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext))
         }
         if (RewardedOnDisplay.isOnScreen) appLovinAdLoadListener.failedToReceiveAd(0)
         else incentivizedInterstitial?.preload(appLovinAdLoadListener)

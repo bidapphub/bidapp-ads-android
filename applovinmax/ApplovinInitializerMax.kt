@@ -1,7 +1,6 @@
 package io.bidapp.networks.applovinmax
 
 import android.content.Context
-import com.applovin.sdk.AppLovinSdk
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 import io.bidapp.sdk.utils.dispatch_main
 import java.lang.ref.WeakReference
@@ -16,9 +15,9 @@ internal object ApplovinInitializerMax : IApplovinInitializer {
     fun doStart(listener: BIDNetworkAdapterProtocol, context: Context) {
           startSDKWaiters.add(WeakReference(listener))
          if (1 == startSDKWaiters.size) {
-            AppLovinSdk.getInstance(context).mediationProvider = "max"
-            AppLovinSdk.getInstance(context).initializeSdk {
-                val success = AppLovinSdk.getInstance(context).isInitialized
+            BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context.applicationContext).mediationProvider = "max"
+            BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context.applicationContext).initializeSdk {
+                val success = BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context.applicationContext).isInitialized
                 dispatch_main {
                     if (!success) {
                         startSDKWaiters.forEach {

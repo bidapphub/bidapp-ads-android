@@ -1,7 +1,6 @@
 package io.bidapp.networks.startIo
 
 import android.content.Context
-import android.util.Log
 import com.startapp.sdk.adsbase.StartAppAd
 import com.startapp.sdk.adsbase.StartAppSDK
 import io.bidapp.sdk.BIDConsent
@@ -12,11 +11,11 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 class BIDStartIoSDK(
     private val adapter: BIDNetworkAdapterProtocol?,
-    val appId: String?,
+    private val appId: String?,
     val developerId: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
-    val TAG = "StartIo SDK"
-    var isInitializationComplete = false
+    private val TAG = "StartIo SDK"
+    private var isInitializationComplete = false
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
         consent.let {
@@ -37,7 +36,7 @@ class BIDStartIoSDK(
                 }
             }
             if (consent.COPPA != null) {
-                Log.d(TAG, "Warning! To enable COPPA compliance for the Start.io adapter, you need to specify it in the manifest file of your application.")
+                BIDLog.d(TAG, "Warning! To enable COPPA compliance for the Start.io adapter, you need to specify it in the manifest file of your application.")
             }
         }
     }
@@ -64,12 +63,12 @@ class BIDStartIoSDK(
         return isInitializationComplete
     }
 
-    fun initializationComplete() {
+    private fun initializationComplete() {
         BIDLog.d(TAG, "Initialization complete")
         adapter?.onInitializationComplete(true, null)
     }
 
-    fun initializationFailed(err: String) {
+    private fun initializationFailed(err: String) {
         BIDLog.d(TAG, "Initialization failed. Error:$err")
         adapter?.onInitializationComplete(false, err)
     }

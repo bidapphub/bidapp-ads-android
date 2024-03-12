@@ -2,11 +2,9 @@ package io.bidapp.networks.unity
 
 
 import android.app.Activity
-import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
-
 import com.unity3d.services.banners.BannerErrorInfo
 import com.unity3d.services.banners.BannerView
 import com.unity3d.services.banners.UnityBannerSize
@@ -19,21 +17,21 @@ import java.lang.ref.WeakReference
 
 @PublishedApi
 internal class BIDUnityBanner(
-    var adapter: BIDBannerAdapterProtocol?,
-    var adTag: String?,
+    private var adapter: BIDBannerAdapterProtocol?,
+    private var adTag: String?,
     format: AdFormat?
 ) : BIDBannerAdapterDelegateProtocol, BannerView.IListener {
 
-    val TAG = "Banner Unity"
+    private val TAG = "Banner Unity"
 
-    val bannerFormat = if (format?.isBanner_320x50 == true) UnityBannerSize(320, 50)
+    private val bannerFormat = if (format?.isBanner_320x50 == true) UnityBannerSize(320, 50)
     else if (format?.isBanner_300x250 == true) UnityBannerSize(300, 250)
     else {
         BIDLog.d(TAG, "Unsupported banner format: $format")
         null
     }
-    var adView: WeakReference<BannerView>? = null
-    var cachedAd: WeakReference<BannerView>? = null
+    private var adView: WeakReference<BannerView>? = null
+    private var cachedAd: WeakReference<BannerView>? = null
 
 
     override fun nativeAdView(): WeakReference<View>? {
@@ -100,16 +98,16 @@ internal class BIDUnityBanner(
     override fun onBannerLoaded(ad: BannerView?) {
         cachedAd = WeakReference(ad)
         adapter?.onLoad()
-        BIDLog.d(TAG, "ad load. adtag: ($adTag)")
+        BIDLog.d(TAG, "ad load. adTag: ($adTag)")
     }
 
     override fun onBannerShown(bannerAdView: BannerView?) {
-        BIDLog.d(TAG, "ad show. adtag: ($adTag)")
+        BIDLog.d(TAG, "ad show. adTag: ($adTag)")
         adapter?.onDisplay()
     }
 
     override fun onBannerClick(bannerAdView: BannerView?) {
-        BIDLog.d(TAG, "ad click. adtag: ($adTag)")
+        BIDLog.d(TAG, "ad click. adTag: ($adTag)")
         adapter?.onClick()
     }
 
@@ -119,7 +117,7 @@ internal class BIDUnityBanner(
     }
 
     override fun onBannerLeftApplication(bannerView: BannerView?) {
-        BIDLog.d(TAG, "banner left application. adtag: ($adTag)")
+        BIDLog.d(TAG, "banner left application. adTag: ($adTag)")
     }
 
     override fun revenue(): Double? {

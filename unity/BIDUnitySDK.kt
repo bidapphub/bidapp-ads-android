@@ -12,12 +12,12 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 @PublishedApi
 internal class BIDUnitySDK(
-    val adapter: BIDNetworkAdapterProtocol? = null,
-    val gameId: String? = null,
+    private val adapter: BIDNetworkAdapterProtocol? = null,
+    private val gameId: String? = null,
     appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
-    var testMode = false
-    val TAG = "Unity SDK"
+    private var testMode = false
+    private val TAG = "Unity SDK"
 
     override fun enableLogging(context: Context) {
         UnityAds.debugMode = true

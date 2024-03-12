@@ -31,64 +31,69 @@ internal class BIDChartboostRewarded(
     var isRewardGranted = false
 
 
-    fun init() {
-        chartboostRewarded = location?.let {
-            Rewarded(it, object : RewardedCallback {
-                override fun onAdClicked(event: ClickEvent, error: ClickError?) {
-                    if (error == null) {
-                        BIDLog.d(TAG, "ad clicked. location: ($location)")
-                        adapter?.onClick()
-                        return
-                    }
-                    BIDLog.d(TAG, "ad clicked is failure. location: ($location)")
-                }
-
-                override fun onAdDismiss(event: DismissEvent) {
-                    if (isRewardGranted){
-                        adapter?.onReward()
-                        isRewardGranted = false
-                    }
-                    adapter?.onHide()
-                    BIDLog.d(TAG, "ad hidden. location: ($location)")
-                }
-
-                override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
-                    if (error == null && event.ad.isCached()) {
-                        BIDLog.d(TAG, "loaded Ad. location: ($location)")
-                        adapter?.onAdLoaded()
-                    } else {
-                        BIDLog.d(
-                            TAG,
-                            "failed to receive ad error ${error?.code?.name.toString()} location: ($location)"
-                        )
-                        adapter?.onAdFailedToLoadWithError(error?.code?.name.toString())
-                    }
-                }
-
-                override fun onAdRequestedToShow(event: ShowEvent) {
-                    BIDLog.d(TAG, "ad requested to show. location: ($location)")
-                }
-
-                override fun onAdShown(event: ShowEvent, error: ShowError?) {
-                    if (error == null) {
-                        BIDLog.d(TAG, "ad display. location: ($location)")
-                    } else {
-                        BIDLog.d(TAG, "ad failed to display ${error.exception?.message} location: ($location)")
-                        adapter?.onFailedToDisplay(error.exception?.message.toString())
-                    }
-                }
-
-                override fun onImpressionRecorded(event: ImpressionEvent) {
-                    BIDLog.d(TAG, "ad impression recorded. location: ($location)")
-                    adapter?.onDisplay()
-                }
-
-                override fun onRewardEarned(event: RewardEvent) {
-                    BIDLog.d(TAG, "on reward earned. location: ($location)")
-                    isRewardGranted = true
-                }
-            }, null)
+    private fun init() {
+        if (chartboostRewarded == null){
+            return
         }
+        if (location == null){
+            BIDLog.d(TAG, "Location is null")
+            return
+        }
+        chartboostRewarded = Rewarded(location, object : RewardedCallback {
+            override fun onAdClicked(event: ClickEvent, error: ClickError?) {
+                if (error == null) {
+                    BIDLog.d(TAG, "ad clicked. Location: ($location)")
+                    adapter?.onClick()
+                    return
+                }
+                BIDLog.d(TAG, "ad clicked is failure. Location: ($location)")
+            }
+
+            override fun onAdDismiss(event: DismissEvent) {
+                if (isRewardGranted){
+                    adapter?.onReward()
+                    isRewardGranted = false
+                }
+                adapter?.onHide()
+                BIDLog.d(TAG, "ad hidden. Location: ($location)")
+            }
+
+            override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
+                if (error == null && event.ad.isCached()) {
+                    BIDLog.d(TAG, "loaded Ad. Location: ($location)")
+                    adapter?.onAdLoaded()
+                } else {
+                    BIDLog.d(
+                        TAG,
+                        "failed to receive ad error ${error?.code?.name.toString()} Location: ($location)"
+                    )
+                    adapter?.onAdFailedToLoadWithError(error?.code?.name.toString())
+                }
+            }
+
+            override fun onAdRequestedToShow(event: ShowEvent) {
+                BIDLog.d(TAG, "ad requested to show. Location: ($location)")
+            }
+
+            override fun onAdShown(event: ShowEvent, error: ShowError?) {
+                if (error == null) {
+                    BIDLog.d(TAG, "ad display. Location: ($location)")
+                } else {
+                    BIDLog.d(TAG, "ad failed to display ${error.exception?.message} Location: ($location)")
+                    adapter?.onFailedToDisplay(error.exception?.message.toString())
+                }
+            }
+
+            override fun onImpressionRecorded(event: ImpressionEvent) {
+                BIDLog.d(TAG, "ad impression recorded. Location: ($location)")
+                adapter?.onDisplay()
+            }
+
+            override fun onRewardEarned(event: RewardEvent) {
+                BIDLog.d(TAG, "on reward earned. Location: ($location)")
+                isRewardGranted = true
+            }
+        }, null)
     }
 
     override fun load(context: Any) {

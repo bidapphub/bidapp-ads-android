@@ -26,54 +26,59 @@ internal class BIDChartboostInterstitial(
     private var chartboostInterstitial: Interstitial? = null
 
     private fun init() {
-        chartboostInterstitial = location?.let {
-            Interstitial(it, object : InterstitialCallback {
-                override fun onAdClicked(event: ClickEvent, error: ClickError?) {
-                    if (error == null) {
-                        BIDLog.d(TAG, "ad clicked. location: ($location)")
-                        adapter?.onClick()
-                        return
-                    }
-                    BIDLog.d(TAG, "ad clicked is failure. location: ($location)")
-                }
-
-                override fun onAdDismiss(event: DismissEvent) {
-                    adapter?.onHide()
-                    BIDLog.d(TAG, "ad hide. location: ($location)")
-                }
-
-                override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
-                    if (error == null && event.ad.isCached()) {
-                        BIDLog.d(TAG, "ad loaded. location: ($location)")
-                        adapter?.onAdLoaded()
-                    } else {
-                        BIDLog.d(
-                            TAG,
-                            "ad Failed To Receive Ad error ${error?.code?.name.toString()} location: ($location)"
-                        )
-                        adapter?.onAdFailedToLoadWithError(error?.code?.name.toString())
-                    }
-                }
-
-                override fun onAdRequestedToShow(event: ShowEvent) {
-                    BIDLog.d(TAG, "ad requested to show. location: ($location)")
-                }
-
-                override fun onAdShown(event: ShowEvent, error: ShowError?) {
-                    if (error == null) {
-                        BIDLog.d(TAG, "ad display. location: ($location)")
-                    } else {
-                        BIDLog.d(TAG, "ad failed to display ${error.exception?.message} location: ($location)")
-                        adapter?.onFailedToDisplay(error.exception?.message.toString())
-                    }
-                }
-
-                override fun onImpressionRecorded(event: ImpressionEvent) {
-                    BIDLog.d(TAG, "ad impression recorded. location: ($location)")
-                    adapter?.onDisplay()
-                }
-            }, null)
+        if (chartboostInterstitial == null){
+            return
         }
+        if (location == null){
+            BIDLog.d(TAG, "Location is null")
+            return
+        }
+        chartboostInterstitial = Interstitial(location, object : InterstitialCallback {
+            override fun onAdClicked(event: ClickEvent, error: ClickError?) {
+                if (error == null) {
+                    BIDLog.d(TAG, "ad clicked. Location: ($location)")
+                    adapter?.onClick()
+                    return
+                }
+                BIDLog.d(TAG, "ad clicked is failure. Location: ($location)")
+            }
+
+            override fun onAdDismiss(event: DismissEvent) {
+                adapter?.onHide()
+                BIDLog.d(TAG, "ad hide. Location: ($location)")
+            }
+
+            override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
+                if (error == null && event.ad.isCached()) {
+                    BIDLog.d(TAG, "ad loaded. Location: ($location)")
+                    adapter?.onAdLoaded()
+                } else {
+                    BIDLog.d(
+                        TAG,
+                        "ad Failed To Receive Ad error ${error?.code?.name.toString()} Location: ($location)"
+                    )
+                    adapter?.onAdFailedToLoadWithError(error?.code?.name.toString())
+                }
+            }
+
+            override fun onAdRequestedToShow(event: ShowEvent) {
+                BIDLog.d(TAG, "ad requested to show. Location: ($location)")
+            }
+
+            override fun onAdShown(event: ShowEvent, error: ShowError?) {
+                if (error == null) {
+                    BIDLog.d(TAG, "ad display. Location: ($location)")
+                } else {
+                    BIDLog.d(TAG, "ad failed to display ${error.exception?.message} Location: ($location)")
+                    adapter?.onFailedToDisplay(error.exception?.message.toString())
+                }
+            }
+
+            override fun onImpressionRecorded(event: ImpressionEvent) {
+                BIDLog.d(TAG, "ad impression recorded. Location: ($location)")
+                adapter?.onDisplay()
+            }
+        }, null)
     }
 
     override fun load(context: Any) {
@@ -89,7 +94,7 @@ internal class BIDChartboostInterstitial(
 
     override fun show(activity: Activity?) {
         if (chartboostInterstitial == null || chartboostInterstitial?.isCached() == false) {
-            adapter?.onFailedToDisplay("Chart boost showing interstitial is failure")
+            adapter?.onFailedToDisplay("Chart boost showing interstitial is failure. Location: ($location)")
             return
         }
         chartboostInterstitial?.show()

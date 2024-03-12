@@ -68,7 +68,7 @@ internal class BIDApplovinMaxInterstitial(
             return
         }
             if (interstitialAd == null) {
-                interstitialAd = MaxInterstitialAd(adTag, context)
+                interstitialAd = MaxInterstitialAd(adTag, BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK((context as Activity).applicationContext), context)
             }
             setListener()
             interstitialAd?.loadAd()

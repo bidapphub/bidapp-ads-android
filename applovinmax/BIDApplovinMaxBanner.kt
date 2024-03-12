@@ -51,7 +51,8 @@ internal class BIDApplovinMaxBanner(
             return
         }
         if (adView?.get() == null) {
-            adView = WeakReference(MaxAdView(adTag, bannerFormat, context))
+            adView = WeakReference(MaxAdView(adTag, bannerFormat, BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context), context))
+            adView?.get()?.setExtraParameter( "allow_pause_auto_refresh_immediately", "true" )
             adView?.get()?.stopAutoRefresh()
         }
         adView?.get()?.setListener(this as MaxAdViewAdListener)
@@ -138,7 +139,7 @@ internal class BIDApplovinMaxBanner(
 
     override fun revenue(): Double? {
         if (cachedAd != null) {
-            return cachedAd?.revenue
+           return cachedAd?.revenue
         }
         return null
     }

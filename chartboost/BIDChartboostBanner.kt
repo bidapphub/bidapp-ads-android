@@ -39,30 +39,30 @@ internal class BIDChartboostBanner(
     private val chartboostCallback = object : BannerCallback {
         override fun onAdClicked(event: ClickEvent, error: ClickError?) {
             if (error == null) {
-                BIDLog.d(TAG, "ad click. location: ($location)")
+                BIDLog.d(TAG, "ad click. Location: ($location)")
                 adapter?.onClick()
             }
-            else BIDLog.d(TAG, "ad click is failure. location: ($location) Error: ${error.exception}")
+            else BIDLog.d(TAG, "ad click is failure. Location: ($location) Error: ${error.exception}")
         }
 
         override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
             if (error == null) {
                 cachedAd = WeakReference(event.ad)
                 adapter?.onLoad()
-                BIDLog.d(TAG, "ad loaded. location: ($location)")
+                BIDLog.d(TAG, "ad loaded. Location: ($location)")
             } else {
-                BIDLog.d(TAG, "Chartboost failed to load ad. Error: ${error.exception} location: ($location)")
+                BIDLog.d(TAG, "Chartboost failed to load ad. Error: ${error.exception} Location: ($location)")
                 adapter?.onFailedToLoad(Error(error.exception))
             }
         }
 
         override fun onAdRequestedToShow(event: ShowEvent) {
-            BIDLog.d(TAG, "ad requested to show. location: ($location)")
+            BIDLog.d(TAG, "ad requested to show. Location: ($location)")
         }
 
         override fun onAdShown(event: ShowEvent, error: ShowError?) {
             if (error != null) {
-                BIDLog.d(TAG, "Chartboost failed to show ad. Error: ${error.exception?.message} location: ($location)")
+                BIDLog.d(TAG, "Chartboost failed to show ad. Error: ${error.exception?.message} Location: ($location)")
                 adapter?.onFailedToDisplay(Error(error.exception?.message))
                 return
             }
@@ -70,7 +70,7 @@ internal class BIDChartboostBanner(
         }
 
         override fun onImpressionRecorded(event: ImpressionEvent) {
-            BIDLog.d(TAG, "ad impression recorded. location: ($location)")
+            BIDLog.d(TAG, "ad impression recorded. Location: ($location)")
             adapter?.onDisplay()
         }
     }
@@ -107,6 +107,7 @@ internal class BIDChartboostBanner(
     }
 
     override fun destroy() {
+        cachedAd?.get()?.clearCache()
         cachedAd = null
         adView?.get()?.detach()
         adView?.clear()

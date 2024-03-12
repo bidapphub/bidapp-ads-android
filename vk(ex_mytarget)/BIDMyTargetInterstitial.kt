@@ -13,12 +13,12 @@ class BIDMyTargetInterstitial(
     val slotId: String? = null
 ) :
     BIDFullscreenAdapterDelegateProtocol {
-    val slotIdToInt = slotId?.toIntOrNull()
+    private val slotIdToInt = slotId?.toIntOrNull()
     val TAG = "Full MyTarget"
-    var ads : InterstitialAd? = null
+    private var ads : InterstitialAd? = null
     var isAdsReady = false
 
-    val callback = object : InterstitialAd.InterstitialAdListener{
+    private val callback = object : InterstitialAd.InterstitialAdListener{
         override fun onLoad(p0: InterstitialAd) {
             isAdsReady = true
             BIDLog.d(TAG, "on ad load $slotId")

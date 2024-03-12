@@ -10,7 +10,7 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 @PublishedApi
 internal class BIDYandexSDK(
-    val adapter: BIDNetworkAdapterProtocol,
+    private val adapter: BIDNetworkAdapterProtocol,
     val appId: String?,
     appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {

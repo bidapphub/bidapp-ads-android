@@ -2,7 +2,6 @@ package io.bidapp.networks.mytarget
 
 import android.app.Activity
 import android.content.Context
-import com.my.target.ads.InterstitialAd
 import com.my.target.ads.Reward
 import com.my.target.ads.RewardedAd
 import com.my.target.common.models.IAdLoadingError
@@ -16,9 +15,9 @@ class BIDMyTargetRewarded(
     isReward: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
 
-    val slotIdToInt = slotId?.toIntOrNull()
+    private val slotIdToInt = slotId?.toIntOrNull()
     val TAG = "Rewarded MyTarget"
-    var ads: RewardedAd? = null
+    private var ads: RewardedAd? = null
     var isAdsReady = false
     var isRewardGranted = false
 

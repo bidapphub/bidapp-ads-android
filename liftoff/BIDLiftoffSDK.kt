@@ -15,13 +15,13 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 @PublishedApi
 internal class BIDLiftoffSDK(
-    val adapter: BIDNetworkAdapterProtocol,
-    val appId: String?,
+    private val adapter: BIDNetworkAdapterProtocol,
+    private val appId: String?,
     appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
-    val TAG = "Liftoff SDK"
-    var testMode = false
+    private val TAG = "Liftoff SDK"
+    private var testMode = false
 
     override fun enableLogging(context: Context) {
     }

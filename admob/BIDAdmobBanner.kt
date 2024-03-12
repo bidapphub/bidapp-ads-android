@@ -103,7 +103,6 @@ internal class BIDAdmobBanner(
         }
         adView?.get()?.adListener = adListener
         adView?.get()?.loadAd(request)
-
     }
 
     override fun destroy() {

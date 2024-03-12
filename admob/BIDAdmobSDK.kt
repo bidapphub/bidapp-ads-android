@@ -67,14 +67,14 @@ internal class BIDAdmobSDK(
         }
     }
 
-    fun initializationComplete() {
+    private fun initializationComplete() {
         BIDLog.d(TAG, "Initialization complete")
         adapter.onInitializationComplete(true, null)
     }
 
-    fun initializationFailed(err: String) {
-        BIDLog.d(TAG, "Initialization failed. Error: $err")
-        adapter.onInitializationComplete(false, err)
+    private fun initializationFailed(error: String) {
+        BIDLog.d(TAG, "Initialization failed. Error: $error")
+        adapter.onInitializationComplete(false, error)
     }
 
 

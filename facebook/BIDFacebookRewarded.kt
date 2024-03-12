@@ -2,6 +2,7 @@ package io.bidapp.networks.facebook
 
 import android.app.Activity
 import android.content.Context
+import android.media.tv.AdRequest
 import android.util.Log
 import com.facebook.ads.Ad
 import com.facebook.ads.AdError
