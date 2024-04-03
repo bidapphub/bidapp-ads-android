@@ -35,8 +35,8 @@ internal class BIDChartboostRewarded(
         if (chartboostRewarded == null){
             return
         }
-        if (location == null){
-            BIDLog.d(TAG, "Location is null")
+        if (location.isNullOrEmpty()){
+            BIDLog.d(TAG, "Location is null or empty")
             return
         }
         chartboostRewarded = Rewarded(location, object : RewardedCallback {
@@ -97,8 +97,8 @@ internal class BIDChartboostRewarded(
     }
 
     override fun load(context: Any) {
-        if (location == null) {
-            adapter?.onAdFailedToLoadWithError("Chartboost rewarded location is null")
+        if (location.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Chartboost rewarded location is null or empty")
             return
         }
         if (chartboostRewarded == null) {

@@ -48,8 +48,8 @@ internal class BIDUnityBanner(
             adapter?.onFailedToLoad(Error("Unity banner loading error"))
             return
         }
-        if (adTag == null){
-            adapter?.onFailedToLoad(Error("Unity banner adtag is null"))
+        if (adTag.isNullOrEmpty()){
+            adapter?.onFailedToLoad(Error("Unity banner adTag is null or empty"))
             return
         }
             adView = WeakReference(BannerView(context, adTag, bannerFormat))

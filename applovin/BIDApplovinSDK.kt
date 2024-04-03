@@ -42,8 +42,8 @@ internal class BIDApplovinSDK(
     }
 
     override fun initializeSDK(context: Context) {
-        if (appId == null && !getApplovinKeyFromManifest(context)) {
-            adapter?.onInitializationComplete(false, "AppLovin App Id is null")
+        if (appId.isNullOrEmpty() && !getApplovinKeyFromManifest(context)) {
+            adapter?.onInitializationComplete(false, "AppLovin App Id is null or empty")
             return
         }
         if (isInitialized(context) ||
@@ -52,7 +52,7 @@ internal class BIDApplovinSDK(
             return
         }
         adapter.onInitializationStart()
-        ApplovinInitializer.start(adapter,context)
+        ApplovinInitializer.start(adapter,context,appId)
     }
 
     override fun isInitialized(context: Context): Boolean {
@@ -67,7 +67,7 @@ internal class BIDApplovinSDK(
         var appId : String? = null
 
         fun appLovinGetInstanceSDK(context: Context) : AppLovinSdk {
-            if (getApplovinKeyFromManifest(context) || this.appId == null) {
+            if (getApplovinKeyFromManifest(context) || this.appId.isNullOrEmpty()) {
                 return AppLovinSdk.getInstance(context)
             }
             return AppLovinSdk.getInstance(appId, AppLovinSdkSettings(context), context)

@@ -39,8 +39,8 @@ class BIDDigitalTurbineSDK(
         {
             return
         }
-        if (appId == null){
-            initializationFailed("App id is null")
+        if (appId.isNullOrEmpty()){
+            initializationFailed("App id is null or empty")
             return
         }
         adapter?.onInitializationStart()

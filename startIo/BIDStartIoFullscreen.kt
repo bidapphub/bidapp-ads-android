@@ -87,7 +87,7 @@ internal class BIDStartIoFullscreen(
         }
         init()
         startAppAdPreferences = AdPreferences()
-        if (adTag == null) BIDLog.d(TAG, "StartIo adTag is null")
+        if (adTag.isNullOrEmpty()) BIDLog.d(TAG, "StartIo adTag is null or empty")
         else startAppAdPreferences?.adTag = adTag
         startAppAdPreferences?.minCpm = ecpm
         if (isRewarded) {

@@ -20,7 +20,7 @@ internal class BIDAdmobRewarded(
     val adTag: String?,
     val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
-    val TAG = "Rewarded Admob"
+    private val TAG = "Rewarded Admob"
     private var rewardedAd: RewardedAd? = null
     private var isRewardGranted = false
 
@@ -61,8 +61,8 @@ internal class BIDAdmobRewarded(
             adapter.onAdFailedToLoadWithError("Admob rewarded loading error")
             return
         }
-        if (adTag == null) {
-            adapter.onAdFailedToLoadWithError("Admob rewarded adtag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter.onAdFailedToLoadWithError("Admob rewarded adTag is null or empty")
             return
         }
         val networkExtrasBundle = Bundle()

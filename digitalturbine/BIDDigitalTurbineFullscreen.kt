@@ -112,8 +112,8 @@ class BIDDigitalTurbineFullscreen(
 
 
     override fun load(context: Any) {
-        if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Digital turbine adTag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Digital turbine adTag is null or empty")
             return
         }
         var videoContentController : InneractiveFullscreenVideoContentController? = null

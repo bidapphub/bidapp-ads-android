@@ -16,7 +16,7 @@ class BIDMyTargetRewarded(
 ) : BIDFullscreenAdapterDelegateProtocol {
 
     private val slotIdToInt = slotId?.toIntOrNull()
-    val TAG = "Rewarded MyTarget"
+    private val TAG = "Rewarded MyTarget"
     private var ads: RewardedAd? = null
     var isAdsReady = false
     var isRewardGranted = false

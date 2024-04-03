@@ -85,7 +85,7 @@ class BIDYandexRewarded(
             adapter?.onAdFailedToLoadWithError("Yandex fullscreen loading error")
             return
         }
-        if (adUnitId == null) {
+        if (adUnitId.isNullOrEmpty()) {
             adapter?.onAdFailedToLoadWithError("Yandex fullscreen adUnitId is null or incorrect format")
             return
         }

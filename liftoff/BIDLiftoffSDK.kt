@@ -47,8 +47,8 @@ internal class BIDLiftoffSDK(
         {
             return
         }
-        if (appId == null){
-            initializationFailed("Liftoff appid is null")
+        if (appId.isNullOrEmpty()){
+            initializationFailed("Liftoff appId is null or empty")
             return
         }
         adapter.onInitializationStart()

@@ -19,7 +19,7 @@ internal class BIDAdmobInterstitial(
     val adapter: BIDFullscreenAdapterProtocol,
     val adTag: String? = null
 ) : BIDFullscreenAdapterDelegateProtocol {
-    val TAG = "interstitial Admob"
+    private val TAG = "interstitial Admob"
     private var interstitialAd: InterstitialAd? = null
 
     val fullScreenContentCallback: FullScreenContentCallback =
@@ -55,8 +55,8 @@ internal class BIDAdmobInterstitial(
             adapter.onAdFailedToLoadWithError("Admob interstitial loading error")
             return
         }
-        if (adTag == null) {
-            adapter.onAdFailedToLoadWithError("Admob interstitial adtag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter.onAdFailedToLoadWithError("Admob interstitial adTag is null or empty")
             return
         }
         val networkExtrasBundle = Bundle()

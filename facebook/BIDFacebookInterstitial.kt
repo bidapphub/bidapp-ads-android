@@ -55,8 +55,8 @@ class BIDFacebookInterstitial(
             adapter?.onAdFailedToLoadWithError("Facebook interstitial loading error")
             return
         }
-        if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Facebook interstitial load is failure. adtag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Facebook interstitial load is failure. adtag is null or empty")
             return
         }
         if (interstitialAd == null) {

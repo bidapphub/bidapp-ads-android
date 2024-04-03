@@ -96,8 +96,8 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             adapter.onFailedToLoad(Error("Unsupported Digital Turbine banner format"))
             return
         }
-        if (adTag == null){
-            adapter.onFailedToLoad(Error("Digital Turbine banner adtag is null"))
+        if (adTag.isNullOrEmpty()){
+            adapter.onFailedToLoad(Error("Digital Turbine banner adtag is null or empty"))
             return
         }
 

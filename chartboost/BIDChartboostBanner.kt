@@ -89,8 +89,8 @@ internal class BIDChartboostBanner(
             adapter?.onFailedToLoad(Error("Chartboost banner loading error"))
             return
         }
-        if (location == null) {
-            adapter?.onFailedToLoad(Error("Chartboost banner location is null"))
+        if (location.isNullOrEmpty()) {
+            adapter?.onFailedToLoad(Error("Chartboost banner location is null or empty"))
             return
         }
         if (adView?.get() == null) {

@@ -52,8 +52,8 @@ internal class BIDUnitySDK(
         {
             return
         }
-        if (gameId == null){
-            initializationFailed("Unity gameId is null")
+        if (gameId.isNullOrEmpty()){
+            initializationFailed("Unity gameId is null or empty")
             return
         }
             adapter?.onInitializationStart()

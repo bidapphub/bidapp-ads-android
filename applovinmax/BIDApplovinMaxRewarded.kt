@@ -86,8 +86,8 @@ internal class BIDApplovinMaxRewarded(
             adapter?.onAdFailedToLoadWithError("Max rewarded loading error")
             return
         }
-        if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Max rewarded adtag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Max rewarded adtag is null or empty")
             return
         }
             if (rewardedAd == null) {

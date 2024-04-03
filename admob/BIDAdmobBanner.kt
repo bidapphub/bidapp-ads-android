@@ -23,8 +23,8 @@ internal class BIDAdmobBanner(
     var adTag: String?,
     format: AdFormat?
 ) : BIDBannerAdapterDelegateProtocol {
-    val TAG = "Banner Admob"
-    val bannerFormat = if (format?.isBanner_320x50 == true) AdSize.BANNER
+    private val TAG = "Banner Admob"
+    private val bannerFormat = if (format?.isBanner_320x50 == true) AdSize.BANNER
     else if (format?.isBanner_300x250 == true) AdSize.MEDIUM_RECTANGLE
     else {
         BIDLog.d(TAG, "Unsupported Admob banner format: $format")
@@ -81,8 +81,8 @@ internal class BIDAdmobBanner(
             adapter.onFailedToLoad(Error("Admob banner loading error"))
             return
         }
-        if (adTag == null) {
-            adapter.onFailedToLoad(Error("Admob banner adtag is null"))
+        if (adTag.isNullOrEmpty()) {
+            adapter.onFailedToLoad(Error("Admob banner adtag is null or empty"))
             return
         }
 

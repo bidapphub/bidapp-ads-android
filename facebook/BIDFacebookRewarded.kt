@@ -71,8 +71,8 @@ internal class BIDFacebookRewarded(
             adapter?.onAdFailedToLoadWithError("Facebook rewarded loading error")
             return
         }
-        if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Facebook rewarded load is failure. adtag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Facebook rewarded load is failure. adTag is null or empty")
             return
         }
         if (rewardedAd == null) {

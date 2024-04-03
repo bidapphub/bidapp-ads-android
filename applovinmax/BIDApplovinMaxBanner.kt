@@ -46,8 +46,8 @@ internal class BIDApplovinMaxBanner(
             adapter?.onFailedToLoad(Error("Max banner loading error"))
             return
         }
-        if (adTag == null) {
-            adapter?.onFailedToLoad(Error("Max banner adtag is null"))
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onFailedToLoad(Error("Max banner adTag is null or empty"))
             return
         }
         if (adView?.get() == null) {

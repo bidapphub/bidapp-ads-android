@@ -89,8 +89,8 @@ internal class BIDChartboostSDK(
         ) {
             return
         }
-        if (appId == null || appSignature == null) {
-            initializationFailed("Chartboost initialization is failure. appId or appSignature is null")
+        if (appId.isNullOrEmpty() || appSignature.isNullOrEmpty()) {
+            initializationFailed("Chartboost initialization is failure. appId or appSignature is null or empty")
             return
         }
         adapter.onInitializationStart()

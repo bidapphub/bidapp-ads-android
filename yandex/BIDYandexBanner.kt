@@ -17,9 +17,9 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
 class BIDYandexBanner(
-    val adapter: BIDBannerAdapterProtocol,
-    val adUnitId: String?,
-    val format: AdFormat
+    private val adapter: BIDBannerAdapterProtocol,
+    private val adUnitId: String?,
+    private val format: AdFormat
 ) :
     BIDBannerAdapterDelegateProtocol, BannerAdEventListener {
 
@@ -53,8 +53,8 @@ class BIDYandexBanner(
             adapter.onFailedToLoad(Error("Unsupported Yandex banner format: $format"))
             return
         }
-        if (adUnitId == null) {
-            adapter.onFailedToLoad(Error("Yandex banner adUnitId is null"))
+        if (adUnitId.isNullOrEmpty()) {
+            adapter.onFailedToLoad(Error("Yandex banner adUnitId is null or empty"))
             return
         }
         isCachedAd = false

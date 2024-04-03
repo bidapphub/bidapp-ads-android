@@ -68,7 +68,7 @@ class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, fo
             adapter?.onFailedToLoad(Error("StartIo banner loading error"))
             return
         }
-        if (adTag == null) BIDLog.d(TAG, "AdTag is null")
+        if (adTag.isNullOrEmpty()) BIDLog.d(TAG, "AdTag is null or empty")
         else startAppAdPreferences?.adTag = adTag
         startAppAdPreferences?.minCpm = ecpm
             if (bannerFormat == "banner") {

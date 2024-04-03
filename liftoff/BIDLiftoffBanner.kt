@@ -47,8 +47,8 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
             adapter?.onFailedToLoad(Error("banner loading error"))
             return
         }
-        if (adTag == null){
-            adapter?.onFailedToLoad(Error("Liftoff banner adTag is null"))
+        if (adTag.isNullOrEmpty()){
+            adapter?.onFailedToLoad(Error("Liftoff banner adTag is null or empty"))
             return
         }
         if (bannerAd == null) {

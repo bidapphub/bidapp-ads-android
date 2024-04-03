@@ -54,7 +54,7 @@ internal class BIDApplovinMaxSDK(
             return
         }
         adapter.onInitializationStart()
-        ApplovinInitializerMax.start(adapter, context)
+        ApplovinInitializerMax.start(adapter, context, appId)
     }
 
     override fun isInitialized(context: Context): Boolean {

@@ -71,8 +71,8 @@ internal class BIDUnityFullscreen(
     }
 
     override fun load(context: Any) {
-        if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Unity fullscreen adTag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Unity fullscreen adTag is null or empty")
             return
         }
         ready = false

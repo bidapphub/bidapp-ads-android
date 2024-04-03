@@ -84,8 +84,8 @@ internal class BIDLiftoffFullscreen(
             adapter?.onAdFailedToLoadWithError("Liftoff fullscreen loading error")
             return
         }
-        if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Liftoff fullscreen adtag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Liftoff fullscreen adTag is null or empty")
             return
         }
         if (isRewarded)

@@ -14,7 +14,7 @@ class BIDMyTargetInterstitial(
 ) :
     BIDFullscreenAdapterDelegateProtocol {
     private val slotIdToInt = slotId?.toIntOrNull()
-    val TAG = "Full MyTarget"
+    private val TAG = "Full MyTarget"
     private var ads : InterstitialAd? = null
     var isAdsReady = false
 

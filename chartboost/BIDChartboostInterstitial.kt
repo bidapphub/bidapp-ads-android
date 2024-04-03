@@ -29,8 +29,8 @@ internal class BIDChartboostInterstitial(
         if (chartboostInterstitial == null){
             return
         }
-        if (location == null){
-            BIDLog.d(TAG, "Location is null")
+        if (location.isNullOrEmpty()){
+            BIDLog.d(TAG, "Location is null or empty")
             return
         }
         chartboostInterstitial = Interstitial(location, object : InterstitialCallback {
@@ -82,8 +82,8 @@ internal class BIDChartboostInterstitial(
     }
 
     override fun load(context: Any) {
-        if (location == null) {
-            adapter?.onAdFailedToLoadWithError("Chartboost interstitial location is null")
+        if (location.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Chartboost interstitial location is null or empty")
             return
         }
         if (chartboostInterstitial == null) {

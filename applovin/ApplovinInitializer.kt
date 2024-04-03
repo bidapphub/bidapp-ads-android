@@ -9,11 +9,12 @@ import java.lang.reflect.InvocationTargetException
 
 @PublishedApi
 internal object ApplovinInitializer : IApplovinInitializer {
-    val startSDKWaiters = arrayListOf<WeakReference<BIDNetworkAdapterProtocol>>()
+    private val startSDKWaiters = arrayListOf<WeakReference<BIDNetworkAdapterProtocol>>()
 
-    fun doStart(listener: BIDNetworkAdapterProtocol, context: Context) {
+    fun doStart(listener: BIDNetworkAdapterProtocol, context: Context, appId: String?) {
            startSDKWaiters.add(WeakReference(listener))
         if (1 == startSDKWaiters.size) {
+            BIDApplovinSDK.appId = appId
             BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).mediationProvider = "max"
             BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).initializeSdk {
                 val success = BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).isInitialized
@@ -36,12 +37,12 @@ internal object ApplovinInitializer : IApplovinInitializer {
         }
     }
 
-    override fun start(listener: BIDNetworkAdapterProtocol, context: Context) {
+    override fun start(listener: BIDNetworkAdapterProtocol, context: Context, appId: String?) {
         val applovinInitializerMax = applovinInitializerMax()
         val applovinInitializer = applovinInitializer()
-        if (applovinInitializerMax && applovinInitializer) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context)
-        else if (applovinInitializerMax) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context)
-        else runStartForClass("io.bidapp.networks.applovin.ApplovinInitializer", listener, context)
+        if (applovinInitializerMax && applovinInitializer) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context, appId)
+        else if (applovinInitializerMax) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context, appId)
+        else runStartForClass("io.bidapp.networks.applovin.ApplovinInitializer", listener, context, appId)
     }
 
     private fun applovinInitializerMax(): Boolean {
@@ -62,12 +63,12 @@ internal object ApplovinInitializer : IApplovinInitializer {
         }
     }
 
-    private fun runStartForClass(cl:String, adapterProtocol : BIDNetworkAdapterProtocol, context: Context){
+    private fun runStartForClass(cl:String, adapterProtocol : BIDNetworkAdapterProtocol, context: Context, appId: String?){
         try {
             val className = cl
             val methodName = "doStart"
-            val parameterTypes = arrayOf(BIDNetworkAdapterProtocol::class.java, Context::class.java)
-            val parameters = arrayOf(adapterProtocol, context)
+            val parameterTypes = arrayOf(BIDNetworkAdapterProtocol::class.java, Context::class.java, String::class.java)
+            val parameters = arrayOf(adapterProtocol, context, appId)
             val clazz = Class.forName(className)
             val method = clazz.getDeclaredMethod(methodName, *parameterTypes)
             val instance = clazz.getField("INSTANCE").get(null)

@@ -19,9 +19,9 @@ internal class BIDAdmobSDK(
 ) :
     BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
-    var sharedPreferences: SharedPreferences? = null
-    var isInitializationComplete = false
-    val TAG = "Admob SDK"
+    private var sharedPreferences: SharedPreferences? = null
+    private var isInitializationComplete = false
+    private val TAG = "Admob SDK"
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
         if (consent.COPPA != null){

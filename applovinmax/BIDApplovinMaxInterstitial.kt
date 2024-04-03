@@ -63,8 +63,8 @@ internal class BIDApplovinMaxInterstitial(
             adapter?.onAdFailedToLoadWithError("Max interstitial loading error")
             return
         }
-        if (adTag == null) {
-            adapter?.onAdFailedToLoadWithError("Max interstitial adtag is null")
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onAdFailedToLoadWithError("Max interstitial adtag is null or empty")
             return
         }
             if (interstitialAd == null) {

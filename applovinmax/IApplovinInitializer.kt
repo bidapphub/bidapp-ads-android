@@ -6,5 +6,5 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 @PublishedApi
 internal interface IApplovinInitializer {
-    fun start(listener: BIDNetworkAdapterProtocol, context: Context)
+    fun start(listener: BIDNetworkAdapterProtocol, context: Context, appID: String?)
 }

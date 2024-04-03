@@ -67,8 +67,8 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, f
             adapter?.onFailedToLoad(Error("ad banner loading error"))
             return
         }
-        if (adTag == null) {
-            adapter?.onFailedToLoad(Error("Facebook banner adtag is null"))
+        if (adTag.isNullOrEmpty()) {
+            adapter?.onFailedToLoad(Error("Facebook banner adtag is null or empty"))
             return
         }
         if (adView?.get() == null) {
