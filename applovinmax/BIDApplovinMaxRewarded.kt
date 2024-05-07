@@ -76,7 +76,7 @@ internal class BIDApplovinMaxRewarded(
         }
     }
 
-    fun setListener () {
+    private fun setListener () {
         rewardedAd?.setListener(rewardedListener)
     }
 

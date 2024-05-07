@@ -25,16 +25,16 @@ class BIDYandexInterstitial(
 
 
     private var loadCallback : InterstitialAdLoadListener? = object : InterstitialAdLoadListener{
-        override fun onAdLoaded(ad: InterstitialAd) {
-            interstitialAd = ad
+        override fun onAdLoaded(interstitialAd: InterstitialAd) {
+            this@BIDYandexInterstitial.interstitialAd = interstitialAd
             BIDLog.d(TAG, "on ad load $adUnitId")
             adapter?.onAdLoaded()
         }
 
-        override fun onAdFailedToLoad(p0: AdRequestError) {
+        override fun onAdFailedToLoad(error: AdRequestError) {
             interstitialAd = null
-            BIDLog.d(TAG, "onError $adUnitId exception: ${p0.description}")
-            adapter?.onAdFailedToLoadWithError(p0.description)
+            BIDLog.d(TAG, "onError $adUnitId exception: ${error.description}")
+            adapter?.onAdFailedToLoadWithError(error.description)
         }
 
     }
@@ -47,9 +47,9 @@ class BIDYandexInterstitial(
             }
         }
 
-        override fun onAdFailedToShow(p0: AdError) {
-            BIDLog.d(TAG, "onError $adUnitId exception: ${p0.description}")
-            adapter?.onFailedToDisplay(p0.description)
+        override fun onAdFailedToShow(adError: AdError) {
+            BIDLog.d(TAG, "onError $adUnitId exception: ${adError.description}")
+            adapter?.onFailedToDisplay(adError.description)
         }
 
         override fun onAdDismissed() {
@@ -62,7 +62,7 @@ class BIDYandexInterstitial(
             adapter?.onClick()
         }
 
-        override fun onAdImpression(p0: ImpressionData?) {
+        override fun onAdImpression(impressionData: ImpressionData?) {
             BIDLog.d(TAG, "on ad impression. $adUnitId")
             adapter?.onDisplay()
         }

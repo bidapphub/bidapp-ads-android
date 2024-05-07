@@ -114,10 +114,10 @@ class BIDYandexBanner(
         BIDLog.d(TAG, "ad loaded. adUnitId: $adUnitId")
     }
 
-    override fun onAdFailedToLoad(p0: AdRequestError) {
+    override fun onAdFailedToLoad(error: AdRequestError) {
         isCachedAd = false
-        BIDLog.d(TAG, "failed to load ad. Error: ${p0.description} adUnitId: ($adUnitId)")
-        adapter.onFailedToLoad(Error(p0.description))
+        BIDLog.d(TAG, "failed to load ad. Error: ${error.description} adUnitId: ($adUnitId)")
+        adapter.onFailedToLoad(Error(error.description))
     }
 
     override fun onAdClicked() {
@@ -133,7 +133,7 @@ class BIDYandexBanner(
         BIDLog.d(TAG, "Yandex banner on returned to application")
     }
 
-    override fun onImpression(p0: ImpressionData?) {
+    override fun onImpression(impressionData: ImpressionData?) {
         BIDLog.d(TAG, "ad on impression. adUnitId: ($adUnitId)")
         adapter.onDisplay()
     }

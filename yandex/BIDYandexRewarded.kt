@@ -26,16 +26,16 @@ class BIDYandexRewarded(
 
 
     private var loadCallback : RewardedAdLoadListener? = object : RewardedAdLoadListener {
-        override fun onAdLoaded(ad: RewardedAd) {
-            rewardedAd = ad
+        override fun onAdLoaded(rewarded: RewardedAd) {
+            rewardedAd = rewarded
             BIDLog.d(TAG, "on ad load $adUnitId")
             adapter?.onAdLoaded()
         }
 
-        override fun onAdFailedToLoad(p0: AdRequestError) {
+        override fun onAdFailedToLoad(error: AdRequestError) {
             rewardedAd = null
-            BIDLog.d(TAG, "onError $adUnitId exception: ${p0.description}")
-            adapter?.onAdFailedToLoadWithError(p0.description)
+            BIDLog.d(TAG, "onError $adUnitId exception: ${error.description}")
+            adapter?.onAdFailedToLoadWithError(error.description)
         }
 
     }
@@ -48,9 +48,9 @@ class BIDYandexRewarded(
             }
         }
 
-        override fun onAdFailedToShow(p0: AdError) {
-            BIDLog.d(TAG, "onError $adUnitId exception: ${p0.description}")
-            adapter?.onFailedToDisplay(p0.description)
+        override fun onAdFailedToShow(adError: AdError) {
+            BIDLog.d(TAG, "onError $adUnitId exception: ${adError.description}")
+            adapter?.onFailedToDisplay(adError.description)
         }
 
         override fun onAdDismissed() {
@@ -67,12 +67,12 @@ class BIDYandexRewarded(
             adapter?.onClick()
         }
 
-        override fun onAdImpression(p0: ImpressionData?) {
+        override fun onAdImpression(impressionData: ImpressionData?) {
             BIDLog.d(TAG, "on ad impression. $adUnitId")
             adapter?.onDisplay()
         }
 
-        override fun onRewarded(p0: Reward) {
+        override fun onRewarded(reward: Reward) {
             BIDLog.d(TAG, "on ad rewarded $adUnitId")
             isRewardGranted = true
         }

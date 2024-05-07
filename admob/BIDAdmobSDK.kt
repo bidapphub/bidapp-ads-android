@@ -92,7 +92,7 @@ internal class BIDAdmobSDK(
         return null
     }
 
-    companion object {
+    internal companion object {
         private var currentConsentGDPR: Boolean? = null
 
         fun getGDPR(): Boolean? {

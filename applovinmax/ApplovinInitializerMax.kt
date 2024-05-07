@@ -38,12 +38,12 @@ internal object ApplovinInitializerMax : IApplovinInitializer {
         }
     }
 
-    override fun start(listener: BIDNetworkAdapterProtocol, context: Context, appId: String?) {
+    override fun start(listener: BIDNetworkAdapterProtocol, context: Context, appID: String?) {
         val applovinInitializerMax = applovinInitializerMax()
         val applovinInitializer = applovinInitializer()
-        if (applovinInitializerMax && applovinInitializer) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context, appId)
-        else if (applovinInitializerMax) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context, appId)
-        else runStartForClass("io.bidapp.networks.applovin.ApplovinInitializer", listener, context, appId)
+        if (applovinInitializerMax && applovinInitializer) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context, appID)
+        else if (applovinInitializerMax) runStartForClass("io.bidapp.networks.applovinmax.ApplovinInitializerMax", listener, context, appID)
+        else runStartForClass("io.bidapp.networks.applovin.ApplovinInitializer", listener, context, appID)
     }
 
     private fun applovinInitializerMax(): Boolean {

@@ -22,7 +22,7 @@ internal class BIDAdmobInterstitial(
     private val TAG = "interstitial Admob"
     private var interstitialAd: InterstitialAd? = null
 
-    val fullScreenContentCallback: FullScreenContentCallback =
+    private val fullScreenContentCallback: FullScreenContentCallback =
         object : FullScreenContentCallback() {
 
             override fun onAdClicked() {

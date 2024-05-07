@@ -25,7 +25,7 @@ internal class BIDAdmobRewarded(
     private var isRewardGranted = false
 
 
-    val fullScreenContentCallback: FullScreenContentCallback =
+    private val fullScreenContentCallback: FullScreenContentCallback =
         object : FullScreenContentCallback() {
             override fun onAdClicked() {
                 BIDLog.d(TAG, "ad clicked. adtag: ($adTag)")

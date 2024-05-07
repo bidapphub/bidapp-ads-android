@@ -1,7 +1,6 @@
 package io.bidapp.networks.applovin
 
 import android.content.Context
-import com.applovin.sdk.AppLovinSdk
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 import io.bidapp.sdk.utils.dispatch_main
 import java.lang.ref.WeakReference
@@ -65,11 +64,10 @@ internal object ApplovinInitializer : IApplovinInitializer {
 
     private fun runStartForClass(cl:String, adapterProtocol : BIDNetworkAdapterProtocol, context: Context, appId: String?){
         try {
-            val className = cl
             val methodName = "doStart"
             val parameterTypes = arrayOf(BIDNetworkAdapterProtocol::class.java, Context::class.java, String::class.java)
             val parameters = arrayOf(adapterProtocol, context, appId)
-            val clazz = Class.forName(className)
+            val clazz = Class.forName(cl)
             val method = clazz.getDeclaredMethod(methodName, *parameterTypes)
             val instance = clazz.getField("INSTANCE").get(null)
             method.invoke(instance, *parameters)

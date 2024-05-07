@@ -38,7 +38,7 @@ class BIDDigitalTurbineFullscreen(
 
         override fun onAdClicked(p0: InneractiveAdSpot?) {
             BIDLog.d(TAG, "ad clicked $adTag")
-            adapter?.onAdLoaded()
+            adapter?.onClick()
         }
 
         override fun onAdWillCloseInternalBrowser(p0: InneractiveAdSpot?) {}
