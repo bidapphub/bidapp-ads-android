@@ -45,9 +45,6 @@ public class MainActivity extends AppCompatActivity {
         bidConfig.enableTestMode();
         bidConfig.enableTestMode();
         bidConfig.enableLogging();
-        bidConfig.enableInterstitialAds();
-        bidConfig.enableRewardedAds();
-        bidConfig.enableBannerAds();
 
         String pubid = "15ddd248-7acc-46ce-a6fd-e6f6543d22cd";
 

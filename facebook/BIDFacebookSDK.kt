@@ -3,13 +3,14 @@ package io.bidapp.networks.facebook
 import android.content.Context
 import com.facebook.ads.AdSettings
 import com.facebook.ads.AudienceNetworkAds
-import com.facebook.ads.BidderTokenProvider
 import io.bidapp.sdk.BIDConsent
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
+internal const val ADAPTERVERSION = "1.1.0"
+internal const val SDKVERSION = "6.17.0"
 class BIDFacebookSDK(
     private val adapter: BIDNetworkAdapterProtocol? = null,
     val appId: String? = null,
@@ -69,6 +70,9 @@ class BIDFacebookSDK(
     override fun enableLogging(context: Context) {}
 
     override fun sharedSDK(): Any? {
-        return null
+        return mapOf(
+            "adapterVersion" to ADAPTERVERSION,
+            "sdkVersion" to SDKVERSION
+        )
     }
 }

@@ -11,10 +11,13 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
+internal const val ADAPTERVERSION = "1.1.0"
+internal const val SDKVERSION = "12.4.2"
+
 @PublishedApi
 internal class BIDApplovinMaxSDK(
     private val adapter: BIDNetworkAdapterProtocol? = null,
-    private val appId:String?,
+    private val appId: String?,
     appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
@@ -25,13 +28,13 @@ internal class BIDApplovinMaxSDK(
     }
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
-        if(consent.GDPR != null){
+        if (consent.GDPR != null) {
             AppLovinPrivacySettings.setHasUserConsent(consent.GDPR!!, context)
         }
-        if(consent.CCPA != null){
+        if (consent.CCPA != null) {
             AppLovinPrivacySettings.setDoNotSell(!consent.CCPA!!, context)
         }
-        if (consent.COPPA != null){
+        if (consent.COPPA != null) {
             AppLovinPrivacySettings.setIsAgeRestrictedUser(consent.COPPA!!, context)
         }
     }
@@ -50,7 +53,8 @@ internal class BIDApplovinMaxSDK(
         }
         if (isInitialized(context) ||
             null == adapter ||
-            adapter.initializationInProgress() ) {
+            adapter.initializationInProgress()
+        ) {
             return
         }
         adapter.onInitializationStart()
@@ -62,25 +66,31 @@ internal class BIDApplovinMaxSDK(
     }
 
     override fun sharedSDK(): Any? {
-        return null
+        return mapOf(
+            "adapterVersion" to ADAPTERVERSION,
+            "sdkVersion" to SDKVERSION
+        )
     }
 
-    companion object{
-        var appId : String? = null
+    companion object {
+        var appId: String? = null
 
-        fun appLovinGetMaxInstanceSDK(context: Context) : AppLovinSdk {
+        fun appLovinGetMaxInstanceSDK(context: Context): AppLovinSdk {
             if (getApplovinKeyFromManifest(context) || this.appId == null) {
                 return AppLovinSdk.getInstance(context)
             }
             return AppLovinSdk.getInstance(appId, AppLovinSdkSettings(context), context)
         }
 
-       fun getApplovinKeyFromManifest(context: Context): Boolean {
+        fun getApplovinKeyFromManifest(context: Context): Boolean {
             try {
-                val appInfo = context.packageManager.getApplicationInfo(context.applicationContext.packageName, PackageManager.GET_META_DATA)
+                val appInfo = context.packageManager.getApplicationInfo(
+                    context.applicationContext.packageName,
+                    PackageManager.GET_META_DATA
+                )
                 val metaData = appInfo.metaData
                 if (metaData?.getString("applovin.sdk.key") != null)
-                return true
+                    return true
             } catch (e: PackageManager.NameNotFoundException) {
                 e.printStackTrace()
                 return false

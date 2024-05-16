@@ -21,8 +21,9 @@ class BIDMyTargetBanner(private val adapter: BIDBannerAdapterProtocol, private v
     private val TAG = "Banner MyTarget"
     private val bannerFormat = if (format.isBanner_320x50) AdSize.ADSIZE_320x50
     else if (format.isBanner_300x250) AdSize.ADSIZE_300x250
+    else if (format.isBanner_728x90) AdSize.ADSIZE_728x90
     else {
-        BIDLog.d(TAG, "Unsupported MyTarget banner format: $format")
+        BIDLog.d(TAG, "Unsupported MyTarget banner format: ${format?.name()}")
         null
     }
 
@@ -65,6 +66,7 @@ class BIDMyTargetBanner(private val adapter: BIDBannerAdapterProtocol, private v
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 AdSize.ADSIZE_300x250 -> arrayOf(300, 250)
                 AdSize.ADSIZE_320x50 -> arrayOf(320, 50)
+                AdSize.ADSIZE_728x90 -> arrayOf(728, 90)
                 else -> arrayOf(0, 0)
             }
             (view.get() as FrameLayout).addView(

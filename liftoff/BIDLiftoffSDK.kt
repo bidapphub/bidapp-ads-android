@@ -12,7 +12,8 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-
+internal const val ADAPTERVERSION = "1.1.0"
+internal const val SDKVERSION = "7.3.1"
 @PublishedApi
 internal class BIDLiftoffSDK(
     private val adapter: BIDNetworkAdapterProtocol,
@@ -77,6 +78,9 @@ internal class BIDLiftoffSDK(
     }
 
     override fun sharedSDK(): Any? {
-        return null
+        return mapOf(
+            "adapterVersion" to ADAPTERVERSION,
+            "sdkVersion" to SDKVERSION
+        )
     }
 }

@@ -23,11 +23,11 @@ internal class BIDUnityBanner(
 ) : BIDBannerAdapterDelegateProtocol, BannerView.IListener {
 
     private val TAG = "Banner Unity"
-
-    private val bannerFormat = if (format?.isBanner_320x50 == true) UnityBannerSize(320, 50)
+    private val bannerFormat = if (format?.isBanner_320x50 == true) UnityBannerSize.standard
     else if (format?.isBanner_300x250 == true) UnityBannerSize(300, 250)
+    else if (format?.isBanner_728x90 == true) UnityBannerSize.leaderboard
     else {
-        BIDLog.d(TAG, "Unsupported banner format: $format")
+        BIDLog.d(TAG, "Unsupported banner format: ${format?.name()}")
         null
     }
     private var adView: WeakReference<BannerView>? = null
@@ -69,13 +69,18 @@ internal class BIDUnityBanner(
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         return try {
             val weightAndHeight =
-                if (bannerFormat!!.height == 50 && bannerFormat.width == 320) arrayOf(
+                if (bannerFormat == UnityBannerSize.standard) arrayOf(
                     320,
                     50
-                ) else if (bannerFormat.height == 250 && bannerFormat.width == 300) arrayOf(
+                ) else if (bannerFormat?.height == 250 && bannerFormat.width == 300) arrayOf(
                     300,
                     250
-                ) else arrayOf(0, 0)
+                )
+                else if (bannerFormat == UnityBannerSize.leaderboard) arrayOf(
+                    728,
+                    90
+                )
+                else arrayOf(0, 0)
             (view.get() as FrameLayout).addView(
                 adView!!.get(),0, ViewGroup.LayoutParams((weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())
             )

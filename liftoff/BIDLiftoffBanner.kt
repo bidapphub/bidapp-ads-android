@@ -27,8 +27,9 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     private val TAG = "Banner Liftoff"
     private val bannerFormat = if (format.isBanner_320x50) BannerAdSize.BANNER
     else if (format.isBanner_300x250) BannerAdSize.VUNGLE_MREC
+    else if (format.isBanner_728x90) BannerAdSize.BANNER_LEADERBOARD
     else {
-        BIDLog.d(TAG, "Unsupported Liftoff banner format: $format")
+        BIDLog.d(TAG, "Unsupported Liftoff banner format: ${format?.name()}")
         null
     }
 
@@ -71,6 +72,7 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 BannerAdSize.VUNGLE_MREC -> arrayOf(300, 250)
                 BannerAdSize.BANNER -> arrayOf(320, 50)
+                BannerAdSize.BANNER_LEADERBOARD -> arrayOf(728, 90)
                 else -> arrayOf(0, 0)
             }
             adView = WeakReference(bannerAd!!.get()!!.getBannerView())

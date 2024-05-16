@@ -43,15 +43,23 @@ class BIDYandexBanner(
             adapter.onFailedToLoad(Error("Yandex banner loading error"))
             return
         }
-        bannerFormat = if (format.isBanner_320x50) {
-            size = "banner"
-            BannerAdSize.fixedSize((context as Activity).applicationContext, 320, 50)
-        } else if (format.isBanner_300x250) {
-            size = "mrec"
-            BannerAdSize.fixedSize((context as Activity).applicationContext, 300, 250)
-        } else {
-            adapter.onFailedToLoad(Error("Unsupported Yandex banner format: $format"))
-            return
+        bannerFormat = when(format.currentFormat()){
+            "banner_320x50" -> {
+                size = "banner"
+                BannerAdSize.fixedSize((context as Activity).applicationContext, 320, 50)
+            }
+            "banner_300x250" -> {
+                size = "mrec"
+                BannerAdSize.fixedSize((context as Activity).applicationContext, 300, 250)
+            }
+            "banner_728x90" -> {
+                size = "leaderboard"
+                BannerAdSize.fixedSize((context as Activity).applicationContext, 728, 90)
+            }
+            else -> {
+                adapter.onFailedToLoad(Error("Unsupported Yandex banner format: ${format?.name()}"))
+                return
+            }
         }
         if (adUnitId.isNullOrEmpty()) {
             adapter.onFailedToLoad(Error("Yandex banner adUnitId is null or empty"))
@@ -80,6 +88,7 @@ class BIDYandexBanner(
             val weightAndHeight: Array<Int> = when (size) {
                 "mrec" -> arrayOf(300, 250)
                 "banner" -> arrayOf(320, 50)
+                "leaderboard" -> arrayOf(728, 90)
                 else -> {
                     adapter.onFailedToLoad(Error("Unsupported Yandex banner format: $format"))
                     return false

@@ -55,11 +55,9 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val config = BIDConfiguration()
+
         config.enableLogging()
         config.enableTestMode()
-        config.enableInterstitialAds()
-        config.enableRewardedAds()
-        config.enableBannerAds()
 
         interstitial = Interstitial(this)
         interstitial.setLoadDelegate(loadDelegate)

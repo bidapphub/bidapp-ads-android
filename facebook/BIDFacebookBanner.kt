@@ -15,6 +15,7 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
+
 class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat) :
     BIDBannerAdapterDelegateProtocol {
     val TAG = "Banner Facebook"
@@ -23,8 +24,9 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, f
     private var adapter: BIDBannerAdapterProtocol? = adapter
     private val bannerFormat = if (format.isBanner_320x50) AdSize.BANNER_HEIGHT_50
     else if (format.isBanner_300x250) AdSize.RECTANGLE_HEIGHT_250
+    else if (format.isBanner_728x90) AdSize.BANNER_HEIGHT_90
     else {
-        BIDLog.d(TAG,"Unsupported Facebook banner format")
+        BIDLog.d(TAG,"Unsupported Facebook banner format : ${format?.name()}")
         null
     }
 
@@ -89,6 +91,7 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, f
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 AdSize.RECTANGLE_HEIGHT_250 -> arrayOf(300, 250)
                 AdSize.BANNER_HEIGHT_50 -> arrayOf(320, 50)
+                AdSize.BANNER_HEIGHT_90 -> arrayOf(728, 90)
                 else -> arrayOf(0, 0)
             }
             (view.get() as FrameLayout).addView(

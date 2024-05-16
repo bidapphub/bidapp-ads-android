@@ -25,8 +25,9 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
     val TAG = "Banner Applovin"
     val bannerFormat = if (format.isBanner_320x50) AppLovinAdSize.BANNER
     else if (format.isBanner_300x250) AppLovinAdSize.MREC
+    else if (format.isBanner_728x90) AppLovinAdSize.LEADER
     else {
-        BIDLog.d(TAG, "Unsupported applovin banner format: $format")
+        BIDLog.d(TAG, "Unsupported applovin banner format: ${format?.name()}")
         null
     }
     var adView : WeakReference<AppLovinAdView>? = null
@@ -105,7 +106,6 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
             adView?.get()?.setAdViewEventListener(this)
             adView?.get()?.setAdClickListener(this)
             adView?.get()?.loadNextAd()
-
     }
 
     override fun destroy() {
@@ -117,9 +117,10 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         BIDLog.d(TAG, "Banner show applovin")
         return try {
-            val weightAndHeight : Array<Int> = when(adView!!.get()!!.size.toString()){
-                "MREC" -> arrayOf(300,250)
-                "BANNER" -> arrayOf(320,50)
+            val weightAndHeight : Array<Int> = when(bannerFormat){
+                AppLovinAdSize.MREC -> arrayOf(300,250)
+                AppLovinAdSize.BANNER -> arrayOf(320,50)
+                AppLovinAdSize.LEADER -> arrayOf(728,90)
                 else -> arrayOf(0,0)
             }
             (view.get() as FrameLayout).addView(adView!!.get(), (weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())

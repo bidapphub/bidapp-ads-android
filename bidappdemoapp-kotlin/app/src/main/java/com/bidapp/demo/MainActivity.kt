@@ -42,9 +42,6 @@ class MainActivity : AppCompatActivity() {
 
         bidConfig.enableTestMode()
         bidConfig.enableLogging()
-        bidConfig.enableInterstitialAds()
-        bidConfig.enableRewardedAds()
-        bidConfig.enableBannerAds()
 
         val pubid = "15ddd248-7acc-46ce-a6fd-e6f6543d22cd"
         BidappAds.start(pubid, bidConfig, this)

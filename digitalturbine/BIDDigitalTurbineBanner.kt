@@ -92,8 +92,8 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             adapter.onFailedToLoad(Error("banner load is failed"))
             return
         }
-        if (!format.isBanner_320x50 && !format.isBanner_300x250){
-            adapter.onFailedToLoad(Error("Unsupported Digital Turbine banner format"))
+        if (!format.isBanner_320x50 && !format.isBanner_300x250 && !format.isBanner_728x90){
+            adapter.onFailedToLoad(Error("Unsupported Digital Turbine banner format : ${format?.name()}"))
             return
         }
         if (adTag.isNullOrEmpty()){
@@ -124,9 +124,11 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         return try {
-            val weightAndHeight: Array<Int> = when (format.isBanner_320x50()) {
-                false -> arrayOf(300, 250)
-                true -> arrayOf(320, 50)
+            val weightAndHeight: Array<Int> = when (format.name()) {
+                "MREC" -> arrayOf(300, 250)
+                "BANNER" -> arrayOf(320, 50)
+                "LEADERBOARD" -> arrayOf(728, 90)
+                else -> arrayOf(0,0)
             }
             (view.get() as FrameLayout).layoutParams.width = (weightAndHeight[0] * density).toInt()
             (view.get() as FrameLayout).layoutParams.height = (weightAndHeight[1] * density).toInt()

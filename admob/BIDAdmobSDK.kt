@@ -11,6 +11,9 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
+internal const val ADAPTERVERSION = "1.1.0"
+internal const val SDKVERSION = "23.0.0"
+
 @PublishedApi
 internal class BIDAdmobSDK(
     private val adapter: BIDNetworkAdapterProtocol,
@@ -51,6 +54,7 @@ internal class BIDAdmobSDK(
         }
     }
 
+
     override fun initializeSDK(context: Context) {
         if (isInitialized(context) || adapter.initializationInProgress())
         {
@@ -82,14 +86,15 @@ internal class BIDAdmobSDK(
         return isInitializationComplete
     }
 
-    override fun enableTesting() {
-    }
+    override fun enableTesting() {}
 
-    override fun enableLogging(context: Context) {
-    }
+    override fun enableLogging(context: Context) {}
 
     override fun sharedSDK(): Any? {
-        return null
+        return mapOf(
+            "adapterVersion" to ADAPTERVERSION,
+            "sdkVersion" to SDKVERSION
+        )
     }
 
     internal companion object {

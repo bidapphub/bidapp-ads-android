@@ -1,5 +1,5 @@
 plugins {
-    id 'com.android.application'
+    alias(libs.plugins.androidApplication)
 }
 
 android {
@@ -8,10 +8,10 @@ android {
 
     defaultConfig {
         applicationId "com.bidapp.demo"
-        minSdk 24
+        minSdk 22
         targetSdk 34
-        versionCode 2
-        versionName "1.1"
+        versionCode 1
+        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -29,22 +29,23 @@ android {
 }
 
 dependencies {
-    implementation 'io.bidapp:sdk:1.0.8'
-    implementation 'io.bidapp.networks:applovin:1.0.5'
-    implementation 'io.bidapp.networks:applovinmax:1.0.5'
-    implementation 'io.bidapp.networks:unity:1.0.5'
-    implementation 'io.bidapp.networks:liftoff:1.0.5'
-    implementation 'io.bidapp.networks:admob:1.0.5'
-    implementation 'io.bidapp.networks:chartboost:1.0.5'
-    implementation 'io.bidapp.networks:digitalturbine:1.0.5'
-    implementation 'io.bidapp.networks:facebook:1.0.5'
-    implementation 'io.bidapp.networks:startIo:1.0.5'
-    implementation 'io.bidapp.networks:mytarget:1.0.5'
-    implementation 'io.bidapp.networks:yandex:1.0.5'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.10.0'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    implementation 'io.bidapp:sdk:1.1.0'
+    implementation 'io.bidapp.networks:applovin:1.1.0'
+    implementation 'io.bidapp.networks:applovinmax:1.1.0'
+    implementation 'io.bidapp.networks:unity:1.1.0'
+    implementation 'io.bidapp.networks:liftoff:1.1.0'
+    implementation 'io.bidapp.networks:admob:1.1.0'
+    implementation 'io.bidapp.networks:chartboost:1.1.0'
+    implementation 'io.bidapp.networks:digitalturbine:1.1.0'
+    implementation 'io.bidapp.networks:facebook:1.1.0'
+    implementation 'io.bidapp.networks:startIo:1.1.0'
+    implementation 'io.bidapp.networks:mytarget:1.1.0'
+    implementation 'io.bidapp.networks:yandex:1.1.0'
+    implementation libs.appcompat
+    implementation libs.material
+    implementation libs.activity
+    implementation libs.constraintlayout
+    testImplementation libs.junit
+    androidTestImplementation libs.ext.junit
+    androidTestImplementation libs.espresso.core
 }

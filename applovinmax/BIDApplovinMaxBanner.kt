@@ -24,8 +24,9 @@ internal class BIDApplovinMaxBanner(
     val TAG = "Banner Max"
     val bannerFormat = if (format.isBanner_320x50) MaxAdFormat.BANNER
     else if (format.isBanner_300x250) MaxAdFormat.MREC
+    else if (format.isBanner_728x90) MaxAdFormat.LEADER
     else {
-        BIDLog.d(TAG, "Unsupported applovin MAX banner format: $format")
+        BIDLog.d(TAG, "Unsupported applovin MAX banner format: ${format?.name()}")
         null
     }
     var adapter: BIDBannerAdapterProtocol? = adapter
@@ -70,6 +71,7 @@ internal class BIDApplovinMaxBanner(
             val weightAndHeight: Array<Int> = when (adView!!.get()!!.adFormat) {
                 MaxAdFormat.MREC -> arrayOf(300, 250)
                 MaxAdFormat.BANNER -> arrayOf(320, 50)
+                MaxAdFormat.LEADER -> arrayOf(728, 90)
                 else -> arrayOf(0, 0)
             }
             (view.get() as FrameLayout).addView(

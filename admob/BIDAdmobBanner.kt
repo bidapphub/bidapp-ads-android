@@ -26,8 +26,9 @@ internal class BIDAdmobBanner(
     private val TAG = "Banner Admob"
     private val bannerFormat = if (format?.isBanner_320x50 == true) AdSize.BANNER
     else if (format?.isBanner_300x250 == true) AdSize.MEDIUM_RECTANGLE
+    else if (format?.isBanner_728x90 == true) AdSize.LEADERBOARD
     else {
-        BIDLog.d(TAG, "Unsupported Admob banner format: $format")
+        BIDLog.d(TAG, "Unsupported Admob banner format: ${format?.name()}")
         null
     }
     var adView: WeakReference<AdView>? = null
@@ -117,6 +118,7 @@ internal class BIDAdmobBanner(
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 AdSize.MEDIUM_RECTANGLE -> arrayOf(300, 250)
                 AdSize.BANNER -> arrayOf(320, 50)
+                AdSize.LEADERBOARD -> arrayOf(728, 90)
                 else -> arrayOf(0, 0)
             }
             (view.get() as FrameLayout).addView(

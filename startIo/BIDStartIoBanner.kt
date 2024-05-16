@@ -14,7 +14,12 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
-class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat, private val ecpm : Double) :
+class BIDStartIoBanner(
+    adapter: BIDBannerAdapterProtocol,
+    val adTag: String?,
+    format: AdFormat,
+    private val ecpm: Double
+) :
     BIDBannerAdapterDelegateProtocol {
 
     val TAG = "Banner StartIo"
@@ -24,8 +29,9 @@ class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, fo
     private var adView: WeakReference<Any>? = null
     private var bannerFormat = if (format.isBanner_320x50) "banner"
     else if (format.isBanner_300x250) "mrec"
+    else if (format.isBanner_728x90) "leaderboard"
     else {
-        adapter.onFailedToLoad(Error("Unsupported Liftoff banner format"))
+        adapter.onFailedToLoad(Error("Unsupported Liftoff banner format : ${format?.name()}"))
         null
     }
 
@@ -71,21 +77,22 @@ class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, fo
         if (adTag.isNullOrEmpty()) BIDLog.d(TAG, "AdTag is null or empty")
         else startAppAdPreferences?.adTag = adTag
         startAppAdPreferences?.minCpm = ecpm
-            if (bannerFormat == "banner") {
-                adView = WeakReference(
-                    Banner(
-                        context,
-                        startAppAdPreferences,
-                        bannerListener
-                    )
-                )
+        when (bannerFormat) {
+            "banner" -> {
+                adView = WeakReference(Banner(context, startAppAdPreferences, bannerListener))
                 (adView!!.get() as Banner).loadAd(320, 50)
-            } else if (bannerFormat == "mrec") {
+            }
+            "mrec" -> {
                 adView =
                     WeakReference(Mrec(context, startAppAdPreferences, bannerListener))
                 (adView!!.get() as Mrec).loadAd(300, 250)
             }
-
+            "leaderboard" -> {
+                adView =
+                    WeakReference(Banner(context, startAppAdPreferences, bannerListener))
+                (adView!!.get() as Banner).loadAd(728, 90)
+            }
+        }
 
     }
 
@@ -99,6 +106,7 @@ class BIDStartIoBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, fo
             val weightAndHeight: Array<Int> = when (bannerFormat) {
                 "mrec" -> arrayOf(300, 250)
                 "banner" -> arrayOf(320, 50)
+                "leaderboard" -> arrayOf(728, 90)
                 else -> arrayOf(0, 0)
             }
             (view.get() as FrameLayout).addView(
