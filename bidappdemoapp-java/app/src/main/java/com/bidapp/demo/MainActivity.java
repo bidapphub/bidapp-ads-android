@@ -41,8 +41,6 @@ public class MainActivity extends AppCompatActivity {
 
         BIDConfiguration bidConfig = new BIDConfiguration();
 
-
-        bidConfig.enableTestMode();
         bidConfig.enableTestMode();
         bidConfig.enableLogging();
 
