@@ -9,11 +9,15 @@ import com.vungle.ads.BaseFullscreenAd
 import com.vungle.ads.InterstitialAd
 import com.vungle.ads.RewardedAd
 import com.vungle.ads.RewardedAdListener
+import com.vungle.ads.VungleAds
 import com.vungle.ads.VungleError
+import io.bidapp.sdk.AdFormat
 import io.bidapp.sdk.BIDLog
+import io.bidapp.sdk.bid.BidappBid
+import io.bidapp.sdk.bid.BidappBidRequester
+import io.bidapp.sdk.mediation.bid_completion
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
-
 
 
 @PublishedApi
@@ -22,8 +26,6 @@ internal class BIDLiftoffFullscreen(
     private val adTag: String?,
     val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
-
-
     val TAG = if (isRewarded) "Reward Liftoff" else "Full Liftoff"
     private var ads: BaseFullscreenAd? = null
     var isRewardGranted = false
@@ -80,6 +82,11 @@ internal class BIDLiftoffFullscreen(
     }
 
     override fun load(context: Any) {
+        load(context, null)
+    }
+
+    override fun load(context: Any, bidAppBid: BidappBid?) {
+
         if (context as? Context == null) {
             adapter?.onAdFailedToLoadWithError("Liftoff fullscreen loading error")
             return
@@ -88,20 +95,20 @@ internal class BIDLiftoffFullscreen(
             adapter?.onAdFailedToLoadWithError("Liftoff fullscreen adTag is null or empty")
             return
         }
-        if (isRewarded)
-            ads =
-                RewardedAd(context, adTag, AdConfig()).apply {
-                    adListener = callBack
-                    load()
-                }
+
+        if (isRewarded){
+            ads = RewardedAd(context, adTag, AdConfig()).apply {
+                adListener = callBack
+                if (bidAppBid == null) load()
+                else load(bidAppBid.nativeBid.toString())
+            }
+        }
         else
-            ads = InterstitialAd(
-                    context,
-                    adTag,
-                    AdConfig()).apply {
-                    adListener = callBack
-                    load()
-                }
+            ads = InterstitialAd(context, adTag, AdConfig()).apply {
+                adListener = callBack
+                if (bidAppBid == null) load()
+                else load(bidAppBid.nativeBid.toString())
+            }
     }
 
     override fun show(activity: Activity?) {
@@ -110,6 +117,7 @@ internal class BIDLiftoffFullscreen(
             return
         }
         (ads)?.play()
+
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -137,4 +145,23 @@ internal class BIDLiftoffFullscreen(
         ads?.adListener = null
         ads = null
     }
+    companion object {
+        fun bid (context: Context?, request:BidappBidRequester, adTag: String?, appId : String?, accountId : String?, adFormat : AdFormat?, bidCompletion : bid_completion){
+            val TAG = "Liftoff bid"
+            if (context != null) {
+                request.requestBidsWithCompletion(
+                    VungleAds.getBiddingToken(context),
+                    adTag,
+                    appId,
+                    accountId,
+                    adFormat,
+                    BIDLiftoffSDK.testMode,
+                    BIDLiftoffSDK.coppa,
+                    bidCompletion
+                )
+            }
+            else BIDLog.d(TAG, "Error : Context is null")
+        }
+    }
+
 }

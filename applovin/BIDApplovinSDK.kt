@@ -11,8 +11,8 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "1.1.0"
-internal const val SDKVERSION = "12.4.2"
+internal const val ADAPTERVERSION = "2.0.0"
+internal const val SDKVERSION = "12.4.3"
 @PublishedApi
 internal class BIDApplovinSDK(
     private val adapter: BIDNetworkAdapterProtocol? = null,
@@ -61,7 +61,7 @@ internal class BIDApplovinSDK(
         return appLovinGetInstanceSDK(context.applicationContext).isInitialized
     }
 
-    override fun sharedSDK(): Any? {
+    override fun sharedSDK(): Any {
         return mapOf(
             "adapterVersion" to ADAPTERVERSION,
             "sdkVersion" to SDKVERSION

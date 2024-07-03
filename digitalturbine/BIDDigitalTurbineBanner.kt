@@ -93,7 +93,7 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             return
         }
         if (!format.isBanner_320x50 && !format.isBanner_300x250 && !format.isBanner_728x90){
-            adapter.onFailedToLoad(Error("Unsupported Digital Turbine banner format : ${format?.name()}"))
+            adapter.onFailedToLoad(Error("Unsupported Digital Turbine banner format : ${format.name()}"))
             return
         }
         if (adTag.isNullOrEmpty()){

@@ -1,10 +1,7 @@
 package io.bidapp.networks.chartboost
 
 import android.app.Activity
-import android.util.Log
-import com.chartboost.sdk.ads.Interstitial
 import com.chartboost.sdk.ads.Rewarded
-import com.chartboost.sdk.callbacks.InterstitialCallback
 import com.chartboost.sdk.callbacks.RewardedCallback
 import com.chartboost.sdk.events.CacheError
 import com.chartboost.sdk.events.CacheEvent

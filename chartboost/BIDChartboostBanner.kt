@@ -76,7 +76,7 @@ internal class BIDChartboostBanner(
         }
     }
 
-    override fun nativeAdView(): WeakReference<View>? {
+    override fun nativeAdView(): WeakReference<View> {
         return WeakReference(adView?.get() as? View)
     }
 

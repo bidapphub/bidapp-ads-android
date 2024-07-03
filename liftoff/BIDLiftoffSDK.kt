@@ -8,12 +8,14 @@ import com.vungle.ads.VungleError
 import com.vungle.ads.VunglePrivacySettings
 import io.bidapp.sdk.BIDConsent
 import io.bidapp.sdk.BIDLog
+import io.bidapp.sdk.BidappAds
 import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "1.1.0"
-internal const val SDKVERSION = "7.3.1"
+
+internal const val ADAPTERVERSION = "2.0.1"
+internal const val SDKVERSION = "7.3.2"
 @PublishedApi
 internal class BIDLiftoffSDK(
     private val adapter: BIDNetworkAdapterProtocol,
@@ -21,8 +23,8 @@ internal class BIDLiftoffSDK(
     appSignature: String?
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
-    private val TAG = "Liftoff SDK"
-    private var testMode = false
+    private val TAG = "Liftoff SDK adapter"
+
 
     override fun enableLogging(context: Context) {
     }
@@ -35,15 +37,17 @@ internal class BIDLiftoffSDK(
             VunglePrivacySettings.setCCPAStatus(consent.CCPA!!)
         }
         if (consent.COPPA != null) {
+            coppa = consent.COPPA
             VunglePrivacySettings.setCOPPAStatus(consent.COPPA!!)
         }
     }
 
     override fun enableTesting() {
-        testMode = true
+        BIDLiftoffSDK.testMode = true
     }
 
     override fun initializeSDK(context: Context) {
+        isCompatibility()
         if (isInitialized(context) || adapter.initializationInProgress())
         {
             return
@@ -53,6 +57,7 @@ internal class BIDLiftoffSDK(
             return
         }
         adapter.onInitializationStart()
+        VungleAds.setIntegrationName(VungleAds.WrapperFramework.vunglehbs, "51.0.0")
         VungleAds.init(context, appId, object : InitializationListener {
             override fun onError(vungleError: VungleError) {
                 this@BIDLiftoffSDK.initializationFailed(vungleError.errorMessage)
@@ -82,5 +87,19 @@ internal class BIDLiftoffSDK(
             "adapterVersion" to ADAPTERVERSION,
             "sdkVersion" to SDKVERSION
         )
+    }
+    private fun isCompatibility(){
+       try {
+           val majorVersion = BidappAds.VERSION.firstOrNull { it.isDigit() }?.toString()?.toIntOrNull()
+           if (majorVersion != null && majorVersion < 2)
+               throw IllegalStateException("The adapter version is not compatible with the Bidapp SDK. Please update the Bidapp SDK to the latest version")
+       } catch (e : Exception){
+               throw IllegalStateException("The adapter version is not compatible with the Bidapp SDK. Please update the Bidapp SDK to the latest version")
+       }
+
+    }
+    companion object{
+        var testMode : Boolean? = false
+        var coppa : Boolean? = false
     }
 }

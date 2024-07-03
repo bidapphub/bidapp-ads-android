@@ -16,7 +16,7 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
 
-class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat) :
+class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, private val adTag: String?, format: AdFormat) :
     BIDBannerAdapterDelegateProtocol {
     val TAG = "Banner Facebook"
     var adView : WeakReference<AdView>? = null
@@ -26,7 +26,7 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, f
     else if (format.isBanner_300x250) AdSize.RECTANGLE_HEIGHT_250
     else if (format.isBanner_728x90) AdSize.BANNER_HEIGHT_90
     else {
-        BIDLog.d(TAG,"Unsupported Facebook banner format : ${format?.name()}")
+        BIDLog.d(TAG,"Unsupported Facebook banner format : ${format.name()}")
         null
     }
 
@@ -55,7 +55,7 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, f
     }
 
 
-    override fun nativeAdView(): WeakReference<View>? {
+    override fun nativeAdView(): WeakReference<View> {
         return WeakReference(adView?.get() as? View)
     }
 

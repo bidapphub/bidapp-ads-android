@@ -9,9 +9,13 @@ import com.vungle.ads.BannerAdListener
 import com.vungle.ads.BannerAdSize
 import com.vungle.ads.BannerView
 import com.vungle.ads.BaseAd
+import com.vungle.ads.VungleAds
 import com.vungle.ads.VungleError
 import io.bidapp.sdk.AdFormat
 import io.bidapp.sdk.BIDLog
+import io.bidapp.sdk.bid.BidappBid
+import io.bidapp.sdk.bid.BidappBidRequester
+import io.bidapp.sdk.mediation.bid_completion
 import io.bidapp.sdk.protocols.BIDBannerAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
@@ -43,6 +47,10 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     }
 
     override fun load(context: Any) {
+        load(context, null)
+    }
+
+    override fun load(context: Any, bidAppBid: BidappBid?) {
         cachedAd = null
         if (context as? Context == null || bannerFormat == null){
             adapter?.onFailedToLoad(Error("banner loading error"))
@@ -56,8 +64,8 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
             bannerAd = WeakReference(BannerAd(context, adTag, bannerFormat))
         }
             bannerAd?.get()?.adListener = this
-            bannerAd?.get()?.load()
-
+            if (bidAppBid == null) bannerAd?.get()?.load()
+            else bannerAd?.get()?.load(bidAppBid.nativeBid.toString())
     }
 
 
@@ -141,6 +149,25 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
 
     override fun revenue(): Double? {
         return null
+    }
+
+    companion object {
+        fun bid(context: Context?, request: BidappBidRequester, adTag: String?, appId : String?, accountId : String?, adFormat : AdFormat?, bidCompletion : bid_completion) {
+            val TAG = "Liftoff bid"
+            if (context != null) {
+                request.requestBidsWithCompletion(
+                    VungleAds.getBiddingToken(context),
+                    adTag,
+                    appId,
+                    accountId,
+                    adFormat,
+                    BIDLiftoffSDK.testMode,
+                    BIDLiftoffSDK.coppa,
+                    bidCompletion
+                )
+            }
+            else BIDLog.d(TAG, "Error : Context is null")
+        }
     }
 }
 

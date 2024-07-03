@@ -9,8 +9,8 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "1.1.0"
-internal const val SDKVERSION = "4.11.5"
+internal const val ADAPTERVERSION = "2.0.1"
+internal const val SDKVERSION = "5.0.1"
 class BIDStartIoSDK(
     private val adapter: BIDNetworkAdapterProtocol?,
     private val appId: String?,
@@ -21,7 +21,7 @@ class BIDStartIoSDK(
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
         consent.let {
-            if (consent.GDPR != null) {
+            if (consent.GDPR != null && context != null) {
                 StartAppSDK.setUserConsent (context,
                     "pas",
                     System.currentTimeMillis(),
@@ -54,11 +54,8 @@ class BIDStartIoSDK(
         }
         adapter?.onInitializationStart()
         StartAppSDK.init(context, appId, false)
-        if (StartAppAd(context).isNetworkAvailable) {
-            isInitializationComplete = true
-            initializationComplete()
-        }
-        else initializationFailed("Network is not available")
+        isInitializationComplete = true
+        initializationComplete()
     }
 
     override fun isInitialized(context: Context): Boolean {

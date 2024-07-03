@@ -18,7 +18,7 @@ class BIDFacebookInterstitial(
 
     val TAG = "Interstitial Facebook"
     private var interstitialAd: InterstitialAd? = null
-    var interstitialAdListener = object : InterstitialAdListener {
+    private var interstitialAdListener = object : InterstitialAdListener {
         override fun onError(p0: Ad?, p1: AdError?) {
             val error = p1?.errorMessage ?: "Unknown error"
             BIDLog.d(TAG, "onError $adTag exception: $error")
