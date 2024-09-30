@@ -79,10 +79,10 @@ internal class BIDApplovinInterstitial(
             return
         }
          if (interstitialAdDialog == null) {
-                interstitialAdDialog = AppLovinInterstitialAd.create(BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext), context)
+                interstitialAdDialog = AppLovinInterstitialAd.create(AppLovinSdk.getInstance(context), context)
             }
             init()
-            BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext).adService.loadNextAd(
+            AppLovinSdk.getInstance(context).adService.loadNextAd(
                 AppLovinAdSize.INTERSTITIAL,
                 appLovinAdLoadListener
             )

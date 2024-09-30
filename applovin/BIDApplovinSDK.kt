@@ -7,12 +7,13 @@ import com.applovin.sdk.AppLovinPrivacySettings
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkSettings
 import io.bidapp.sdk.BIDConsent
+import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.0.0"
-internal const val SDKVERSION = "12.4.3"
+internal const val ADAPTERVERSION = "2.1.0"
+internal const val SDKVERSION = "13.0.0"
 @PublishedApi
 internal class BIDApplovinSDK(
     private val adapter: BIDNetworkAdapterProtocol? = null,
@@ -21,14 +22,10 @@ internal class BIDApplovinSDK(
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
     override fun enableLogging(context: Context) {
-        appLovinGetInstanceSDK(context.applicationContext).settings.setVerboseLogging(true)
+        AppLovinSdk.getInstance(context.applicationContext).settings.setVerboseLogging(true)
     }
 
     override fun enableTesting() {
-    }
-
-    init {
-        BIDApplovinSDK.appId = appId
     }
 
    override fun setConsent(consent: BIDConsent, context: Context?) {
@@ -39,12 +36,12 @@ internal class BIDApplovinSDK(
             AppLovinPrivacySettings.setDoNotSell(!consent.CCPA!!, context)
         }
         if (consent.COPPA != null){
-            AppLovinPrivacySettings.setIsAgeRestrictedUser(consent.COPPA!!, context)
+           BIDLog.e("Applovin SDK", "IMPORTANCE!!! COPPA method not support for latest version adapter. Please review the official information on the AppLovin website.")
         }
     }
 
     override fun initializeSDK(context: Context) {
-        if (appId.isNullOrEmpty() && !getApplovinKeyFromManifest(context)) {
+        if (appId.isNullOrEmpty()) {
             adapter?.onInitializationComplete(false, "AppLovin App Id is null or empty")
             return
         }
@@ -58,7 +55,7 @@ internal class BIDApplovinSDK(
     }
 
     override fun isInitialized(context: Context): Boolean {
-        return appLovinGetInstanceSDK(context.applicationContext).isInitialized
+        return AppLovinSdk.getInstance(context).isInitialized
     }
 
     override fun sharedSDK(): Any {
@@ -66,30 +63,6 @@ internal class BIDApplovinSDK(
             "adapterVersion" to ADAPTERVERSION,
             "sdkVersion" to SDKVERSION
         )
-    }
-
-    companion object{
-        var appId : String? = null
-
-        fun appLovinGetInstanceSDK(context: Context) : AppLovinSdk {
-            if (getApplovinKeyFromManifest(context) || this.appId.isNullOrEmpty()) {
-                return AppLovinSdk.getInstance(context)
-            }
-            return AppLovinSdk.getInstance(appId, AppLovinSdkSettings(context), context)
-        }
-
-        fun getApplovinKeyFromManifest(context: Context): Boolean {
-            try {
-                val appInfo = context.packageManager.getApplicationInfo(context.applicationContext.packageName, PackageManager.GET_META_DATA)
-                val metaData = appInfo.metaData
-                if (metaData?.getString("applovin.sdk.key") != null)
-                    return true
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
-                return false
-            }
-            return false
-        }
     }
 
 }

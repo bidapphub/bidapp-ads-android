@@ -93,7 +93,7 @@ internal class BIDApplovinRewarded(
             return
         }
         if (incentivizedInterstitial == null) {
-            incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext))
+            incentivizedInterstitial = AppLovinIncentivizedInterstitial.create(context)
         }
         if (RewardedOnDisplay.isOnScreen) appLovinAdLoadListener.failedToReceiveAd(0)
         else incentivizedInterstitial?.preload(appLovinAdLoadListener)

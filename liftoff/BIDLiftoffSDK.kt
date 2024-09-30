@@ -14,8 +14,8 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 
-internal const val ADAPTERVERSION = "2.0.1"
-internal const val SDKVERSION = "7.3.2"
+internal const val ADAPTERVERSION = "2.1.0"
+internal const val SDKVERSION = "7.4.1"
 @PublishedApi
 internal class BIDLiftoffSDK(
     private val adapter: BIDNetworkAdapterProtocol,
@@ -43,7 +43,7 @@ internal class BIDLiftoffSDK(
     }
 
     override fun enableTesting() {
-        BIDLiftoffSDK.testMode = true
+        testMode = true
     }
 
     override fun initializeSDK(context: Context) {

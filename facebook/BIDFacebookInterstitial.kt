@@ -32,7 +32,7 @@ class BIDFacebookInterstitial(
 
         override fun onAdClicked(p0: Ad?) {
             BIDLog.d(TAG, "ad clicked $adTag")
-            adapter?.onAdLoaded()
+            adapter?.onClick()
         }
 
         override fun onLoggingImpression(p0: Ad?) {

@@ -27,7 +27,7 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
     else if (format.isBanner_300x250) AppLovinAdSize.MREC
     else if (format.isBanner_728x90) AppLovinAdSize.LEADER
     else {
-        BIDLog.d(TAG, "Unsupported applovin banner format: ${format?.name()}")
+        BIDLog.d(TAG, "Unsupported applovin banner format: ${format.name()}")
         null
     }
     var adView : WeakReference<AppLovinAdView>? = null
@@ -99,7 +99,7 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
             return
         }
             if (adView?.get() == null) {
-                adView = WeakReference(AppLovinAdView(BIDApplovinSDK.appLovinGetInstanceSDK((context as Context).applicationContext), bannerFormat, context))
+                adView = WeakReference(AppLovinAdView(bannerFormat, context))
             }
             adView?.get()?.setAdLoadListener(this)
             adView?.get()?.setAdDisplayListener(this)

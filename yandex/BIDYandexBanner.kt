@@ -57,7 +57,7 @@ class BIDYandexBanner(
                 BannerAdSize.fixedSize((context as Activity).applicationContext, 728, 90)
             }
             else -> {
-                adapter.onFailedToLoad(Error("Unsupported Yandex banner format: ${format?.name()}"))
+                adapter.onFailedToLoad(Error("Unsupported Yandex banner format: ${format.name()}"))
                 return
             }
         }

@@ -66,14 +66,6 @@ internal class BIDApplovinMaxRewarded(
             BIDLog.d(TAG, "on user rewarded adtag: ($adTag)")
             isGrantedReward = true
         }
-
-        @Deprecated("Deprecated in Java")
-        override fun onRewardedVideoStarted(p0: MaxAd) {
-        }
-
-        @Deprecated("Deprecated in Java")
-        override fun onRewardedVideoCompleted(p0: MaxAd) {
-        }
     }
 
     private fun setListener () {
@@ -91,7 +83,7 @@ internal class BIDApplovinMaxRewarded(
             return
         }
             if (rewardedAd == null) {
-                rewardedAd = MaxRewardedAd.getInstance(adTag,BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK((context as Activity).applicationContext), context)
+                rewardedAd = MaxRewardedAd.getInstance(adTag, context)
             }
             if (RewardedOnDisplay.isOnScreen) adapter?.onAdFailedToLoadWithError("Max rewarded loading error")
             else {
@@ -105,11 +97,11 @@ internal class BIDApplovinMaxRewarded(
             adapter?.onFailedToDisplay("Max interstitial showing error")
             return
         }
-        rewardedAd?.showAd()
+        rewardedAd?.showAd(activity)
     }
 
     override fun activityNeededForShow(): Boolean {
-        return false
+        return true
     }
 
     override fun activityNeededForLoad(): Boolean {

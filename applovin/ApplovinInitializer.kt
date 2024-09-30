@@ -1,6 +1,10 @@
 package io.bidapp.networks.applovin
 
 import android.content.Context
+import android.util.Log
+import com.applovin.sdk.AppLovinMediationProvider
+import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 import io.bidapp.sdk.utils.dispatch_main
 import java.lang.ref.WeakReference
@@ -13,12 +17,14 @@ internal object ApplovinInitializer : IApplovinInitializer {
     fun doStart(listener: BIDNetworkAdapterProtocol, context: Context, appId: String?) {
            startSDKWaiters.add(WeakReference(listener))
         if (1 == startSDKWaiters.size) {
-            BIDApplovinSDK.appId = appId
-            BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).mediationProvider = "max"
-            BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).initializeSdk {
-                val success = BIDApplovinSDK.appLovinGetInstanceSDK(context.applicationContext).isInitialized
+            val initConfig = AppLovinSdkInitializationConfiguration.builder(appId, context)
+                .setMediationProvider(AppLovinMediationProvider.MAX)
+                .build()
+            AppLovinSdk.getInstance(context).initialize(initConfig){
+                val success = AppLovinSdk.getInstance(context).isInitialized
                 dispatch_main {
                     if (!success) {
+                        Log.d("mylog", "Applovin not init")
                         startSDKWaiters.forEach {
                             it.get()?.onInitializationComplete(
                                 false,
@@ -28,6 +34,7 @@ internal object ApplovinInitializer : IApplovinInitializer {
                         return@dispatch_main
                     }
                     startSDKWaiters.forEach {
+                        Log.d("mylog", "Applovin init")
                         it.get()?.onInitializationComplete(true, null)
                     }
                     startSDKWaiters.clear()

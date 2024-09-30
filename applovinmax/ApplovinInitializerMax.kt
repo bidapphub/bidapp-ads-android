@@ -1,6 +1,10 @@
 package io.bidapp.networks.applovinmax
 
 import android.content.Context
+import android.util.Log
+import com.applovin.sdk.AppLovinMediationProvider
+import com.applovin.sdk.AppLovinSdk
+import com.applovin.sdk.AppLovinSdkInitializationConfiguration
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 import io.bidapp.sdk.utils.dispatch_main
 import java.lang.ref.WeakReference
@@ -15,26 +19,29 @@ internal object ApplovinInitializerMax : IApplovinInitializer {
     fun doStart(listener: BIDNetworkAdapterProtocol, context: Context, appId: String?) {
           startSDKWaiters.add(WeakReference(listener))
          if (1 == startSDKWaiters.size) {
-            BIDApplovinMaxSDK.appId = appId
-            BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context.applicationContext).mediationProvider = "max"
-            BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context.applicationContext).initializeSdk {
-                val success = BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context.applicationContext).isInitialized
-                dispatch_main {
-                    if (!success) {
-                        startSDKWaiters.forEach {
-                            it.get()?.onInitializationComplete(
-                                false,
-                                "ApplovinMAX initialized failed"
-                            )
-                        }
-                        return@dispatch_main
-                    }
-                    startSDKWaiters.forEach {
-                        it.get()?.onInitializationComplete(true, null)
-                    }
-                    startSDKWaiters.clear()
-                }
-            }
+             val initConfig = AppLovinSdkInitializationConfiguration.builder(appId, context)
+                 .setMediationProvider(AppLovinMediationProvider.MAX)
+                 .build()
+             AppLovinSdk.getInstance(context).initialize(initConfig){
+                 val success = AppLovinSdk.getInstance(context).isInitialized
+                 dispatch_main {
+                     if (!success) {
+                         startSDKWaiters.forEach {
+                             Log.d("mylog", "Applovin max not init")
+                             it.get()?.onInitializationComplete(
+                                 false,
+                                 "ApplovinMAX isInitialized failed"
+                             )
+                         }
+                         return@dispatch_main
+                     }
+                     startSDKWaiters.forEach {
+                         Log.d("mylog", "Applovin max init")
+                         it.get()?.onInitializationComplete(true, null)
+                     }
+                     startSDKWaiters.clear()
+                 }
+             }
         }
     }
 

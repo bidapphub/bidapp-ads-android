@@ -59,10 +59,8 @@ internal class BIDUnityBanner(
 
     override fun destroy() {
        cachedAd?.get()?.removeAllViews()
-       cachedAd?.get()?.destroy()
        cachedAd = null
        adView?.get()?.removeAllViews()
-       adView?.get()?.destroy()
        adView = null
     }
 

@@ -7,12 +7,13 @@ import com.applovin.sdk.AppLovinPrivacySettings
 import com.applovin.sdk.AppLovinSdk
 import com.applovin.sdk.AppLovinSdkSettings
 import io.bidapp.sdk.BIDConsent
+import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.0.0"
-internal const val SDKVERSION = "12.4.3"
+internal const val ADAPTERVERSION = "2.1.0"
+internal const val SDKVERSION = "13.0.0"
 
 @PublishedApi
 internal class BIDApplovinMaxSDK(
@@ -23,8 +24,7 @@ internal class BIDApplovinMaxSDK(
 
 
     override fun enableLogging(context: Context) {
-        BIDApplovinMaxSDK.appId = appId
-        appLovinGetMaxInstanceSDK(context).settings.setVerboseLogging(true)
+        AppLovinSdk.getInstance(context).settings.setVerboseLogging(true)
     }
 
     override fun setConsent(consent: BIDConsent, context: Context?) {
@@ -35,19 +35,15 @@ internal class BIDApplovinMaxSDK(
             AppLovinPrivacySettings.setDoNotSell(!consent.CCPA!!, context)
         }
         if (consent.COPPA != null) {
-            AppLovinPrivacySettings.setIsAgeRestrictedUser(consent.COPPA!!, context)
+            BIDLog.e("Applovin SDK", "IMPORTANCE!!! COPPA method not support for latest version adapter. Please review the official information on the AppLovin website.")
         }
-    }
-
-    init {
-        BIDApplovinMaxSDK.appId = appId
     }
 
     override fun enableTesting() {
     }
 
     override fun initializeSDK(context: Context) {
-        if (appId == null && !getApplovinKeyFromManifest(context.applicationContext)) {
+        if (appId == null) {
             adapter?.onInitializationComplete(false, "AppLovinMax App Id is null")
             return
         }
@@ -62,7 +58,7 @@ internal class BIDApplovinMaxSDK(
     }
 
     override fun isInitialized(context: Context): Boolean {
-        return appLovinGetMaxInstanceSDK(context.applicationContext).isInitialized
+        return AppLovinSdk.getInstance(context).isInitialized
     }
 
     override fun sharedSDK(): Any {
@@ -72,30 +68,4 @@ internal class BIDApplovinMaxSDK(
         )
     }
 
-    companion object {
-        var appId: String? = null
-
-        fun appLovinGetMaxInstanceSDK(context: Context): AppLovinSdk {
-            if (getApplovinKeyFromManifest(context) || this.appId == null) {
-                return AppLovinSdk.getInstance(context)
-            }
-            return AppLovinSdk.getInstance(appId, AppLovinSdkSettings(context), context)
-        }
-
-        fun getApplovinKeyFromManifest(context: Context): Boolean {
-            try {
-                val appInfo = context.packageManager.getApplicationInfo(
-                    context.applicationContext.packageName,
-                    PackageManager.GET_META_DATA
-                )
-                val metaData = appInfo.metaData
-                if (metaData?.getString("applovin.sdk.key") != null)
-                    return true
-            } catch (e: PackageManager.NameNotFoundException) {
-                e.printStackTrace()
-                return false
-            }
-            return false
-        }
-    }
 }

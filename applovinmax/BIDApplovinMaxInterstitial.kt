@@ -68,7 +68,7 @@ internal class BIDApplovinMaxInterstitial(
             return
         }
             if (interstitialAd == null) {
-                interstitialAd = MaxInterstitialAd(adTag, BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK((context as Activity).applicationContext), context)
+                interstitialAd = MaxInterstitialAd(adTag, context)
             }
             setListener()
             interstitialAd?.loadAd()
@@ -79,11 +79,11 @@ internal class BIDApplovinMaxInterstitial(
             adapter?.onFailedToDisplay("Max interstitial showing error")
             return
         }
-        interstitialAd?.showAd()
+        interstitialAd?.showAd(activity)
     }
 
     override fun activityNeededForShow(): Boolean {
-        return false
+        return true
     }
 
     override fun activityNeededForLoad(): Boolean {

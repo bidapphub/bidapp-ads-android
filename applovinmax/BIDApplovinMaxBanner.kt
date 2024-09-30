@@ -52,7 +52,7 @@ internal class BIDApplovinMaxBanner(
             return
         }
         if (adView?.get() == null) {
-            adView = WeakReference(MaxAdView(adTag, bannerFormat, BIDApplovinMaxSDK.appLovinGetMaxInstanceSDK(context), context))
+            adView = WeakReference(MaxAdView(adTag, context))
             adView?.get()?.setExtraParameter( "allow_pause_auto_refresh_immediately", "true" )
             adView?.get()?.stopAutoRefresh()
         }
