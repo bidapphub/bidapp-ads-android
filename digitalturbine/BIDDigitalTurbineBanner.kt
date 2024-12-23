@@ -18,7 +18,7 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
 
-class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: String?, val format: AdFormat) : BIDBannerAdapterDelegateProtocol {
+class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: String?, val format: AdFormat) : BIDBannerAdapterDelegateProtocol, InneractiveAdViewEventsListenerWithImpressionData {
 
     val TAG = "Banner Digital Turbine"
     private var adViewSpot : WeakReference<InneractiveAdSpot>? = null
@@ -26,46 +26,10 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
     var view : WeakReference<View>? = null
     private var controller : InneractiveAdViewUnitController? = null
 
-    private val bannerEventListener = object : InneractiveAdViewEventsListenerWithImpressionData{
-        override fun onAdImpression(p0: InneractiveAdSpot?, p1: ImpressionData?) {
-            BIDLog.d(TAG, "ad show adTag: ($adTag)")
-            adapter.onDisplay()
-        }
-
-        override fun onAdImpression(p0: InneractiveAdSpot?) {
-        }
-
-        override fun onAdClicked(p0: InneractiveAdSpot?) {
-            BIDLog.d(TAG, "ad clicked. adTag: ($adTag)")
-            adapter.onClick()
-        }
-
-        override fun onAdWillCloseInternalBrowser(p0: InneractiveAdSpot?) {}
-
-        override fun onAdWillOpenExternalApp(p0: InneractiveAdSpot?) {}
-
-        override fun onAdEnteredErrorState(
-            p0: InneractiveAdSpot?,
-            p1: InneractiveUnitController.AdDisplayError?
-        ) {
-            val error = p1?.message ?: "Unknown error"
-            BIDLog.d(TAG, "failed to play $error")
-            adapter.onFailedToDisplay(Error(error))
-        }
-
-        override fun onAdExpanded(p0: InneractiveAdSpot?) {
-        }
-
-        override fun onAdResized(p0: InneractiveAdSpot?) {}
-
-        override fun onAdCollapsed(p0: InneractiveAdSpot?) {}
-
-    }
-
-    private val bannerLoadListener = object : InneractiveAdSpot.RequestListener{
+     private val bannerLoadListener = object : InneractiveAdSpot.RequestListener{
         override fun onInneractiveSuccessfulAdRequest(p0: InneractiveAdSpot?) {
             ready = true
-            BIDLog.d(TAG, "ad loaded adTag: ($adTag)")
+            BIDLog.d(TAG, "Ad loaded adTag: ($adTag)")
             adapter.onLoad()
         }
 
@@ -74,7 +38,7 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             p1: InneractiveErrorCode?
         ) {
             val error = p1 ?: "Unknown Error"
-            BIDLog.d(TAG, "Admob failed to load ad. adTag: ($adTag) Error: $error")
+            BIDLog.d(TAG, "Failed to load ad. adTag: ($adTag) Error: $error")
             adapter.onFailedToLoad(Error(error.toString()))
             ready = false
         }
@@ -89,7 +53,7 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
 
     override fun load(context: Any) {
         if (context as? Context == null){
-            adapter.onFailedToLoad(Error("banner load is failed"))
+            adapter.onFailedToLoad(Error("Banner load is failed"))
             return
         }
         if (!format.isBanner_320x50 && !format.isBanner_300x250 && !format.isBanner_728x90){
@@ -106,7 +70,7 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
                 controller = InneractiveAdViewUnitController()
                 adViewSpot = WeakReference(InneractiveAdSpotManager.get().createSpot())
             }
-            controller?.eventsListener = bannerEventListener
+            controller?.eventsListener = this
             adViewSpot?.get()?.addUnitController(controller)
             adViewSpot?.get()?.setRequestListener(bannerLoadListener)
             val request = InneractiveAdRequest(adTag)
@@ -152,4 +116,47 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
     override fun revenue(): Double? {
         return null
     }
+
+    override fun onAdImpression(p0: InneractiveAdSpot?, p1: ImpressionData?) {
+        BIDLog.d(TAG, "Ad show adTag: ($adTag)")
+        adapter.onDisplay()
+    }
+
+    override fun onAdImpression(p0: InneractiveAdSpot?) {}
+
+    override fun onAdClicked(p0: InneractiveAdSpot?) {
+        BIDLog.d(TAG, "Ad clicked. adTag: ($adTag)")
+        adapter.onClick()
+    }
+
+    override fun onAdWillCloseInternalBrowser(p0: InneractiveAdSpot?) {
+        BIDLog.d(TAG, "Ad close internal browser. adTag: ($adTag)")
+    }
+
+    override fun onAdWillOpenExternalApp(p0: InneractiveAdSpot?) {
+        BIDLog.d(TAG, "Ad will open external app. adTag: ($adTag)")
+    }
+
+    override fun onAdEnteredErrorState(
+        p0: InneractiveAdSpot?,
+        p1: InneractiveUnitController.AdDisplayError?
+    ) {
+        val error = p1?.message ?: "Unknown error"
+        BIDLog.d(TAG, "Failed to play ad $error adTag: ($adTag)")
+        adapter.onFailedToDisplay(Error(error))
+    }
+
+    override fun onAdExpanded(p0: InneractiveAdSpot?) {
+        BIDLog.d(TAG, "On ad expanded adTag: ($adTag)")
+    }
+
+    override fun onAdResized(p0: InneractiveAdSpot?) {
+        BIDLog.d(TAG, "On ad resized adTag: ($adTag)")
+    }
+
+    override fun onAdCollapsed(p0: InneractiveAdSpot?) {
+        BIDLog.d(TAG, "On ad collapsed adTag: ($adTag)")
+    }
+
+
 }

@@ -9,6 +9,8 @@ import com.vungle.ads.BannerAdListener
 import com.vungle.ads.BannerAdSize
 import com.vungle.ads.BannerView
 import com.vungle.ads.BaseAd
+import com.vungle.ads.BidTokenCallback
+import com.vungle.ads.VungleAdSize
 import com.vungle.ads.VungleAds
 import com.vungle.ads.VungleError
 import io.bidapp.sdk.AdFormat
@@ -22,16 +24,16 @@ import java.lang.ref.WeakReference
 
 
 @PublishedApi
-internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: String?, format: AdFormat) :
+internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, private val adTag: String?, format: AdFormat) :
     BIDBannerAdapterDelegateProtocol, BannerAdListener {
     private var adapter: BIDBannerAdapterProtocol? = adapter
     private var bannerAd: WeakReference<BannerAd>? = null
     private var adView: WeakReference<BannerView>? = null
     private var cachedAd: String? = null
     private val TAG = "Banner Liftoff"
-    private val bannerFormat = if (format.isBanner_320x50) BannerAdSize.BANNER
-    else if (format.isBanner_300x250) BannerAdSize.VUNGLE_MREC
-    else if (format.isBanner_728x90) BannerAdSize.BANNER_LEADERBOARD
+    private val bannerFormat = if (format.isBanner_320x50) VungleAdSize.BANNER
+    else if (format.isBanner_300x250) VungleAdSize.MREC
+    else if (format.isBanner_728x90) VungleAdSize.BANNER_LEADERBOARD
     else {
         BIDLog.d(TAG, "Unsupported Liftoff banner format: ${format?.name()}")
         null
@@ -53,7 +55,7 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     override fun load(context: Any, bidAppBid: BidappBid?) {
         cachedAd = null
         if (context as? Context == null || bannerFormat == null){
-            adapter?.onFailedToLoad(Error("banner loading error"))
+            adapter?.onFailedToLoad(Error("Banner loading error"))
             return
         }
         if (adTag.isNullOrEmpty()){
@@ -69,7 +71,6 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     }
 
 
-
     override fun destroy() {
        cachedAd = null
        adView?.get()?.removeAllViews()
@@ -78,9 +79,9 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         return try {
             val weightAndHeight: Array<Int> = when (bannerFormat) {
-                BannerAdSize.VUNGLE_MREC -> arrayOf(300, 250)
-                BannerAdSize.BANNER -> arrayOf(320, 50)
-                BannerAdSize.BANNER_LEADERBOARD -> arrayOf(728, 90)
+                VungleAdSize.MREC -> arrayOf(300, 250)
+                VungleAdSize.BANNER -> arrayOf(320, 50)
+                VungleAdSize.BANNER_LEADERBOARD -> arrayOf(728, 90)
                 else -> arrayOf(0, 0)
             }
             adView = WeakReference(bannerAd!!.get()!!.getBannerView())
@@ -108,43 +109,43 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
     }
 
     override fun onAdClicked(baseAd: BaseAd) {
-        BIDLog.d(TAG, "ad click. adTag: ($adTag)")
+        BIDLog.d(TAG, "Ad click. adTag: ($adTag)")
         adapter?.onClick()
     }
 
     override fun onAdEnd(baseAd: BaseAd) {
-        BIDLog.d(TAG, "ad end. adTag: ($adTag)")
+        BIDLog.d(TAG, "Ad end. adTag: ($adTag)")
         adapter?.onHide()
         cachedAd = null
     }
 
     override fun onAdFailedToLoad(baseAd: BaseAd, adError: VungleError) {
-        BIDLog.d(TAG, "failed to load ad. Error: ${adError.message} adTag: ($adTag)")
+        BIDLog.d(TAG, "Failed to load ad. Error: ${adError.message} adTag: ($adTag)")
         adapter?.onFailedToLoad(Error(adError.message))
     }
 
     override fun onAdFailedToPlay(baseAd: BaseAd, adError: VungleError) {
-        BIDLog.d(TAG, "failed to play ${adError.message} adTag: ($adTag)")
+        BIDLog.d(TAG, "Failed to play ${adError.message} adTag: ($adTag)")
         adapter?.onFailedToDisplay(Error(adError.message))
     }
 
     override fun onAdImpression(baseAd: BaseAd) {
-        BIDLog.d(TAG, "ad displayed. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad displayed. adtag: ($adTag)")
         adapter?.onDisplay()
     }
 
     override fun onAdLeftApplication(baseAd: BaseAd) {
         cachedAd = null
-        BIDLog.d(TAG, "ad left application. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad left application. adtag: ($adTag)")
     }
     override fun onAdLoaded(baseAd: BaseAd) {
         cachedAd = baseAd.placementId
         adapter?.onLoad()
-        BIDLog.d(TAG, "ad loaded. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad loaded. adtag: ($adTag)")
     }
 
     override fun onAdStart(baseAd: BaseAd) {
-        BIDLog.d(TAG, "ad start. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad start. adtag: ($adTag)")
     }
 
     override fun revenue(): Double? {
@@ -155,18 +156,27 @@ internal class BIDLiftoffBanner(adapter: BIDBannerAdapterProtocol, val adTag: St
         fun bid(context: Context?, request: BidappBidRequester, adTag: String?, appId : String?, accountId : String?, adFormat : AdFormat?, bidCompletion : bid_completion) {
             val TAG = "Liftoff bid"
             if (context != null) {
-                request.requestBidsWithCompletion(
-                    VungleAds.getBiddingToken(context),
-                    adTag,
-                    appId,
-                    accountId,
-                    adFormat,
-                    BIDLiftoffSDK.testMode,
-                    BIDLiftoffSDK.coppa,
-                    bidCompletion
-                )
+                val tokenCallback = object : BidTokenCallback{
+                    override fun onBidTokenCollected(bidToken: String) {
+                        request.requestBidsWithCompletion(
+                            bidToken,
+                            adTag,
+                            appId,
+                            accountId,
+                            adFormat,
+                            BIDLiftoffSDK.testMode,
+                            BIDLiftoffSDK.coppa,
+                            bidCompletion
+                        )
+                    }
+
+                    override fun onBidTokenError(errorMessage: String) {
+                        bidCompletion.invoke(null, Error(errorMessage))
+                    }
+                }
+                VungleAds.getBiddingToken(context, tokenCallback)
             }
-            else BIDLog.d(TAG, "Error : Context is null")
+            else bidCompletion.invoke(null, Error("Error : Context is null"))
         }
     }
 }

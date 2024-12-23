@@ -21,53 +21,8 @@ class BIDYandexInterstitial(
 
     val TAG = "Full Yandex"
     private var interstitialAdLoader : InterstitialAdLoader? = null
-    var interstitialAd : InterstitialAd? = null
+    private var interstitialAdListener: InterstitialListenerAd? = null
 
-
-    private var loadCallback : InterstitialAdLoadListener? = object : InterstitialAdLoadListener{
-        override fun onAdLoaded(interstitialAd: InterstitialAd) {
-            this@BIDYandexInterstitial.interstitialAd = interstitialAd
-            BIDLog.d(TAG, "on ad load $adUnitId")
-            adapter?.onAdLoaded()
-        }
-
-        override fun onAdFailedToLoad(error: AdRequestError) {
-            interstitialAd = null
-            BIDLog.d(TAG, "onError $adUnitId exception: ${error.description}")
-            adapter?.onAdFailedToLoadWithError(error.description)
-        }
-
-    }
-
-    private val showCallback = object : InterstitialAdEventListener{
-        override fun onAdShown() {
-            BIDLog.d(TAG, "on ad shown. $adUnitId")
-            if (BIDYandexSDK.debugOrTesting != null && BIDYandexSDK.debugOrTesting == true){
-                adapter?.onDisplay()
-            }
-        }
-
-        override fun onAdFailedToShow(adError: AdError) {
-            BIDLog.d(TAG, "onError $adUnitId exception: ${adError.description}")
-            adapter?.onFailedToDisplay(adError.description)
-        }
-
-        override fun onAdDismissed() {
-            BIDLog.d(TAG, "on ad dismiss. $adUnitId")
-            adapter?.onHide()
-        }
-
-        override fun onAdClicked() {
-            BIDLog.d(TAG, "on ad click. $adUnitId")
-            adapter?.onClick()
-        }
-
-        override fun onAdImpression(impressionData: ImpressionData?) {
-            BIDLog.d(TAG, "on ad impression. $adUnitId")
-            adapter?.onDisplay()
-        }
-
-    }
 
     override fun load(context: Any) {
         if (context as? Activity == null) {
@@ -78,25 +33,25 @@ class BIDYandexInterstitial(
             adapter?.onAdFailedToLoadWithError("Yandex fullscreen adUnitId is null or incorrect format")
             return
         }
-        interstitialAd = null
+        interstitialAdListener = InterstitialListenerAd(TAG, adapter, adUnitId)
         val loadInterstitialAdRunnable = Runnable {
             if (interstitialAdLoader == null) {
                 interstitialAdLoader = InterstitialAdLoader(context.applicationContext)
             }
-            interstitialAdLoader?.setAdLoadListener(loadCallback)
+            interstitialAdLoader?.setAdLoadListener(interstitialAdListener)
             val adRequestConfiguration = AdRequestConfiguration.Builder(adUnitId).build()
             interstitialAdLoader?.loadAd(adRequestConfiguration)
         }
-        (context as Activity).runOnUiThread(loadInterstitialAdRunnable)
+        (context).runOnUiThread(loadInterstitialAdRunnable)
     }
 
     override fun show(activity: Activity?) {
-        if (interstitialAd == null || activity == null){
+        if (interstitialAdListener?.interstitial == null || activity == null){
         adapter?.onAdFailedToLoadWithError("Yandex interstitial ad failed to load. $adUnitId")
         return
         }
-        interstitialAd?.setAdEventListener(showCallback)
-        interstitialAd?.show(activity)
+        interstitialAdListener?.interstitial?.setAdEventListener(interstitialAdListener)
+        interstitialAdListener?.interstitial?.show(activity)
     }
 
     override fun activityNeededForShow(): Boolean {
@@ -116,15 +71,57 @@ class BIDYandexInterstitial(
     }
 
     override fun destroy() {
-        if ( interstitialAd != null )
-        {
-            interstitialAd?.setAdEventListener(null)
-            loadCallback = null
-            interstitialAd = null
-        }
+        interstitialAdListener?.interstitial?.setAdEventListener(null)
+        interstitialAdListener = null
     }
 
     override fun revenue(): Double? {
         return null
+    }
+
+    private class InterstitialListenerAd(
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val adUnitId: String?
+    ) : InterstitialAdLoadListener, InterstitialAdEventListener {
+        var interstitial : InterstitialAd? = null
+        override fun onAdLoaded(interstitialAd: InterstitialAd) {
+            interstitial = interstitialAd
+            BIDLog.d(tag, "Ad load $adUnitId")
+            adapter?.onAdLoaded()
+        }
+
+        override fun onAdFailedToLoad(error: AdRequestError) {
+            interstitial = null
+            BIDLog.d(tag, "Error $adUnitId exception: ${error.description}")
+            adapter?.onAdFailedToLoadWithError(error.description)
+        }
+
+        override fun onAdShown() {
+            BIDLog.d(tag, "Ad shown. $adUnitId")
+            if (BIDYandexSDK.debugOrTesting != null && BIDYandexSDK.debugOrTesting == true){
+                adapter?.onDisplay()
+            }
+        }
+
+        override fun onAdFailedToShow(adError: AdError) {
+            BIDLog.d(tag, "Error $adUnitId exception: ${adError.description}")
+            adapter?.onFailedToDisplay(adError.description)
+        }
+
+        override fun onAdDismissed() {
+            BIDLog.d(tag, "Ad dismiss. $adUnitId")
+            adapter?.onHide()
+        }
+
+        override fun onAdClicked() {
+            BIDLog.d(tag, "Ad click. $adUnitId")
+            adapter?.onClick()
+        }
+
+        override fun onAdImpression(impressionData: ImpressionData?) {
+            BIDLog.d(tag, "Ad impression. $adUnitId")
+            adapter?.onDisplay()
+        }
     }
 }

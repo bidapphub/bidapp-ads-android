@@ -17,7 +17,7 @@ import java.lang.ref.WeakReference
 
 
 class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, private val adTag: String?, format: AdFormat) :
-    BIDBannerAdapterDelegateProtocol {
+    BIDBannerAdapterDelegateProtocol, AdListener {
     val TAG = "Banner Facebook"
     var adView : WeakReference<AdView>? = null
     var cachedAd: WeakReference<Ad>? = null
@@ -28,30 +28,6 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, private val adTag: St
     else {
         BIDLog.d(TAG,"Unsupported Facebook banner format : ${format.name()}")
         null
-    }
-
-    private val bannerListener = object : AdListener {
-        override fun onError(p0: Ad?, p1: AdError?) {
-            BIDLog.d(TAG, "failed to load ad. Error: ${p1?.errorMessage} ${p0?.placementId}")
-            adapter.onFailedToLoad(Error(p1?.errorMessage))
-        }
-
-        override fun onAdLoaded(p0: Ad?) {
-            cachedAd = WeakReference(p0)
-            adapter.onLoad()
-            BIDLog.d(TAG, "loaded ad ${p0?.placementId}")
-        }
-
-        override fun onAdClicked(p0: Ad?) {
-            BIDLog.d(TAG, "on click ${p0?.placementId}")
-            adapter.onClick()
-        }
-
-        override fun onLoggingImpression(p0: Ad?) {
-            BIDLog.d(TAG, "ad displayed ${p0?.placementId}")
-            adapter.onDisplay()
-        }
-
     }
 
 
@@ -76,7 +52,7 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, private val adTag: St
         if (adView?.get() == null) {
             adView = WeakReference(AdView(context, adTag, bannerFormat))
         }
-             adView?.get()?.loadAd(adView?.get()?.buildLoadAdConfig()?.withAdListener(bannerListener)?.build())
+             adView?.get()?.loadAd(adView?.get()?.buildLoadAdConfig()?.withAdListener(this)?.build())
     }
 
     override fun destroy() {
@@ -120,4 +96,26 @@ class BIDFacebookBanner(adapter: BIDBannerAdapterProtocol, private val adTag: St
     override fun revenue(): Double? {
         return null
     }
+
+    override fun onError(p0: Ad?, p1: AdError?) {
+        BIDLog.d(TAG, "Failed to load ad. Error: ${p1?.errorMessage} ${p0?.placementId}")
+        adapter?.onFailedToLoad(Error(p1?.errorMessage))
+    }
+
+    override fun onAdLoaded(p0: Ad?) {
+        cachedAd = WeakReference(p0)
+        adapter?.onLoad()
+        BIDLog.d(TAG, "Ad loaded ${p0?.placementId}")
+    }
+
+    override fun onAdClicked(p0: Ad?) {
+        BIDLog.d(TAG, "Ad click ${p0?.placementId}")
+        adapter?.onClick()
+    }
+
+    override fun onLoggingImpression(p0: Ad?) {
+        BIDLog.d(TAG, "Ad displayed ${p0?.placementId}")
+        adapter?.onDisplay()
+    }
+
 }

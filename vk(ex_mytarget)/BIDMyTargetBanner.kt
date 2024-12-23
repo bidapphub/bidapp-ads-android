@@ -27,8 +27,6 @@ class BIDMyTargetBanner(private val adapter: BIDBannerAdapterProtocol, private v
         null
     }
 
-
-
     override fun nativeAdView(): WeakReference<View>? {
         return WeakReference(adView?.get() as? View)
     }
@@ -95,21 +93,21 @@ class BIDMyTargetBanner(private val adapter: BIDBannerAdapterProtocol, private v
     override fun onLoad(p0: MyTargetView) {
         cachedAd = WeakReference(p0)
         adapter.onLoad()
-        BIDLog.d(TAG, "ad loaded. slotId: $slotId")
+        BIDLog.d(TAG, "Ad loaded. slotId: $slotId")
     }
 
     override fun onNoAd(p0: IAdLoadingError, p1: MyTargetView) {
-        BIDLog.d(TAG, "failed to load ad. Error: ${p0.message} slotId: ($slotId)")
+        BIDLog.d(TAG, "Failed to load ad. Error: ${p0.message} slotId: ($slotId)")
         adapter.onFailedToLoad(Error(p0.message))
     }
 
     override fun onShow(p0: MyTargetView) {
-        BIDLog.d(TAG, "ad displayed. slotId: ($slotId)")
+        BIDLog.d(TAG, "Ad displayed. slotId: ($slotId)")
         adapter.onDisplay()
     }
 
     override fun onClick(p0: MyTargetView) {
-        BIDLog.d(TAG, "ad click. slotId: ($slotId)")
+        BIDLog.d(TAG, "Ad click. slotId: ($slotId)")
         adapter.onClick()
     }
 

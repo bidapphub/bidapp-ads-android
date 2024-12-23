@@ -35,20 +35,20 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
 
 
     override fun adClicked(p0: AppLovinAd?) {
-        BIDLog.d(TAG, "ad clicked ")
+        BIDLog.d(TAG, "Ad clicked ")
         adapter.onClick()
     }
 
     override fun adOpenedFullscreen(p0: AppLovinAd?, p1: AppLovinAdView?) {
-        BIDLog.d(TAG, "ad open fullscreen")
+        BIDLog.d(TAG, "Ad open fullscreen")
     }
 
     override fun adClosedFullscreen(p0: AppLovinAd?, p1: AppLovinAdView?) {
-        BIDLog.d(TAG, "ad closed fullscreen")
+        BIDLog.d(TAG, "Ad closed fullscreen")
     }
 
     override fun adLeftApplication(p0: AppLovinAd?, p1: AppLovinAdView?) {
-        BIDLog.d(TAG, "ad left application")
+        BIDLog.d(TAG, "Ad left application")
     }
 
     override fun adFailedToDisplay(
@@ -62,24 +62,24 @@ internal class BIDApplovinBanner(val adapter: BIDBannerAdapterProtocol, adTag: S
     }
 
     override fun adDisplayed(p0: AppLovinAd?) {
-        BIDLog.d(TAG, "ad display")
+        BIDLog.d(TAG, "Ad display")
         adapter.onDisplay()
     }
 
     override fun adHidden(p0: AppLovinAd?) {
-        BIDLog.d(TAG, "ad hide")
+        BIDLog.d(TAG, "Ad hide")
         adapter.onHide()
     }
 
     override fun adReceived(ad: AppLovinAd?) {
         cachedAd = ad
         adapter.onLoad()
-        BIDLog.d(TAG, "ad load")
+        BIDLog.d(TAG, "Ad load")
     }
 
     override fun failedToReceiveAd(p0: Int) {
         cachedAd = null
-        BIDLog.d(TAG, "ad failed to load. Error: $p0")
+        BIDLog.d(TAG, "Ad failed to load. Error: $p0")
         adapter.onFailedToLoad(Error(p0.toString()))
     }
 

@@ -22,39 +22,7 @@ internal class BIDAdmobRewarded(
 ) : BIDFullscreenAdapterDelegateProtocol {
     private val TAG = "Rewarded Admob"
     private var rewardedAd: RewardedAd? = null
-    private var isRewardGranted = false
-
-
-    private val fullScreenContentCallback: FullScreenContentCallback =
-        object : FullScreenContentCallback() {
-            override fun onAdClicked() {
-                BIDLog.d(TAG, "ad clicked. adtag: ($adTag)")
-                adapter.onClick()
-            }
-
-            override fun onAdDismissedFullScreenContent() {
-                if (isRewardGranted){
-                    adapter.onReward()
-                    isRewardGranted = false
-                }
-                adapter.onHide()
-                BIDLog.d(TAG, "ad hidden. adtag: ($adTag)")
-            }
-
-            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                BIDLog.d(TAG, "ad failed to display. adtag: ($adTag)")
-                adapter.onFailedToDisplay(p0.message)
-            }
-
-            override fun onAdImpression() {
-                adapter.onDisplay()
-                BIDLog.d(TAG, "ad show. adtag: ($adTag)")
-            }
-
-            override fun onAdShowedFullScreenContent() {
-                BIDLog.d(TAG, "ad on display. adtag: ($adTag)")
-            }
-        }
+    private var rewardedAdListener: RewardedAdListener? = null
 
     override fun load(context: Any) {
         if (context as? Context == null) {
@@ -88,9 +56,9 @@ internal class BIDAdmobRewarded(
 
                     override fun onAdLoaded(p0: RewardedAd) {
                         rewardedAd = p0
-                        rewardedAd?.fullScreenContentCallback =
-                            this@BIDAdmobRewarded.fullScreenContentCallback
-                        BIDLog.d(TAG, "ad loaded. adtag: ($adTag)")
+                        rewardedAdListener = RewardedAdListener(TAG, adapter, adTag)
+                        rewardedAd?.fullScreenContentCallback = rewardedAdListener
+                        BIDLog.d(TAG, "Ad loaded. adtag: ($adTag)")
                         adapter.onAdLoaded()
                     }
                 })
@@ -98,11 +66,11 @@ internal class BIDAdmobRewarded(
 
     override fun show(activity: Activity?) {
         if (activity == null || rewardedAd == null){
-            adapter.onFailedToDisplay("Error Admob showing rewarded. adtag: ($adTag)")
+            adapter.onFailedToDisplay("Error showing rewarded. adtag: ($adTag)")
             return
         }
             rewardedAd?.show(activity) {
-                isRewardGranted = true
+                rewardedAdListener?.isRewardGranted = true
             } ?: {
                 BIDLog.d(TAG, "The rewarded ad wasn't ready yet.")
             }
@@ -131,5 +99,43 @@ internal class BIDAdmobRewarded(
     override fun destroy() {
         rewardedAd?.fullScreenContentCallback = null
         rewardedAd = null
+        rewardedAdListener = null
+    }
+
+    private class RewardedAdListener(
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val adTag: String?
+    ) : FullScreenContentCallback() {
+        var isRewardGranted = false
+        override fun onAdClicked() {
+            BIDLog.d(tag, "Ad clicked. adtag: ($adTag)")
+            adapter?.onClick()
+        }
+
+
+        override fun onAdDismissedFullScreenContent() {
+            if (isRewardGranted){
+                adapter?.onReward()
+                isRewardGranted = false
+            }
+            adapter?.onHide()
+            BIDLog.d(tag, "Ad hidden. adtag: ($adTag)")
+        }
+
+        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+            BIDLog.d(tag, "Ad failed to display. adtag: ($adTag)")
+            adapter?.onFailedToDisplay(p0.message)
+        }
+
+        override fun onAdImpression() {
+            adapter?.onDisplay()
+            BIDLog.d(tag, "Ad show. adtag: ($adTag)")
+        }
+
+        override fun onAdShowedFullScreenContent() {
+            BIDLog.d(tag, "Ad on display. adtag: ($adTag)")
+        }
+
     }
 }

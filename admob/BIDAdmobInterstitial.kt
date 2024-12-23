@@ -21,34 +21,8 @@ internal class BIDAdmobInterstitial(
 ) : BIDFullscreenAdapterDelegateProtocol {
     private val TAG = "interstitial Admob"
     private var interstitialAd: InterstitialAd? = null
+    private var interstitialAdListener : InterstitialAdListener? = null
 
-    private val fullScreenContentCallback: FullScreenContentCallback =
-        object : FullScreenContentCallback() {
-
-            override fun onAdClicked() {
-                BIDLog.d(TAG, "ad clicked. adtag: ($adTag)")
-                adapter.onClick()
-            }
-
-            override fun onAdDismissedFullScreenContent() {
-                adapter.onHide()
-                BIDLog.d(TAG, "ad hidden. adtag: ($adTag)")
-            }
-
-            override fun onAdFailedToShowFullScreenContent(p0: AdError) {
-                BIDLog.d(TAG, "ad failed to display. adtag: ($adTag)")
-                adapter.onFailedToDisplay(p0.message)
-            }
-
-            override fun onAdImpression() {
-                adapter.onDisplay()
-                BIDLog.d(TAG, "ad display. adtag: ($adTag)")
-            }
-
-            override fun onAdShowedFullScreenContent() {
-                BIDLog.d(TAG, "ad on showed fullscreen content. adtag: ($adTag)")
-            }
-        }
 
     override fun load(context: Any) {
         if (context as? Context == null) {
@@ -76,15 +50,15 @@ internal class BIDAdmobInterstitial(
             object : InterstitialAdLoadCallback() {
                 override fun onAdFailedToLoad(p0: LoadAdError) {
                     interstitialAd = null
-                    BIDLog.d(TAG, "failed to receive ad error ${p0.message} adtag: ($adTag)")
+                    BIDLog.d(TAG, "Failed to receive ad error ${p0.message} adtag: ($adTag)")
                     adapter.onAdFailedToLoadWithError(p0.message)
                 }
 
                 override fun onAdLoaded(p0: InterstitialAd) {
                     interstitialAd = p0
-                    interstitialAd?.fullScreenContentCallback =
-                        this@BIDAdmobInterstitial.fullScreenContentCallback
-                    BIDLog.d(TAG, "ad loaded. adtag: ($adTag)")
+                    interstitialAdListener = InterstitialAdListener(TAG, adapter, adTag)
+                    interstitialAd?.fullScreenContentCallback = interstitialAdListener
+                    BIDLog.d(TAG, "Ad loaded. adtag: ($adTag)")
                     adapter.onAdLoaded()
                 }
             })
@@ -121,5 +95,36 @@ internal class BIDAdmobInterstitial(
     override fun destroy() {
         interstitialAd?.fullScreenContentCallback = null
         interstitialAd = null
+        interstitialAdListener = null
+    }
+
+    private class InterstitialAdListener(
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val adTag: String?
+    ) : FullScreenContentCallback() {
+        override fun onAdClicked() {
+            BIDLog.d(tag, "Ad clicked. adtag: ($adTag)")
+            adapter?.onClick()
+        }
+
+        override fun onAdDismissedFullScreenContent() {
+            adapter?.onHide()
+            BIDLog.d(tag, "Ad hidden. adtag: ($adTag)")
+        }
+
+        override fun onAdFailedToShowFullScreenContent(p0: AdError) {
+            BIDLog.d(tag, "Ad failed to display. adtag: ($adTag)")
+            adapter?.onFailedToDisplay(p0.message)
+        }
+
+        override fun onAdImpression() {
+            adapter?.onDisplay()
+            BIDLog.d(tag, "Ad display. adtag: ($adTag)")
+        }
+
+        override fun onAdShowedFullScreenContent() {
+            BIDLog.d(tag, "Ad on showed fullscreen content. adtag: ($adTag)")
+        }
     }
 }

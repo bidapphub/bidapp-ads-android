@@ -93,49 +93,49 @@ internal class BIDApplovinMaxBanner(
     override fun onAdLoaded(p0: MaxAd) {
         cachedAd = p0
         adapter?.onLoad()
-        BIDLog.d(TAG, "ad loaded. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad loaded. adtag: ($adTag)")
     }
 
     private fun onFailedToLoad(error: String) {
         cachedAd = null
-        BIDLog.d(TAG, "AppLovin MAX failed to load ad. Error: $error adtag: ($adTag)")
+        BIDLog.d(TAG, "Failed to load ad. Error: $error adtag: ($adTag)")
         adapter?.onFailedToLoad(Error(error))
     }
 
     override fun onAdDisplayed(p0: MaxAd) {
-        BIDLog.d(TAG, "ad displayed. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad displayed. adtag: ($adTag)")
         adapter?.onDisplay()
     }
 
     override fun onAdHidden(p0: MaxAd) {
-        BIDLog.d(TAG, "ad hide. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad hide. adtag: ($adTag)")
         cachedAd = null
         adapter?.onHide()
         adView?.get()?.destroy()
     }
 
     override fun onAdClicked(p0: MaxAd) {
-        BIDLog.d(TAG, " ad clicked. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad clicked. adtag: ($adTag)")
         adapter?.onClick()
     }
 
     override fun onAdLoadFailed(p0: String, p1: MaxError) {
         val error = p1.message ?: "Unknown error"
-        BIDLog.d(TAG, "ad load failed. Error:${error}")
+        BIDLog.d(TAG, "Ad load failed. Error:${error}")
         onFailedToLoad(error)
     }
 
     override fun onAdExpanded(p0: MaxAd) {
-        BIDLog.d(TAG, "ad expanded. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad expanded. adtag: ($adTag)")
     }
 
     override fun onAdCollapsed(p0: MaxAd) {
-        BIDLog.d(TAG, "ad collapsed. adtag: ($adTag)")
+        BIDLog.d(TAG, "Ad collapsed. adtag: ($adTag)")
     }
 
     override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
         adapter?.onFailedToDisplay(kotlin.Error(p1.message))
-        BIDLog.d(TAG, "failed to display ad. Error: ${p1.message} adtag: ($adTag)")
+        BIDLog.d(TAG, "Failed to display ad. Error: ${p1.message} adtag: ($adTag)")
     }
 
 

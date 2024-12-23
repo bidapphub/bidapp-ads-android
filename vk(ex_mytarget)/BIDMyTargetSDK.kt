@@ -9,8 +9,8 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.1.0"
-internal const val SDKVERSION = "5.22.1"
+internal const val ADAPTERVERSION = "2.2.5"
+internal const val SDKVERSION = "5.27.0"
 @PublishedApi
 internal class BIDMyTargetSDK(
     private val adapter: BIDNetworkAdapterProtocol,

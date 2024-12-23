@@ -9,8 +9,8 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.1.0"
-internal const val SDKVERSION = "8.3.1"
+internal const val ADAPTERVERSION = "2.2.5"
+internal const val SDKVERSION = "8.3.3"
 class BIDDigitalTurbineSDK(
     private val adapter: BIDNetworkAdapterProtocol?,
     private val appId: String?,

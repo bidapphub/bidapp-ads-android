@@ -24,7 +24,6 @@ internal object ApplovinInitializer : IApplovinInitializer {
                 val success = AppLovinSdk.getInstance(context).isInitialized
                 dispatch_main {
                     if (!success) {
-                        Log.d("mylog", "Applovin not init")
                         startSDKWaiters.forEach {
                             it.get()?.onInitializationComplete(
                                 false,
@@ -34,7 +33,6 @@ internal object ApplovinInitializer : IApplovinInitializer {
                         return@dispatch_main
                     }
                     startSDKWaiters.forEach {
-                        Log.d("mylog", "Applovin init")
                         it.get()?.onInitializationComplete(true, null)
                     }
                     startSDKWaiters.clear()

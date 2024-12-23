@@ -1,7 +1,6 @@
 package io.bidapp.networks.digitalturbine
 
 import android.app.Activity
-import android.util.Log
 import com.fyber.inneractive.sdk.external.ImpressionData
 import com.fyber.inneractive.sdk.external.InneractiveAdRequest
 import com.fyber.inneractive.sdk.external.InneractiveAdSpot
@@ -15,7 +14,7 @@ import com.fyber.inneractive.sdk.external.InneractiveUnitController
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
-import java.lang.ref.WeakReference
+
 
 
 class BIDDigitalTurbineFullscreen(
@@ -23,92 +22,9 @@ class BIDDigitalTurbineFullscreen(
     val adTag: String?,
     val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
-    val TAG = if (isRewarded) "Reward Digital Turbine" else "Full Digital Turbine"
-    var isGrantedReward = false
+    val TAG = if (isRewarded) "Reward Digital Turbine" else "Interstitial Digital Turbine"
     private var fullscreenSpot: InneractiveAdSpot? = null
-
-
-    private val showEventListener = object : InneractiveFullscreenAdEventsListenerWithImpressionData {
-        override fun onAdImpression(p0: InneractiveAdSpot?, p1: ImpressionData?) {
-            BIDLog.d(TAG, "ad displayed $adTag")
-            adapter?.onDisplay()
-        }
-
-        override fun onAdImpression(p0: InneractiveAdSpot?) {}
-
-        override fun onAdClicked(p0: InneractiveAdSpot?) {
-            BIDLog.d(TAG, "ad clicked $adTag")
-            adapter?.onClick()
-        }
-
-        override fun onAdWillCloseInternalBrowser(p0: InneractiveAdSpot?) {}
-
-        override fun onAdWillOpenExternalApp(p0: InneractiveAdSpot?) {}
-
-        override fun onAdEnteredErrorState(
-            p0: InneractiveAdSpot?,
-            p1: InneractiveUnitController.AdDisplayError?
-        ) {
-            val errorMessage = p1?.localizedMessage ?: "Unknown error"
-            BIDLog.d(TAG, "Ad failed to display $adTag")
-            adapter?.onFailedToDisplay(errorMessage)
-        }
-
-        override fun onAdDismissed(p0: InneractiveAdSpot?) {
-            if (isRewarded) {
-                BIDLog.d(TAG, "ad hide $adTag")
-                adapter?.onHide()
-                if (isGrantedReward) {
-                    BIDLog.d(TAG, "rewarded $adTag")
-                    adapter?.onReward()
-                    isGrantedReward = false
-                }
-            } else {
-                BIDLog.d(TAG, "ad hide $adTag")
-                adapter?.onHide()
-            }
-        }
-
-    }
-
-    private val loadEventListener = object : InneractiveAdSpot.RequestListener {
-        override fun onInneractiveSuccessfulAdRequest(p0: InneractiveAdSpot?) {
-            BIDLog.d(TAG, "ad load $adTag")
-            adapter?.onAdLoaded()
-        }
-
-        override fun onInneractiveFailedAdRequest(
-            p0: InneractiveAdSpot?,
-            p1: InneractiveErrorCode?
-        ) {
-            val error = p1?.name ?: "Unknown error"
-            BIDLog.d(TAG, "onError $adTag exception: $error")
-            adapter?.onAdFailedToLoadWithError(error)
-        }
-
-    }
-
-    private val contentEventListener = object : InneractiveFullscreenVideoContentController() {
-        override fun onProgress(p0: Int, p1: Int) {
-            BIDLog.d(TAG, "rewarded ad on progress $adTag")
-        }
-
-        override fun onCompleted() {
-            BIDLog.d(TAG, "rewarded ad on complete $adTag")
-        }
-
-        @Deprecated("Deprecated in Java")
-        override fun onPlayerError() {
-            BIDLog.d(TAG, "rewarded ad error $adTag")
-            adapter?.onFailedToDisplay("rewarded ad error")
-        }
-    }
-
-    private val rewardEventListener = object : InneractiveFullScreenAdRewardedListener {
-        override fun onAdRewarded(p0: InneractiveAdSpot?) {
-            isGrantedReward = true
-        }
-    }
+    private var fullscreenAdListener : FullscreenAdListener? = null
 
 
     override fun load(context: Any) {
@@ -125,13 +41,14 @@ class BIDDigitalTurbineFullscreen(
                 controller?.addContentController(videoContentController)
                 fullscreenSpot = InneractiveAdSpotManager.get().createSpot()
             }
+            fullscreenAdListener = FullscreenAdListener(TAG, adapter, adTag, isRewarded)
             if (isRewarded) {
-                controller?.rewardedListener = rewardEventListener
-                videoContentController?.eventsListener = contentEventListener
+                controller?.rewardedListener = fullscreenAdListener
+                videoContentController?.eventsListener = fullscreenAdListener
             }
-            controller?.eventsListener = showEventListener
+            controller?.eventsListener = fullscreenAdListener
             fullscreenSpot?.addUnitController(controller)
-            fullscreenSpot?.setRequestListener(loadEventListener)
+            fullscreenSpot?.setRequestListener(fullscreenAdListener)
             val fullscreenAdRequest = InneractiveAdRequest(adTag)
             fullscreenSpot?.requestAd(fullscreenAdRequest)
         }
@@ -167,9 +84,97 @@ class BIDDigitalTurbineFullscreen(
     override fun destroy() {
         fullscreenSpot?.destroy()
         fullscreenSpot = null
+        fullscreenAdListener = null
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
         return true
+    }
+
+    private class FullscreenAdListener (
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val adTag: String?,
+        private val isRewarded : Boolean
+    ) : InneractiveFullscreenAdEventsListenerWithImpressionData, InneractiveAdSpot.RequestListener, InneractiveFullscreenVideoContentController(), InneractiveFullScreenAdRewardedListener  {
+        var isGrantedReward = false
+
+
+        override fun onAdImpression(p0: InneractiveAdSpot?, p1: ImpressionData?) {
+            BIDLog.d(tag, "Ad displayed $adTag")
+            adapter?.onDisplay()
+        }
+
+        override fun onAdImpression(p0: InneractiveAdSpot?) {}
+
+        override fun onAdClicked(p0: InneractiveAdSpot?) {
+            BIDLog.d(tag, "Ad clicked $adTag")
+            adapter?.onClick()
+        }
+
+        override fun onAdWillCloseInternalBrowser(p0: InneractiveAdSpot?) {
+            BIDLog.d(tag, "Ad will close internal browser $adTag")
+        }
+
+        override fun onAdWillOpenExternalApp(p0: InneractiveAdSpot?) {
+            BIDLog.d(tag, "Ad will open external app $adTag")
+        }
+
+        override fun onAdEnteredErrorState(
+            p0: InneractiveAdSpot?,
+            p1: InneractiveUnitController.AdDisplayError?
+        ) {
+            val errorMessage = p1?.localizedMessage ?: "Unknown error"
+            BIDLog.d(tag, "Ad failed to display $adTag")
+            adapter?.onFailedToDisplay(errorMessage)
+        }
+
+        override fun onAdDismissed(p0: InneractiveAdSpot?) {
+            if (isRewarded) {
+                BIDLog.d(tag, "Ad hide $adTag")
+                adapter?.onHide()
+                if (isGrantedReward) {
+                    BIDLog.d(tag, "Ad rewarded $adTag")
+                    adapter?.onReward()
+                    isGrantedReward = false
+                }
+            } else {
+                BIDLog.d(tag, "Ad hide $adTag")
+                adapter?.onHide()
+            }
+        }
+
+        override fun onInneractiveSuccessfulAdRequest(p0: InneractiveAdSpot?) {
+            BIDLog.d(tag, "Ad load $adTag")
+            adapter?.onAdLoaded()
+        }
+
+        override fun onInneractiveFailedAdRequest(
+            p0: InneractiveAdSpot?,
+            p1: InneractiveErrorCode?
+        ) {
+            val error = p1?.name ?: "Unknown error"
+            BIDLog.d(tag, "On Error $adTag exception: $error")
+            adapter?.onAdFailedToLoadWithError(error)
+        }
+
+        override fun onProgress(p0: Int, p1: Int) {
+            BIDLog.d(tag, "Ad on progress $adTag")
+        }
+
+        override fun onCompleted() {
+            BIDLog.d(tag, "Ad on complete $adTag")
+        }
+
+        @Deprecated("Deprecated in Java")
+        override fun onPlayerError() {
+            BIDLog.d(tag, "Ad error $adTag")
+            adapter?.onFailedToDisplay("Ad error")
+        }
+
+        override fun onAdRewarded(p0: InneractiveAdSpot?) {
+            isGrantedReward = true
+        }
+
     }
 }

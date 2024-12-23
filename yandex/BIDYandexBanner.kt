@@ -20,8 +20,7 @@ class BIDYandexBanner(
     private val adapter: BIDBannerAdapterProtocol,
     private val adUnitId: String?,
     private val format: AdFormat
-) :
-    BIDBannerAdapterDelegateProtocol, BannerAdEventListener {
+) : BIDBannerAdapterDelegateProtocol, BannerAdEventListener {
 
     var adView: WeakReference<BannerAdView>? = null
     val TAG = "Banner Yandex"
@@ -46,15 +45,15 @@ class BIDYandexBanner(
         bannerFormat = when(format.currentFormat()){
             "banner_320x50" -> {
                 size = "banner"
-                BannerAdSize.fixedSize((context as Activity).applicationContext, 320, 50)
+                BannerAdSize.fixedSize((context).applicationContext, 320, 50)
             }
             "banner_300x250" -> {
                 size = "mrec"
-                BannerAdSize.fixedSize((context as Activity).applicationContext, 300, 250)
+                BannerAdSize.fixedSize((context).applicationContext, 300, 250)
             }
             "banner_728x90" -> {
                 size = "leaderboard"
-                BannerAdSize.fixedSize((context as Activity).applicationContext, 728, 90)
+                BannerAdSize.fixedSize((context).applicationContext, 728, 90)
             }
             else -> {
                 adapter.onFailedToLoad(Error("Unsupported Yandex banner format: ${format.name()}"))
@@ -68,14 +67,14 @@ class BIDYandexBanner(
         isCachedAd = false
         val loadBannerAdRunnable = Runnable {
             if (adView?.get() == null) {
-                adView = WeakReference(BannerAdView((context as Activity).applicationContext))
+                adView = WeakReference(BannerAdView((context).applicationContext))
             }
             adView?.get()?.setAdUnitId(adUnitId)
             adView?.get()?.setAdSize(bannerFormat!!)
             adView?.get()?.setBannerAdEventListener(this)
             adView?.get()?.loadAd(AdRequest.Builder().build())
         }
-        (context as Activity).runOnUiThread(loadBannerAdRunnable)
+        (context).runOnUiThread(loadBannerAdRunnable)
     }
 
     override fun destroy() {
@@ -120,30 +119,30 @@ class BIDYandexBanner(
     override fun onAdLoaded() {
         isCachedAd = true
         adapter.onLoad()
-        BIDLog.d(TAG, "ad loaded. adUnitId: $adUnitId")
+        BIDLog.d(TAG, "Ad loaded. adUnitId: $adUnitId")
     }
 
     override fun onAdFailedToLoad(error: AdRequestError) {
         isCachedAd = false
-        BIDLog.d(TAG, "failed to load ad. Error: ${error.description} adUnitId: ($adUnitId)")
+        BIDLog.d(TAG, "Failed to load ad. Error: ${error.description} adUnitId: ($adUnitId)")
         adapter.onFailedToLoad(Error(error.description))
     }
 
     override fun onAdClicked() {
-        BIDLog.d(TAG, "ad click. adUnitId: ($adUnitId)")
+        BIDLog.d(TAG, "Ad click. adUnitId: ($adUnitId)")
         adapter.onClick()
     }
 
     override fun onLeftApplication() {
-        BIDLog.d(TAG, "Yandex banner on left application")
+        BIDLog.d(TAG, "Banner on left application")
     }
 
     override fun onReturnedToApplication() {
-        BIDLog.d(TAG, "Yandex banner on returned to application")
+        BIDLog.d(TAG, "Banner on returned to application")
     }
 
     override fun onImpression(impressionData: ImpressionData?) {
-        BIDLog.d(TAG, "ad on impression. adUnitId: ($adUnitId)")
+        BIDLog.d(TAG, "Ad on impression. adUnitId: ($adUnitId)")
         adapter.onDisplay()
     }
 

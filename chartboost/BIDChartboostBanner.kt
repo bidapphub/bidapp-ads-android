@@ -25,7 +25,7 @@ internal class BIDChartboostBanner(
     var adapter: BIDBannerAdapterProtocol?,
     var location: String?,
     format: AdFormat?
-) : BIDBannerAdapterDelegateProtocol {
+) : BIDBannerAdapterDelegateProtocol, BannerCallback {
     val TAG = "Banner Chartboost"
     private val bannerFormat = if (format?.isBanner_320x50 == true) Banner.BannerSize.STANDARD
     else if (format?.isBanner_300x250 == true) Banner.BannerSize.MEDIUM
@@ -37,44 +37,6 @@ internal class BIDChartboostBanner(
     private var adView: WeakReference<Banner>? = null
     var cachedAd: WeakReference<Ad>? = null
 
-    private val chartboostCallback = object : BannerCallback {
-        override fun onAdClicked(event: ClickEvent, error: ClickError?) {
-            if (error == null) {
-                BIDLog.d(TAG, "ad click. Location: ($location)")
-                adapter?.onClick()
-            }
-            else BIDLog.d(TAG, "ad click is failure. Location: ($location) Error: ${error.exception}")
-        }
-
-        override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
-            if (error == null) {
-                cachedAd = WeakReference(event.ad)
-                adapter?.onLoad()
-                BIDLog.d(TAG, "ad loaded. Location: ($location)")
-            } else {
-                BIDLog.d(TAG, "Chartboost failed to load ad. Error: ${error.exception} Location: ($location)")
-                adapter?.onFailedToLoad(Error(error.exception))
-            }
-        }
-
-        override fun onAdRequestedToShow(event: ShowEvent) {
-            BIDLog.d(TAG, "ad requested to show. Location: ($location)")
-        }
-
-        override fun onAdShown(event: ShowEvent, error: ShowError?) {
-            if (error != null) {
-                BIDLog.d(TAG, "Chartboost failed to show ad. Error: ${error.exception?.message} Location: ($location)")
-                adapter?.onFailedToDisplay(Error(error.exception?.message))
-                return
-            }
-            BIDLog.d(TAG, "ad show. location: ($location)")
-        }
-
-        override fun onImpressionRecorded(event: ImpressionEvent) {
-            BIDLog.d(TAG, "ad impression recorded. Location: ($location)")
-            adapter?.onDisplay()
-        }
-    }
 
     override fun nativeAdView(): WeakReference<View> {
         return WeakReference(adView?.get() as? View)
@@ -100,7 +62,7 @@ internal class BIDChartboostBanner(
                     context,
                     location!!,
                     bannerFormat,
-                    chartboostCallback
+                    this
                 )
             )
         }
@@ -148,5 +110,42 @@ internal class BIDChartboostBanner(
 
     override fun revenue(): Double? {
         return null
+    }
+
+    override fun onAdClicked(event: ClickEvent, error: ClickError?) {
+        if (error == null) {
+            BIDLog.d(TAG, "Ad click. Location: ($location)")
+            adapter?.onClick()
+        }
+        else BIDLog.d(TAG, "Ad click is failure. Location: ($location) Error: ${error.exception}")
+    }
+
+    override fun onAdLoaded(event: CacheEvent, error: CacheError?) {
+        if (error == null) {
+            cachedAd = WeakReference(event.ad)
+            adapter?.onLoad()
+            BIDLog.d(TAG, "Ad loaded. Location: ($location)")
+        } else {
+            BIDLog.d(TAG, "Failed to load ad. Error: ${error.exception} Location: ($location)")
+            adapter?.onFailedToLoad(Error(error.exception))
+        }
+    }
+
+    override fun onAdRequestedToShow(event: ShowEvent) {
+        BIDLog.d(TAG, "Ad requested to show. Location: ($location)")
+    }
+
+    override fun onAdShown(event: ShowEvent, error: ShowError?) {
+        if (error != null) {
+            BIDLog.d(TAG, "Failed to show ad. Error: ${error.exception?.message} Location: ($location)")
+            adapter?.onFailedToDisplay(Error(error.exception?.message))
+            return
+        }
+        BIDLog.d(TAG, "Ad show. location: ($location)")
+    }
+
+    override fun onImpressionRecorded(event: ImpressionEvent) {
+        BIDLog.d(TAG, "Ad impression recorded. Location: ($location)")
+        adapter?.onDisplay()
     }
 }

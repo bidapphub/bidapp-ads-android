@@ -22,7 +22,7 @@ internal class BIDAdmobBanner(
     var adapter: BIDBannerAdapterProtocol,
     var adTag: String?,
     format: AdFormat?
-) : BIDBannerAdapterDelegateProtocol {
+) : BIDBannerAdapterDelegateProtocol, AdListener() {
     private val TAG = "Banner Admob"
     private val bannerFormat = if (format?.isBanner_320x50 == true) AdSize.BANNER
     else if (format?.isBanner_300x250 == true) AdSize.MEDIUM_RECTANGLE
@@ -33,39 +33,8 @@ internal class BIDAdmobBanner(
     }
     var adView: WeakReference<AdView>? = null
     var ready = false
-    private val adListener = object : AdListener() {
 
-        override fun onAdClicked() {
-            BIDLog.d(TAG, "ad clicked. adtag: ($adTag)")
-            adapter.onClick()
-        }
 
-        override fun onAdClosed() {
-            BIDLog.d(TAG, "ad closed. adtag: ($adTag)")
-        }
-
-        override fun onAdFailedToLoad(p0: LoadAdError) {
-            ready = false
-            BIDLog.d(TAG, "Admob failed to load ad. adtag: ($adTag) Error: ${p0.message}")
-            adapter.onFailedToLoad(Error(p0.message))
-        }
-
-        override fun onAdImpression() {
-            BIDLog.d(TAG, "ad show adtag: ($adTag)")
-            adapter.onDisplay()
-        }
-
-        override fun onAdLoaded() {
-            BIDLog.d(TAG, "ad loaded adtag: ($adTag)")
-            ready = true
-            adapter.onLoad()
-        }
-
-        override fun onAdOpened() {
-            BIDLog.d(TAG, "ad open adtag: ($adTag)")
-        }
-
-    }
 
 
     override fun nativeAdView(): WeakReference<View>? {
@@ -102,7 +71,7 @@ internal class BIDAdmobBanner(
             adView?.get()?.setAdSize(bannerFormat)
             adView?.get()?.adUnitId = adTag!!
         }
-        adView?.get()?.adListener = adListener
+        adView?.get()?.adListener = this
         adView?.get()?.loadAd(request)
     }
 
@@ -147,5 +116,36 @@ internal class BIDAdmobBanner(
     override fun revenue(): Double? {
         return null
     }
+
+    override fun onAdClicked() {
+        BIDLog.d(TAG, "Ad clicked. adtag: ($adTag)")
+        adapter.onClick()
+    }
+
+    override fun onAdClosed() {
+        BIDLog.d(TAG, "Ad closed. adtag: ($adTag)")
+    }
+
+    override fun onAdFailedToLoad(p0: LoadAdError) {
+        ready = false
+        BIDLog.d(TAG, "Ad failed to load ad. adtag: ($adTag) Error: ${p0.message}")
+        adapter.onFailedToLoad(Error(p0.message))
+    }
+
+    override fun onAdImpression() {
+        BIDLog.d(TAG, "Ad show adtag: ($adTag)")
+        adapter.onDisplay()
+    }
+
+    override fun onAdLoaded() {
+        BIDLog.d(TAG, "Ad loaded adtag: ($adTag)")
+        ready = true
+        adapter.onLoad()
+    }
+
+    override fun onAdOpened() {
+        BIDLog.d(TAG, "Ad open adtag: ($adTag)")
+    }
+
 }
 

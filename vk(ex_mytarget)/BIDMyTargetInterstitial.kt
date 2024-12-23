@@ -14,43 +14,9 @@ class BIDMyTargetInterstitial(
 ) :
     BIDFullscreenAdapterDelegateProtocol {
     private val slotIdToInt = slotId?.toIntOrNull()
-    private val TAG = "Full MyTarget"
+    private val TAG = "Interstitial MyTarget"
     private var ads : InterstitialAd? = null
-    var isAdsReady = false
-
-    private val callback = object : InterstitialAd.InterstitialAdListener{
-        override fun onLoad(p0: InterstitialAd) {
-            isAdsReady = true
-            BIDLog.d(TAG, "on ad load $slotId")
-            adapter?.onAdLoaded()
-        }
-
-        override fun onNoAd(p0: IAdLoadingError, p1: InterstitialAd) {
-            BIDLog.d(TAG, "onError $slotId exception: ${p0.message}")
-            adapter?.onAdFailedToLoadWithError(p0.message)
-        }
-
-        override fun onClick(p0: InterstitialAd) {
-            BIDLog.d(TAG, "on ad click. $slotId")
-            adapter?.onClick()
-        }
-
-        override fun onDismiss(p0: InterstitialAd) {
-            BIDLog.d(TAG, "on ad dismiss. $slotId")
-            adapter?.onHide()
-        }
-
-        override fun onVideoCompleted(p0: InterstitialAd) {
-            BIDLog.d(TAG, "Interstitial video completed. $slotId")
-        }
-
-        override fun onDisplay(p0: InterstitialAd) {
-            BIDLog.d(TAG, "on ad impression $slotId")
-            adapter?.onDisplay()
-        }
-
-    }
-
+    private var interstitialAdListener: InterstitialListenerAd? = null
 
     override fun load(context: Any) {
         if (context as? Context == null) {
@@ -61,16 +27,16 @@ class BIDMyTargetInterstitial(
             adapter?.onAdFailedToLoadWithError("MyTarget fullscreen slotId is null or incorrect format")
             return
         }
-        isAdsReady = false
+        interstitialAdListener = InterstitialListenerAd(TAG, adapter, slotId)
         if (ads == null){
             ads = InterstitialAd(slotIdToInt, context)
         }
-        ads?.listener = callback
+        ads?.listener = interstitialAdListener
         ads?.load()
     }
 
     override fun show(activity: Activity?) {
-        if (ads == null && !isAdsReady) {
+        if (ads == null && (interstitialAdListener?.isAdsReady == false || interstitialAdListener?.isAdsReady == null)) {
             adapter?.onFailedToDisplay("Failed to display")
             return
         }
@@ -86,7 +52,7 @@ class BIDMyTargetInterstitial(
     }
 
     override fun readyToShow(): Boolean {
-        return isAdsReady
+        return interstitialAdListener?.isAdsReady ?: false
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
@@ -95,6 +61,50 @@ class BIDMyTargetInterstitial(
 
     override fun destroy() {
         ads?.destroy()
-        ads= null
+        ads = null
+        interstitialAdListener = null
+    }
+
+    private class InterstitialListenerAd(
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val slotId: String?
+    ) :  InterstitialAd.InterstitialAdListener {
+        var isAdsReady = false
+
+        override fun onLoad(p0: InterstitialAd) {
+            isAdsReady = true
+            BIDLog.d(tag, "Ad load $slotId")
+            adapter?.onAdLoaded()
+        }
+
+        override fun onNoAd(p0: IAdLoadingError, p1: InterstitialAd) {
+            BIDLog.d(tag, "Error $slotId exception: ${p0.message}")
+            adapter?.onAdFailedToLoadWithError(p0.message)
+        }
+
+        override fun onClick(p0: InterstitialAd) {
+            BIDLog.d(tag, "Ad click. $slotId")
+            adapter?.onClick()
+        }
+
+        override fun onFailedToShow(p0: InterstitialAd) {
+            BIDLog.d(tag, "Ad failed to display $slotId")
+            adapter?.onFailedToDisplay("on ad failed to display")
+        }
+
+        override fun onDismiss(p0: InterstitialAd) {
+            BIDLog.d(tag, "Ad dismiss. $slotId")
+            adapter?.onHide()
+        }
+
+        override fun onVideoCompleted(p0: InterstitialAd) {
+            BIDLog.d(tag, "Interstitial video completed. $slotId")
+        }
+
+        override fun onDisplay(p0: InterstitialAd) {
+            BIDLog.d(tag, "Ad impression $slotId")
+            adapter?.onDisplay()
+        }
     }
 }

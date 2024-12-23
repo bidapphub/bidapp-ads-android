@@ -19,8 +19,7 @@ class BIDStartIoBanner(
     val adTag: String?,
     format: AdFormat,
     private val ecpm: Double
-) :
-    BIDBannerAdapterDelegateProtocol {
+) : BIDBannerAdapterDelegateProtocol, BannerListener {
 
     val TAG = "Banner StartIo"
     private var adapter: BIDBannerAdapterProtocol? = adapter
@@ -33,30 +32,6 @@ class BIDStartIoBanner(
     else {
         adapter.onFailedToLoad(Error("Unsupported Liftoff banner format : ${format?.name()}"))
         null
-    }
-
-    private val bannerListener = object : BannerListener {
-        override fun onReceiveAd(p0: View?) {
-            cachedAd = WeakReference(p0)
-            adapter.onLoad()
-            BIDLog.d(TAG, "loaded $adTag")
-        }
-
-        override fun onFailedToReceiveAd(p0: View?) {
-            BIDLog.d(TAG, "startIo failed to load ad $adTag")
-            adapter.onFailedToLoad(Error("failed to load ad"))
-        }
-
-        override fun onImpression(p0: View?) {
-            BIDLog.d(TAG, "on ad clicked $adTag")
-            adapter.onDisplay()
-        }
-
-        override fun onClick(p0: View?) {
-            BIDLog.d(TAG, "on ad clicked $adTag")
-            adapter.onClick()
-        }
-
     }
 
     override fun nativeAdView(): WeakReference<View>? {
@@ -79,17 +54,17 @@ class BIDStartIoBanner(
         startAppAdPreferences?.minCpm = ecpm
         when (bannerFormat) {
             "banner" -> {
-                adView = WeakReference(Banner(context, startAppAdPreferences, bannerListener))
+                adView = WeakReference(Banner(context, startAppAdPreferences, this))
                 (adView!!.get() as Banner).loadAd(320, 50)
             }
             "mrec" -> {
                 adView =
-                    WeakReference(Mrec(context, startAppAdPreferences, bannerListener))
+                    WeakReference(Mrec(context, startAppAdPreferences, this))
                 (adView!!.get() as Mrec).loadAd(300, 250)
             }
             "leaderboard" -> {
                 adView =
-                    WeakReference(Banner(context, startAppAdPreferences, bannerListener))
+                    WeakReference(Banner(context, startAppAdPreferences, this))
                 (adView!!.get() as Banner).loadAd(728, 90)
             }
         }
@@ -134,5 +109,26 @@ class BIDStartIoBanner(
 
     override fun revenue(): Double? {
         return startAppAdPreferences?.minCpm
+    }
+
+    override fun onReceiveAd(p0: View?) {
+        cachedAd = WeakReference(p0)
+        adapter?.onLoad()
+        BIDLog.d(TAG, "loaded $adTag")
+    }
+
+    override fun onFailedToReceiveAd(p0: View?) {
+        BIDLog.d(TAG, "startIo failed to load ad $adTag")
+        adapter?.onFailedToLoad(Error("failed to load ad"))
+    }
+
+    override fun onImpression(p0: View?) {
+        BIDLog.d(TAG, "on ad clicked $adTag")
+        adapter?.onDisplay()
+    }
+
+    override fun onClick(p0: View?) {
+        BIDLog.d(TAG, "on ad clicked $adTag")
+        adapter?.onClick()
     }
 }

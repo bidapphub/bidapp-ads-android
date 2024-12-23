@@ -6,6 +6,7 @@ import android.content.Context
 import com.vungle.ads.AdConfig
 import com.vungle.ads.BaseAd
 import com.vungle.ads.BaseFullscreenAd
+import com.vungle.ads.BidTokenCallback
 import com.vungle.ads.InterstitialAd
 import com.vungle.ads.RewardedAd
 import com.vungle.ads.RewardedAdListener
@@ -26,67 +27,16 @@ internal class BIDLiftoffFullscreen(
     private val adTag: String?,
     val isRewarded: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
-    val TAG = if (isRewarded) "Reward Liftoff" else "Full Liftoff"
+    val TAG = if (isRewarded) "Reward Liftoff" else "Interstitial Liftoff"
     private var ads: BaseFullscreenAd? = null
-    var isRewardGranted = false
-    private val callBack = object : RewardedAdListener {
-        override fun onAdClicked(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad click. ${baseAd.placementId}")
-            adapter?.onClick()
-        }
+    private var fullscreenAdListener : FullscreenAdListener? = null
 
-        override fun onAdEnd(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad end. ${baseAd.placementId}")
-            if (isRewarded) {
-                if (isRewardGranted) {
-                    adapter?.onReward()
-                    isRewardGranted = false
-                }
-            }
-            adapter?.onHide()
-        }
-
-        override fun onAdFailedToLoad(baseAd: BaseAd, adError: VungleError) {
-            BIDLog.d(TAG, "onError ${baseAd.placementId} exception: ${adError.message}")
-            adapter?.onAdFailedToLoadWithError(adError.message.toString())
-        }
-
-        override fun onAdFailedToPlay(baseAd: BaseAd, adError: VungleError) {
-            BIDLog.d(TAG, "onError ${baseAd.placementId} exception: ${adError.message}")
-            adapter?.onFailedToDisplay(adError.errorMessage)
-        }
-
-        override fun onAdImpression(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad impression ${baseAd.placementId}")
-            adapter?.onDisplay()
-        }
-
-        override fun onAdLeftApplication(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad left application ${baseAd.placementId}")
-        }
-
-        override fun onAdLoaded(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad load ${baseAd.placementId}")
-            adapter?.onAdLoaded()
-        }
-
-        override fun onAdRewarded(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad rewarded ${baseAd.placementId}")
-            if(isRewarded) isRewardGranted = true
-        }
-
-        override fun onAdStart(baseAd: BaseAd) {
-            BIDLog.d(TAG, "on ad viewed ${baseAd.placementId}")
-        }
-
-    }
 
     override fun load(context: Any) {
         load(context, null)
     }
 
     override fun load(context: Any, bidAppBid: BidappBid?) {
-
         if (context as? Context == null) {
             adapter?.onAdFailedToLoadWithError("Liftoff fullscreen loading error")
             return
@@ -95,17 +45,17 @@ internal class BIDLiftoffFullscreen(
             adapter?.onAdFailedToLoadWithError("Liftoff fullscreen adTag is null or empty")
             return
         }
-
+        fullscreenAdListener = FullscreenAdListener(TAG, adapter, isRewarded)
         if (isRewarded){
             ads = RewardedAd(context, adTag, AdConfig()).apply {
-                adListener = callBack
+                adListener = fullscreenAdListener
                 if (bidAppBid == null) load()
                 else load(bidAppBid.nativeBid.toString())
             }
         }
         else
             ads = InterstitialAd(context, adTag, AdConfig()).apply {
-                adListener = callBack
+                adListener = fullscreenAdListener
                 if (bidAppBid == null) load()
                 else load(bidAppBid.nativeBid.toString())
             }
@@ -143,25 +93,94 @@ internal class BIDLiftoffFullscreen(
 
     override fun destroy() {
         ads?.adListener = null
+        fullscreenAdListener = null
         ads = null
     }
+
+    private class FullscreenAdListener (
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val isRewarded : Boolean
+    ) :  RewardedAdListener {
+        var isRewardGranted = false
+        override fun onAdClicked(baseAd: BaseAd) {
+            BIDLog.d(tag, "Ad click. ${baseAd.placementId}")
+            adapter?.onClick()
+        }
+
+        override fun onAdEnd(baseAd: BaseAd) {
+            BIDLog.d(tag, "Ad end. ${baseAd.placementId}")
+            if (isRewarded) {
+                if (isRewardGranted) {
+                    adapter?.onReward()
+                    isRewardGranted = false
+                }
+            }
+            adapter?.onHide()
+        }
+
+        override fun onAdFailedToLoad(baseAd: BaseAd, adError: VungleError) {
+            BIDLog.d(tag, "On error ${baseAd.placementId} exception: ${adError.message}")
+            adapter?.onAdFailedToLoadWithError(adError.message.toString())
+        }
+
+        override fun onAdFailedToPlay(baseAd: BaseAd, adError: VungleError) {
+            BIDLog.d(tag, "On error ${baseAd.placementId} exception: ${adError.message}")
+            adapter?.onFailedToDisplay(adError.errorMessage)
+        }
+
+        override fun onAdImpression(baseAd: BaseAd) {
+            BIDLog.d(tag, "Ad impression ${baseAd.placementId}")
+            adapter?.onDisplay()
+        }
+
+        override fun onAdLeftApplication(baseAd: BaseAd) {
+            BIDLog.d(tag, "Ad left application ${baseAd.placementId}")
+        }
+
+        override fun onAdLoaded(baseAd: BaseAd) {
+            BIDLog.d(tag, "Ad load ${baseAd.placementId}")
+            adapter?.onAdLoaded()
+        }
+
+        override fun onAdRewarded(baseAd: BaseAd) {
+            BIDLog.d(tag, "Ad rewarded ${baseAd.placementId}")
+            if(isRewarded) isRewardGranted = true
+        }
+
+        override fun onAdStart(baseAd: BaseAd) {
+            BIDLog.d(tag, "Ad viewed ${baseAd.placementId}")
+        }
+
+    }
+
     companion object {
         fun bid (context: Context?, request:BidappBidRequester, adTag: String?, appId : String?, accountId : String?, adFormat : AdFormat?, bidCompletion : bid_completion){
             val TAG = "Liftoff bid"
             if (context != null) {
-                request.requestBidsWithCompletion(
-                    VungleAds.getBiddingToken(context),
-                    adTag,
-                    appId,
-                    accountId,
-                    adFormat,
-                    BIDLiftoffSDK.testMode,
-                    BIDLiftoffSDK.coppa,
-                    bidCompletion
-                )
+                val tokenCallback = object : BidTokenCallback {
+                    override fun onBidTokenCollected(bidToken: String) {
+                        request.requestBidsWithCompletion(
+                            bidToken,
+                            adTag,
+                            appId,
+                            accountId,
+                            adFormat,
+                            BIDLiftoffSDK.testMode,
+                            BIDLiftoffSDK.coppa,
+                            bidCompletion
+                        )
+                    }
+                    override fun onBidTokenError(errorMessage: String) {
+                        bidCompletion.invoke(null, Error(errorMessage))
+                    }
+                }
+                VungleAds.getBiddingToken(context, tokenCallback)
             }
-            else BIDLog.d(TAG, "Error : Context is null")
+            else bidCompletion.invoke(null, Error("Error : Context is null"))
         }
     }
+
+
 
 }

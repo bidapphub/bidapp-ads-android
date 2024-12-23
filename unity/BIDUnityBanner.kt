@@ -101,26 +101,26 @@ internal class BIDUnityBanner(
     override fun onBannerLoaded(ad: BannerView?) {
         cachedAd = WeakReference(ad)
         adapter?.onLoad()
-        BIDLog.d(TAG, "ad load. adTag: ($adTag)")
+        BIDLog.d(TAG, "Ad load. adTag: ($adTag)")
     }
 
     override fun onBannerShown(bannerAdView: BannerView?) {
-        BIDLog.d(TAG, "ad show. adTag: ($adTag)")
+        BIDLog.d(TAG, "Ad show. adTag: ($adTag)")
         adapter?.onDisplay()
     }
 
     override fun onBannerClick(bannerAdView: BannerView?) {
-        BIDLog.d(TAG, "ad click. adTag: ($adTag)")
+        BIDLog.d(TAG, "Ad click. adTag: ($adTag)")
         adapter?.onClick()
     }
 
     override fun onBannerFailedToLoad(bannerAdView: BannerView?, errorInfo: BannerErrorInfo?) {
-        BIDLog.d(TAG, "failed to load ad. Error: ${errorInfo?.errorCode}")
+        BIDLog.d(TAG, "Failed to load ad. Error: ${errorInfo?.errorCode}")
         adapter?.onFailedToLoad(Error(errorInfo?.errorCode.toString()))
     }
 
     override fun onBannerLeftApplication(bannerView: BannerView?) {
-        BIDLog.d(TAG, "banner left application. adTag: ($adTag)")
+        BIDLog.d(TAG, "Banner left application. adTag: ($adTag)")
     }
 
     override fun revenue(): Double? {

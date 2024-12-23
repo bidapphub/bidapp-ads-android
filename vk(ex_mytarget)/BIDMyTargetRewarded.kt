@@ -18,47 +18,8 @@ class BIDMyTargetRewarded(
     private val slotIdToInt = slotId?.toIntOrNull()
     private val TAG = "Rewarded MyTarget"
     private var ads: RewardedAd? = null
-    var isAdsReady = false
-    var isRewardGranted = false
+    private var rewardedAdListener: RewardedAdListener? = null
 
-    val callback = object : RewardedAd.RewardedAdListener {
-        override fun onLoad(p0: RewardedAd) {
-            isAdsReady = true
-            BIDLog.d(TAG, "on ad load $slotId")
-            adapter?.onAdLoaded()
-        }
-
-        override fun onNoAd(p0: IAdLoadingError, p1: RewardedAd) {
-            BIDLog.d(TAG, "onError $slotId exception: ${p0.message}")
-            adapter?.onAdFailedToLoadWithError(p0.message)
-        }
-
-        override fun onClick(p0: RewardedAd) {
-            BIDLog.d(TAG, "on ad click. $slotId")
-            adapter?.onClick()
-        }
-
-        override fun onDismiss(p0: RewardedAd) {
-            BIDLog.d(TAG, "on ad dismiss. $slotId")
-            if (isRewardGranted) {
-                adapter?.onReward()
-                isRewardGranted = false
-            }
-            adapter?.onHide()
-        }
-
-        override fun onReward(p0: Reward, p1: RewardedAd) {
-            BIDLog.d(TAG, "on ad rewarded $slotId")
-            isRewardGranted = true
-        }
-
-
-        override fun onDisplay(p0: RewardedAd) {
-            BIDLog.d(TAG, "on ad impression $slotId")
-            adapter?.onDisplay()
-        }
-
-    }
 
     override fun load(context: Any) {
         if (context as? Context == null) {
@@ -69,17 +30,17 @@ class BIDMyTargetRewarded(
             adapter?.onAdFailedToLoadWithError("MyTarget fullscreen slotId is null or incorrect format")
             return
         }
-        isAdsReady = false
+        rewardedAdListener = RewardedAdListener(TAG, adapter, slotId)
         if (ads == null) {
             ads = RewardedAd(slotIdToInt, context)
         }
-        ads?.listener = callback
+        ads?.listener = rewardedAdListener
         ads?.load()
 
     }
 
     override fun show(activity: Activity?) {
-        if (ads == null && !isAdsReady) {
+        if (ads == null && rewardedAdListener?.isAdsReady != true) {
             adapter?.onFailedToDisplay("Failed to display")
             return
         }
@@ -95,7 +56,7 @@ class BIDMyTargetRewarded(
     }
 
     override fun readyToShow(): Boolean {
-        return isAdsReady
+        return rewardedAdListener?.isAdsReady ?: false
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
@@ -103,8 +64,58 @@ class BIDMyTargetRewarded(
     }
 
     override fun destroy() {
-
+        ads?.destroy()
+        ads = null
+        rewardedAdListener = null
     }
 
+    private class RewardedAdListener (
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val slotId: String?
+    ) : RewardedAd.RewardedAdListener {
+        var isAdsReady = false
+        var isRewardGranted = false
+        override fun onLoad(p0: RewardedAd) {
+            isAdsReady = true
+            BIDLog.d(tag, "Ad load $slotId")
+            adapter?.onAdLoaded()
+        }
+
+        override fun onNoAd(p0: IAdLoadingError, p1: RewardedAd) {
+            BIDLog.d(tag, "On error $slotId exception: ${p0.message}")
+            adapter?.onAdFailedToLoadWithError(p0.message)
+        }
+
+        override fun onClick(p0: RewardedAd) {
+            BIDLog.d(tag, "Ad click. $slotId")
+            adapter?.onClick()
+        }
+
+        override fun onFailedToShow(p0: RewardedAd) {
+            BIDLog.d(tag, "Ad failed to display $slotId")
+            adapter?.onFailedToDisplay("on ad failed to display")
+        }
+
+        override fun onDismiss(p0: RewardedAd) {
+            BIDLog.d(tag, "Ad dismiss. $slotId")
+            if (isRewardGranted) {
+                adapter?.onReward()
+                isRewardGranted = false
+            }
+            adapter?.onHide()
+        }
+
+        override fun onReward(p0: Reward, p1: RewardedAd) {
+            BIDLog.d(tag, "Ad rewarded $slotId")
+            isRewardGranted = true
+        }
+
+
+        override fun onDisplay(p0: RewardedAd) {
+            BIDLog.d(tag, "Ad impression $slotId")
+            adapter?.onDisplay()
+        }
+    }
 
 }

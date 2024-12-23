@@ -10,8 +10,9 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.1.0"
-internal const val SDKVERSION = "4.12.3"
+internal const val ADAPTERVERSION = "2.2.5"
+internal const val SDKVERSION = "4.12.15"
+
 @PublishedApi
 internal class BIDUnitySDK(
     private val adapter: BIDNetworkAdapterProtocol? = null,
@@ -50,31 +51,30 @@ internal class BIDUnitySDK(
     }
 
     override fun initializeSDK(context: Context) {
-        if (isInitialized(context) || adapter?.initializationInProgress() == true)
-        {
+        if (isInitialized(context) || adapter?.initializationInProgress() == true) {
             return
         }
-        if (gameId.isNullOrEmpty()){
+        if (gameId.isNullOrEmpty()) {
             initializationFailed("Unity gameId is null or empty")
             return
         }
-            adapter?.onInitializationStart()
-            UnityAds.initialize(
-                context.applicationContext,
-                gameId,
-                testMode,
-                object : IUnityAdsInitializationListener {
-                    override fun onInitializationComplete() {
-                        initializationComplete()
-                    }
+        adapter?.onInitializationStart()
+        UnityAds.initialize(
+            context.applicationContext,
+            gameId,
+            testMode,
+            object : IUnityAdsInitializationListener {
+                override fun onInitializationComplete() {
+                    initializationComplete()
+                }
 
-                    override fun onInitializationFailed(
-                        error: UnityAds.UnityAdsInitializationError?,
-                        message: String?
-                    ) {
-                        initializationFailed(error?.name.toString())
-                    }
-                })
+                override fun onInitializationFailed(
+                    error: UnityAds.UnityAdsInitializationError?,
+                    message: String?
+                ) {
+                    initializationFailed(error?.name.toString())
+                }
+            })
     }
 
     fun initializationComplete() {

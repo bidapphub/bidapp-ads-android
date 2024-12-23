@@ -13,70 +13,19 @@ import com.unity3d.ads.UnityAdsShowOptions
 internal class BIDUnityFullscreen(
     val adapter: BIDFullscreenAdapterProtocol? = null,
     private val adTag: String?,
-    isRewarded: Boolean
+    private val isRewarded: Boolean
 ) :
     BIDFullscreenAdapterDelegateProtocol {
     val TAG = if (isRewarded) "Reward Unity" else "Full Unity"
-    var ready = false
-    private val loadListener: IUnityAdsLoadListener = object : IUnityAdsLoadListener {
-        override fun onUnityAdsAdLoaded(placementId: String) {
-            BIDLog.d(TAG, "onUnityAdsAdLoaded: $placementId")
-            ready = true
-            adapter?.onAdLoaded()
-        }
-
-        override fun onUnityAdsFailedToLoad(
-            placementId: String,
-            error: UnityAds.UnityAdsLoadError,
-            message: String
-        ) {
-            BIDLog.d(TAG, "onUnityAdsFailedToLoad: $placementId error: $error message: $message")
-            adapter?.onAdFailedToLoadWithError(error.name)
-        }
-    }
-    private val showListener: IUnityAdsShowListener = object : IUnityAdsShowListener {
-
-        override fun onUnityAdsShowFailure(
-            placementId: String,
-            error: UnityAds.UnityAdsShowError,
-            message: String
-        ) {
-            BIDLog.d(TAG, "onUnityAdsShowFailure: $placementId error: $error message: $message")
-            adapter?.onFailedToDisplay(error.name)
-        }
-
-        override fun onUnityAdsShowStart(placementId: String) {
-            BIDLog.d(TAG, "onUnityAdsShowStart: $placementId")
-            adapter?.onDisplay()
-        }
-
-        override fun onUnityAdsShowClick(placementId: String) {
-            BIDLog.d(TAG, "onUnityAdsShowClick: $placementId")
-            adapter?.onClick()
-        }
-
-        override fun onUnityAdsShowComplete(
-            placementId: String,
-            state: UnityAds.UnityAdsShowCompletionState
-        ) {
-            BIDLog.d(TAG, "onUnityAdsShowComplete: $placementId state: $state")
-            if (state == UnityAds.UnityAdsShowCompletionState.COMPLETED && isRewarded) {
-                BIDLog.d(TAG, "on ad rewarded $placementId")
-                adapter?.onReward()
-                adapter?.onHide()
-            } else {
-                adapter?.onHide()
-            }
-        }
-    }
+    private var fullscreenAdListener : FullscreenAdListener? = null
 
     override fun load(context: Any) {
         if (adTag.isNullOrEmpty()) {
             adapter?.onAdFailedToLoadWithError("Unity fullscreen adTag is null or empty")
             return
         }
-        ready = false
-        UnityAds.load(adTag, loadListener)
+        fullscreenAdListener = FullscreenAdListener(TAG, adapter, isRewarded)
+        UnityAds.load(adTag, fullscreenAdListener)
     }
 
     override fun show(activity: Activity?) {
@@ -88,7 +37,7 @@ internal class BIDUnityFullscreen(
             activity,
             adTag,
             UnityAdsShowOptions(),
-            showListener
+            fullscreenAdListener
         )
     }
 
@@ -101,7 +50,7 @@ internal class BIDUnityFullscreen(
     }
 
     override fun readyToShow(): Boolean {
-        return ready
+        return fullscreenAdListener?.ready ?: false
     }
 
     override fun shouldWaitForAdToDisplay(): Boolean {
@@ -112,5 +61,64 @@ internal class BIDUnityFullscreen(
         return null
     }
 
-    override fun destroy() {}
+    override fun destroy() {
+        fullscreenAdListener = null
+    }
+
+    private class FullscreenAdListener (
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val isRewarded : Boolean
+    ) : IUnityAdsLoadListener, IUnityAdsShowListener {
+        var ready = false
+
+        override fun onUnityAdsAdLoaded(placementId: String) {
+            BIDLog.d(tag, "Ad loaded: $placementId")
+            ready = true
+            adapter?.onAdLoaded()
+        }
+
+        override fun onUnityAdsFailedToLoad(
+            placementId: String,
+            error: UnityAds.UnityAdsLoadError,
+            message: String
+        ) {
+            BIDLog.d(tag, "Ad failed to load: $placementId error: $error message: $message")
+            adapter?.onAdFailedToLoadWithError(error.name)
+        }
+
+        override fun onUnityAdsShowFailure(
+            placementId: String,
+            error: UnityAds.UnityAdsShowError,
+            message: String
+        ) {
+            BIDLog.d(tag, "Ad show failure: $placementId error: $error message: $message")
+            adapter?.onFailedToDisplay(error.name)
+        }
+
+        override fun onUnityAdsShowStart(placementId: String) {
+            BIDLog.d(tag, "Ad show start: $placementId")
+            adapter?.onDisplay()
+        }
+
+        override fun onUnityAdsShowClick(placementId: String) {
+            BIDLog.d(tag, "Ad click: $placementId")
+            adapter?.onClick()
+        }
+
+        override fun onUnityAdsShowComplete(
+            placementId: String,
+            state: UnityAds.UnityAdsShowCompletionState
+        ) {
+            BIDLog.d(tag, "Ad show complete: $placementId state: $state")
+            if (state == UnityAds.UnityAdsShowCompletionState.COMPLETED && isRewarded) {
+                BIDLog.d(tag, "on ad rewarded $placementId")
+                adapter?.onReward()
+                adapter?.onHide()
+            } else {
+                adapter?.onHide()
+            }
+        }
+
+    }
 }

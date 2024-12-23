@@ -13,42 +13,12 @@ import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
 class BIDFacebookInterstitial(
     val adapter: BIDFullscreenAdapterProtocol? = null,
     val adTag: String? = null
-) :
-    BIDFullscreenAdapterDelegateProtocol {
+) : BIDFullscreenAdapterDelegateProtocol {
 
     val TAG = "Interstitial Facebook"
     private var interstitialAd: InterstitialAd? = null
-    private var interstitialAdListener = object : InterstitialAdListener {
-        override fun onError(p0: Ad?, p1: AdError?) {
-            val error = p1?.errorMessage ?: "Unknown error"
-            BIDLog.d(TAG, "onError $adTag exception: $error")
-            adapter?.onAdFailedToLoadWithError(error)
-        }
+    private var interstitialAdListener: InterstitialListenerAd? = null
 
-        override fun onAdLoaded(p0: Ad?) {
-            BIDLog.d(TAG, "ad load $adTag")
-            adapter?.onAdLoaded()
-        }
-
-        override fun onAdClicked(p0: Ad?) {
-            BIDLog.d(TAG, "ad clicked $adTag")
-            adapter?.onClick()
-        }
-
-        override fun onLoggingImpression(p0: Ad?) {
-            BIDLog.d(TAG, "interstitial ad logging impression $adTag")
-            adapter?.onDisplay()
-        }
-
-        override fun onInterstitialDisplayed(p0: Ad?) {
-            BIDLog.d(TAG, "ad displayed $adTag")
-        }
-
-        override fun onInterstitialDismissed(p0: Ad?) {
-            BIDLog.d(TAG, "ad hide $adTag")
-            adapter?.onHide()
-        }
-    }
 
     override fun load(context: Any) {
         if (context as? Context == null) {
@@ -62,12 +32,11 @@ class BIDFacebookInterstitial(
         if (interstitialAd == null) {
             interstitialAd = InterstitialAd(context, adTag)
         }
+        interstitialAdListener = InterstitialListenerAd(TAG, adapter, adTag)
         interstitialAd?.loadAd(
             interstitialAd?.buildLoadAdConfig()?.withAdListener(interstitialAdListener)?.build()
         )
     }
-
-
     override fun show(activity: Activity?) {
         if (interstitialAd == null || interstitialAd?.isAdLoaded == false || interstitialAd?.isAdInvalidated == true) {
             adapter?.onFailedToDisplay("ad is not ready or invalidated")
@@ -98,7 +67,45 @@ class BIDFacebookInterstitial(
 
     override fun destroy() {
         interstitialAd?.destroy()
+        interstitialAdListener = null
         interstitialAd = null
+    }
+
+    private class InterstitialListenerAd(
+        private val tag : String,
+        private val adapter: BIDFullscreenAdapterProtocol?,
+        private val adTag: String?
+    ) : InterstitialAdListener {
+        override fun onError(p0: Ad?, p1: AdError?) {
+            val error = p1?.errorMessage ?: "Unknown error"
+            BIDLog.d(tag, "On error $adTag exception: $error")
+            adapter?.onAdFailedToLoadWithError(error)
+        }
+
+        override fun onAdLoaded(p0: Ad?) {
+            BIDLog.d(tag, "Ad load $adTag")
+            adapter?.onAdLoaded()
+        }
+
+        override fun onAdClicked(p0: Ad?) {
+            BIDLog.d(tag, "Ad clicked $adTag")
+            adapter?.onClick()
+        }
+
+        override fun onLoggingImpression(p0: Ad?) {
+            BIDLog.d(tag, "Ad logging impression $adTag")
+            adapter?.onDisplay()
+        }
+
+        override fun onInterstitialDisplayed(p0: Ad?) {
+            BIDLog.d(tag, "Ad displayed $adTag")
+        }
+
+        override fun onInterstitialDismissed(p0: Ad?) {
+            BIDLog.d(tag, "Ad hide $adTag")
+            adapter?.onHide()
+        }
+
     }
 
 
