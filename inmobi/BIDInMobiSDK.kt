@@ -15,7 +15,7 @@ import org.json.JSONObject
 import java.lang.Error
 
 
-internal const val ADAPTERVERSION = "2.2.5"
+internal const val ADAPTERVERSION = "2.3.0"
 internal const val SDKVERSION = "10.8.0"
 @PublishedApi
 internal class BIDInMobiSDK(
@@ -25,7 +25,6 @@ internal class BIDInMobiSDK(
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
     private val TAG = "InMobi SDK"
-    var testMode = false
     private var consentObject : JSONObject = JSONObject()
 
     override fun initializeSDK(context: Context) {
@@ -92,5 +91,13 @@ internal class BIDInMobiSDK(
         if (consent.CCPA != null){
             InMobiPrivacyCompliance.setDoNotSell(!consent.CCPA!!)
         }
+        if (consent.COPPA != null){
+            COPPA = consent.COPPA!!
+        }
+    }
+
+    companion object{
+        var testMode = false
+        var COPPA = false
     }
 }

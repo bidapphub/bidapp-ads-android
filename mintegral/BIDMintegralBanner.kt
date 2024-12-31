@@ -200,7 +200,7 @@ internal class BIDMintegralBanner(
             val bidManager = BidManager(BannerBidRequestParams(placementId, unitId, size.first, size.second))
             bidManager.setBidListener(object : BidListennning {
                 override fun onFailed(p0: String?) {
-                    bidCompletion.invoke(null, Error(p0 ?: "Mintegral banner bid failed unknown error"))
+                    bidCompletion.invoke(null, Error("Mintgral bid ${p0 ?: "Unknown error"}"))
                 }
 
                 override fun onSuccessed(p0: BidResponsed?) {

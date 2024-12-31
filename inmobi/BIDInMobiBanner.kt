@@ -7,9 +7,16 @@ import android.widget.FrameLayout
 import com.inmobi.ads.AdMetaInfo
 import com.inmobi.ads.InMobiAdRequestStatus
 import com.inmobi.ads.InMobiBanner
+import com.inmobi.ads.InMobiInterstitial
 import com.inmobi.ads.listeners.BannerAdEventListener
+import com.inmobi.ads.listeners.InterstitialAdEventListener
 import io.bidapp.sdk.AdFormat
 import io.bidapp.sdk.BIDLog
+import io.bidapp.sdk.bid.BIDNativeBidData
+import io.bidapp.sdk.bid.BIDNativeBidNotify
+import io.bidapp.sdk.bid.BidappBid
+import io.bidapp.sdk.bid.BidappBidRequester
+import io.bidapp.sdk.mediation.bid_completion
 import io.bidapp.sdk.protocols.BIDBannerAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
@@ -18,8 +25,13 @@ import java.lang.ref.WeakReference
 private const val BANNER = "banner"
 private const val MREC = "mrec"
 private const val LEADERBOARD = "leader_board"
+
 @PublishedApi
-internal class BIDInMobiBanner(private val adapter: BIDBannerAdapterProtocol, private val placementId: String?, format: AdFormat) :
+internal class BIDInMobiBanner(
+    private val adapter: BIDBannerAdapterProtocol,
+    private val placementId: String?,
+    format: AdFormat
+) :
     BIDBannerAdapterDelegateProtocol, BannerAdEventListener() {
     private val TAG = "Banner InMobi"
     private var adView: WeakReference<InMobiBanner>? = null
@@ -36,16 +48,28 @@ internal class BIDInMobiBanner(private val adapter: BIDBannerAdapterProtocol, pr
         return null
     }
 
+
     override fun load(context: Any) {
-        if (context as? Context == null || bannerFormat == null){
-            adapter.onFailedToLoad(Error("Banner InMobi loading error." + if (context as? Context == null) "Context" else "Format" + "is null"))
-            return
+        load(context, null)
+    }
+
+    override fun load(context: Any, bidAppBid: BidappBid?) {
+        cachedAd = null
+        if (bidAppBid?.nativeBid != null){
+            val banner = bidAppBid.nativeBid as InMobiBanner
+            adView = WeakReference(banner)
         }
-        if (placementId.isNullOrEmpty() || placementId.toLongOrNull() == null){
-            adapter.onFailedToLoad(Error("InMobi banner Placement ID is null or empty"))
-            return
+        else {
+            if (context as? Context == null || bannerFormat == null) {
+                adapter.onFailedToLoad(Error("Banner InMobi loading error." + if (context as? Context == null) "Context" else "Format" + "is null"))
+                return
+            }
+            if (bidAppBid == null && (placementId.isNullOrEmpty() || placementId.toLongOrNull() == null)) {
+                adapter.onFailedToLoad(Error("InMobi banner Placement ID is null or empty"))
+                return
+            }
+            adView = WeakReference(InMobiBanner(context, placementId!!.toLong()))
         }
-        adView = WeakReference(InMobiBanner(context, placementId.toLong()))
         adView?.get()?.setAnimationType(InMobiBanner.AnimationType.ANIMATION_OFF)
         adView?.get()?.setEnableAutoRefresh(false)
         adView?.get()?.setListener(this)
@@ -53,11 +77,20 @@ internal class BIDInMobiBanner(private val adapter: BIDBannerAdapterProtocol, pr
             BANNER -> Pair(320, 50)
             MREC -> Pair(300, 250)
             LEADERBOARD -> Pair(728, 90)
-            else -> Pair(0,0)
+            else -> Pair(0, 0)
         }
-        val density = context.resources?.displayMetrics?.density ?: 1.0f
-        adView?.get()?.layoutParams = ViewGroup.LayoutParams(Math.round(size.first * density), Math.round(size.second * density))
-        adView?.get()?.load()
+        val density = (context as Context).resources?.displayMetrics?.density ?: 1.0f
+        adView?.get()?.layoutParams = ViewGroup.LayoutParams(
+            Math.round(size.first * density),
+            Math.round(size.second * density)
+        )
+        if (bidAppBid == null) {
+            adView?.get()?.load()
+        }
+        else {
+            adView?.get()?.preloadManager?.load()
+        }
+
     }
 
     override fun nativeAdView(): WeakReference<View>? {
@@ -145,4 +178,69 @@ internal class BIDInMobiBanner(private val adapter: BIDBannerAdapterProtocol, pr
         BIDLog.d(TAG, "AdView will leave application: $placementId")
     }
 
+    companion object {
+        fun bid(
+            context: Context?,
+            request: BidappBidRequester,
+            placementId: String?,
+            appId: String?,
+            accountId: String?,
+            adFormat: AdFormat?,
+            bidCompletion: bid_completion
+        ) {
+            if (context == null || placementId == null || placementId.toLongOrNull() == null) {
+                bidCompletion.invoke(
+                    null,
+                    Error("InMobi bid is failed." + if (context == null) "Context" else "Placement ID" + "is null")
+                )
+                return
+            }
+            var banner: InMobiBanner? = null
+            val bannerAdListener = object : BannerAdEventListener() {
+                override fun onAdFetchFailed(p0: InMobiBanner, p1: InMobiAdRequestStatus) {
+                    bidCompletion.invoke(
+                        null,
+                        Error("InMobi bid is failed. Banner instance is null")
+                    )
+                }
+
+                override fun onAdFetchSuccessful(p0: InMobiBanner, p1: AdMetaInfo) {
+                    val notifyListener = object : BIDNativeBidNotify {
+                        override fun winNotify(secPrice: Double?, secBidder: String?) {}
+                        override fun loseNotify(
+                            firstPrice: Double?,
+                            firstBidder: String?,
+                            lossReason: Int?
+                        ) {
+                        }
+                    }
+                    if (banner != null) {
+                        request.requestBidsWithCompletion(
+                            BIDNativeBidData(banner!!, p1.bid, notifyListener),
+                            placementId,
+                            appId,
+                            accountId,
+                            adFormat,
+                            BIDInMobiSDK.testMode,
+                            BIDInMobiSDK.COPPA,
+                            bidCompletion
+                        )
+                    } else {
+                        bidCompletion.invoke(
+                            null,
+                            Error("InMobi bid is failed. Banner instance is null")
+                        )
+                    }
+                }
+            }
+            banner = InMobiBanner(context, placementId.toLong())
+            when {
+                adFormat?.isBanner_320x50 == true -> banner.setBannerSize(320, 50)
+                adFormat?.isBanner_300x250 == true -> banner.setBannerSize(300, 250)
+                adFormat?.isBanner_728x90 == true -> banner.setBannerSize(728, 90)
+            }
+            banner.setListener(bannerAdListener)
+            banner.preloadManager.preload()
+        }
+    }
 }

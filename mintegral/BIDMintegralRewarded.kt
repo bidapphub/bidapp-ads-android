@@ -192,7 +192,7 @@ internal class BIDMintegralRewarded(
             val bidManager = BidManager(placementId, unitId)
             bidManager.setBidListener(object : BidListennning {
                 override fun onFailed(p0: String?) {
-                    bidCompletion.invoke(null, Error(p0 ?: "Mintegral rewarded bid failed unknown error"))
+                    bidCompletion.invoke(null, Error("Mintgral bid ${p0 ?: "Unknown error"}"))
                 }
 
                 override fun onSuccessed(p0: BidResponsed?) {

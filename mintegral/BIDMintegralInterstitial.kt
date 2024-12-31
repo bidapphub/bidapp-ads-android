@@ -189,7 +189,7 @@ internal class BIDMintegralInterstitial(
             val bidManager = BidManager(placementId, unitId)
             bidManager.setBidListener(object : BidListennning {
                 override fun onFailed(p0: String?) {
-                    bidCompletion.invoke(null, Error(p0 ?: "Mintegral interstitial bid failed unknown error"))
+                    bidCompletion.invoke(null, Error("Mintgral bid ${p0 ?: "Unknown error"}"))
                 }
 
                 override fun onSuccessed(p0: BidResponsed?) {
@@ -229,8 +229,6 @@ internal class BIDMintegralInterstitial(
                             BIDMintegralSDK.COPPA,
                             bidCompletion
                         )
-
-
                     }
                 }
             })
