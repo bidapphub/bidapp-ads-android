@@ -2,7 +2,9 @@ package io.bidapp.networks.digitalturbine
 
 import android.content.Context
 import android.view.View
+import android.view.ViewGroup
 import android.widget.FrameLayout
+import android.widget.RelativeLayout
 import com.fyber.inneractive.sdk.external.ImpressionData
 import com.fyber.inneractive.sdk.external.InneractiveAdRequest
 import com.fyber.inneractive.sdk.external.InneractiveAdSpot
@@ -64,7 +66,6 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
             adapter.onFailedToLoad(Error("Digital Turbine banner adtag is null or empty"))
             return
         }
-
         val load = runCatching {
             if (adViewSpot == null || controller == null) {
                 controller = InneractiveAdViewUnitController()
@@ -94,9 +95,21 @@ class BIDDigitalTurbineBanner(val adapter: BIDBannerAdapterProtocol, val adTag: 
                 "LEADERBOARD" -> arrayOf(728, 90)
                 else -> arrayOf(0,0)
             }
-            (view.get() as FrameLayout).layoutParams.width = (weightAndHeight[0] * density).toInt()
-            (view.get() as FrameLayout).layoutParams.height = (weightAndHeight[1] * density).toInt()
-            controller!!.bindView(view.get() as FrameLayout)
+            val adViewGroup = RelativeLayout(view.get()?.context)
+            val layoutParams = RelativeLayout.LayoutParams(
+                (weightAndHeight[0] * density).toInt(),
+                (weightAndHeight[1] * density).toInt()
+            )
+            adViewGroup.layoutParams = layoutParams
+            controller!!.bindView(adViewGroup)
+            (view.get() as FrameLayout).addView(
+                adViewGroup,
+                0,
+                ViewGroup.LayoutParams(
+                    (weightAndHeight[0] * density).toInt(),
+                    (weightAndHeight[1] * density).toInt()
+                )
+            )
             this.view = view
             true
         } catch (e: Exception) {

@@ -29,6 +29,7 @@ internal class BIDIronSourceBanner(private val adapter: BIDBannerAdapterProtocol
     }
 
     override fun load(context: Any) {
+        IronSource.destroyISDemandOnlyBanner(instanceId)
         cachedAd = false
         if (context as? Activity == null || bannerFormat == null){
             adapter.onFailedToLoad(Error("Banner IronSource loading error." + if (context as? Activity == null) "Activity" else "Format" + "is null"))

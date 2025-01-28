@@ -13,7 +13,7 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 
-internal const val ADAPTERVERSION = "2.2.5"
+internal const val ADAPTERVERSION = "2.3.5"
 internal const val SDKVERSION = "6.18.0"
 
 @PublishedApi
@@ -24,6 +24,8 @@ internal class BIDIronSourceSDK(
 ) : BIDNetworkAdapterDelegateProtocol, ConsentListener {
     private val TAG = "IronSource SDK"
     private var isInitialize = false
+
+
 
     override fun initializeSDK(context: Context) {
         if (isInitialized(context) || adapter.initializationInProgress()) {
@@ -94,6 +96,4 @@ internal class BIDIronSourceSDK(
             IronSource.setMetaData("is_child_directed", if (consent.COPPA!!) "true" else "false")
         }
     }
-
-
 }

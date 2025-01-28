@@ -200,7 +200,7 @@ internal class BIDInMobiBanner(
                 override fun onAdFetchFailed(p0: InMobiBanner, p1: InMobiAdRequestStatus) {
                     bidCompletion.invoke(
                         null,
-                        Error("InMobi bid is failed. Banner instance is null")
+                        Error("InMobi bid is failed. Error: ${p1.message}")
                     )
                 }
 

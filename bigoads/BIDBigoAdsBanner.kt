@@ -55,10 +55,10 @@ internal class BIDBigoAdsBanner(
         handler?.removeCallbacksAndMessages(null)
         handler = null
         task = null
-        cachedAd = null
         adView?.get()?.removeAllViews()
         adView?.get()?.destroy()
         adView = null
+        cachedAd = null
     }
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {

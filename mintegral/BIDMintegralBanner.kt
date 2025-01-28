@@ -99,6 +99,7 @@ internal class BIDMintegralBanner(
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
         return try {
+            (view.get() as FrameLayout).removeAllViews()
             val weightAndHeight: Array<Int> = when {
                 bannerFormat?.second == MREC -> arrayOf(300, 250)
                 bannerFormat?.second == BANNER -> arrayOf(320, 50)

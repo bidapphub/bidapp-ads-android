@@ -9,8 +9,8 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.2.5"
-internal const val SDKVERSION = "8.3.3"
+internal const val ADAPTERVERSION = "2.3.5"
+internal const val SDKVERSION = "8.3.4"
 class BIDDigitalTurbineSDK(
     private val adapter: BIDNetworkAdapterProtocol?,
     private val appId: String?,
@@ -64,7 +64,9 @@ class BIDDigitalTurbineSDK(
 
     override fun enableTesting() {}
 
-    override fun enableLogging(context: Context) {}
+    override fun enableLogging(context: Context) {
+        
+    }
 
     override fun sharedSDK(): Any {
         return mapOf(

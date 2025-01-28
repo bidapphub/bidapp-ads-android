@@ -31,7 +31,7 @@ internal class BIDUnityBanner(
         null
     }
     private var adView: WeakReference<BannerView>? = null
-    private var cachedAd: WeakReference<BannerView>? = null
+    private var cachedAd: String? = null
 
 
     override fun nativeAdView(): WeakReference<View>? {
@@ -44,24 +44,30 @@ internal class BIDUnityBanner(
 
     override fun load(context: Any) {
         cachedAd = null
-        if (context as? Activity == null || bannerFormat == null){
+        if (context as? Activity == null || bannerFormat == null) {
             adapter?.onFailedToLoad(Error("Unity banner loading error"))
             return
         }
-        if (adTag.isNullOrEmpty()){
+        if (adTag.isNullOrEmpty()) {
             adapter?.onFailedToLoad(Error("Unity banner adTag is null or empty"))
             return
         }
-            adView = WeakReference(BannerView(context, adTag, bannerFormat))
-            adView?.get()?.listener = this
-            adView?.get()?.load()
+        adView = WeakReference(BannerView(context, adTag, bannerFormat))
+        adView?.get()?.listener = this
+        adView?.get()?.load()
     }
 
     override fun destroy() {
-       cachedAd?.get()?.removeAllViews()
-       cachedAd = null
-       adView?.get()?.removeAllViews()
-       adView = null
+        cachedAd = null
+        val destroy = runCatching {
+            adView?.get()?.destroy()
+        }
+        if (destroy.isFailure) {
+            BIDLog.d(TAG, "Banner destroy failed. adTag: ($adTag). Error ${ destroy.exceptionOrNull()?.localizedMessage }")
+        }
+        adView?.get()?.removeAllViews()
+        adView = null
+
     }
 
     override fun showOnView(view: WeakReference<View>, density: Float): Boolean {
@@ -80,7 +86,12 @@ internal class BIDUnityBanner(
                 )
                 else arrayOf(0, 0)
             (view.get() as FrameLayout).addView(
-                adView!!.get(),0, ViewGroup.LayoutParams((weightAndHeight[0]*density).toInt(), (weightAndHeight[1]*density).toInt())
+                adView!!.get(),
+                0,
+                ViewGroup.LayoutParams(
+                    (weightAndHeight[0] * density).toInt(),
+                    (weightAndHeight[1] * density).toInt()
+                )
             )
             true
         } catch (e: Exception) {
@@ -99,7 +110,7 @@ internal class BIDUnityBanner(
 
 
     override fun onBannerLoaded(ad: BannerView?) {
-        cachedAd = WeakReference(ad)
+        cachedAd = ad?.placementId
         adapter?.onLoad()
         BIDLog.d(TAG, "Ad load. adTag: ($adTag)")
     }
