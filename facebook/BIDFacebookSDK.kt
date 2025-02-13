@@ -9,7 +9,7 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.2.5"
+internal const val ADAPTERVERSION = "2.3.0"
 internal const val SDKVERSION = "6.18.0"
 class BIDFacebookSDK(
     private val adapter: BIDNetworkAdapterProtocol? = null,

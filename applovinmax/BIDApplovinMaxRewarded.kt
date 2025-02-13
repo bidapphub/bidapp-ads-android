@@ -9,6 +9,7 @@ import com.applovin.mediation.ads.MaxRewardedAd
 import io.bidapp.sdk.BIDLog
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDFullscreenAdapterProtocol
+
 @PublishedApi
 internal class BIDApplovinMaxRewarded(
     val adapter: BIDFullscreenAdapterProtocol? = null,
@@ -16,14 +17,8 @@ internal class BIDApplovinMaxRewarded(
     var isReward: Boolean
 ) : BIDFullscreenAdapterDelegateProtocol {
     val TAG = "Reward Max"
-    private var rewardedAd: MaxRewardedAd? = null
     private var rewardedAdListener: RewardedAdListener? = null
-
-
-    private fun setListener () {
-        rewardedAdListener = RewardedAdListener(TAG, adapter, adTag)
-        rewardedAd?.setListener(rewardedAdListener)
-    }
+    private var rewardedAd: MaxRewardedAd? = null
 
 
     override fun load(context: Any) {
@@ -35,14 +30,14 @@ internal class BIDApplovinMaxRewarded(
             adapter?.onAdFailedToLoadWithError("Max rewarded adtag is null or empty")
             return
         }
-            if (rewardedAd == null) {
-                rewardedAd = MaxRewardedAd.getInstance(adTag, context)
-            }
-            if (RewardedOnDisplay.isOnScreen) adapter?.onAdFailedToLoadWithError("Max rewarded loading error")
-            else {
-                setListener()
-                rewardedAd?.loadAd()
-            }
+        if (!canLoadReward(adTag)){
+            adapter?.onAdFailedToLoadWithError("Instance is busy")
+            return
+        }
+         rewardedAdListener = RewardedAdListener(adTag, adapter, adTag)
+         rewardedAd = MaxRewardedAd.getInstance(adTag, context)
+         rewardedAd?.setListener(rewardedAdListener)
+         rewardedAd?.loadAd()
     }
 
     override fun show(activity: Activity?) {
@@ -77,10 +72,9 @@ internal class BIDApplovinMaxRewarded(
     }
 
     override fun destroy() {
-        rewardedAd?.setListener(null)
-        rewardedAd?.destroy()
         rewardedAd = null
         rewardedAdListener = null
+        currentRewardedInstance = null
     }
 
 
@@ -101,8 +95,7 @@ internal class BIDApplovinMaxRewarded(
         override fun onAdDisplayed(maxAd: MaxAd) {
             BIDLog.d(tag, "Ad displayed. adtag: ($adTag)")
             adapter?.onDisplay()
-            RewardedOnDisplay.isOnScreen = true
-        }
+         }
 
         override fun onAdHidden(maxAd: MaxAd) {
             BIDLog.d(tag, "Ad hidden. adtag: ($adTag)")
@@ -111,7 +104,7 @@ internal class BIDApplovinMaxRewarded(
                 isRewardGranted = false
             }
             adapter?.onHide()
-            RewardedOnDisplay.isOnScreen = false
+            currentRewardedInstance = null
         }
 
         override fun onAdClicked(maxAd: MaxAd) {
@@ -123,12 +116,14 @@ internal class BIDApplovinMaxRewarded(
             val errorDescription = p1.toString()
             BIDLog.d(tag, "Ad load failed error $errorDescription adtag: ($adTag)")
             adapter?.onAdFailedToLoadWithError(p1.toString())
+            currentRewardedInstance = null
         }
 
         override fun onAdDisplayFailed(p0: MaxAd, p1: MaxError) {
             val errorDescription = p1.toString()
             BIDLog.d(tag, "Ad display failed error $errorDescription adtag: ($adTag)")
             adapter?.onFailedToDisplay(p1.toString())
+            currentRewardedInstance = null
         }
 
         override fun onUserRewarded(p0: MaxAd, p1: MaxReward) {
@@ -136,8 +131,15 @@ internal class BIDApplovinMaxRewarded(
             isRewardGranted = true
         }
     }
-}
+    internal companion object {
+        var currentRewardedInstance : String? = null
 
-object RewardedOnDisplay {
-    var isOnScreen = false
+        fun canLoadReward(adTag: String) : Boolean{
+            if (currentRewardedInstance == null) {
+                currentRewardedInstance = adTag
+                return true
+            }
+            return false
+        }
+    }
 }

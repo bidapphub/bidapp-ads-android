@@ -15,7 +15,7 @@ import org.json.JSONObject
 import java.lang.Error
 
 
-internal const val ADAPTERVERSION = "2.3.0"
+internal const val ADAPTERVERSION = "2.4.0"
 internal const val SDKVERSION = "10.8.0"
 @PublishedApi
 internal class BIDInMobiSDK(

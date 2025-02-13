@@ -14,7 +14,8 @@ import io.bidapp.sdk.protocols.BIDBannerAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDBannerAdapterProtocol
 import java.lang.ref.WeakReference
 
-class BIDStartIoBanner(
+@PublishedApi
+internal class BIDStartIoBanner(
     adapter: BIDBannerAdapterProtocol,
     val adTag: String?,
     format: AdFormat,

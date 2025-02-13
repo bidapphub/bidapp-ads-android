@@ -62,7 +62,6 @@ internal class BIDUnityFullscreen(
     }
 
     override fun destroy() {
-
         fullscreenAdListener = null
     }
 

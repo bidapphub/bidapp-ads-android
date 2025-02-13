@@ -11,7 +11,7 @@ import io.bidapp.sdk.ConsentListener
 import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
-internal const val ADAPTERVERSION = "2.2.5"
+internal const val ADAPTERVERSION = "2.3.0"
 internal const val SDKVERSION = "23.6.0"
 
 @PublishedApi
@@ -22,7 +22,6 @@ internal class BIDAdmobSDK(
 ) :
     BIDNetworkAdapterDelegateProtocol, ConsentListener {
 
-    private var sharedPreferences: SharedPreferences? = null
     private var isInitializationComplete = false
     private val TAG = "Admob SDK"
 
@@ -49,6 +48,7 @@ internal class BIDAdmobSDK(
             MobileAds.setRequestConfiguration(requestConfiguration)
         }
         if (consent.CCPA != null) {
+            val sharedPreferences = context?.getSharedPreferences(context.packageName, Context.MODE_PRIVATE)
             if (consent.CCPA == false) sharedPreferences?.edit()?.putInt("gad_rdp", 1)?.apply()
             else sharedPreferences?.edit()?.remove("gad_rdp")?.apply()
         }

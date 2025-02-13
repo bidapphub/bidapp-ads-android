@@ -13,8 +13,8 @@ import io.bidapp.sdk.protocols.BIDNetworkAdapterDelegateProtocol
 import io.bidapp.sdk.protocols.BIDNetworkAdapterProtocol
 
 
-internal const val ADAPTERVERSION = "2.3.5"
-internal const val SDKVERSION = "6.18.0"
+internal const val ADAPTERVERSION = "2.5.5"
+internal const val SDKVERSION = "8.6.1"
 
 @PublishedApi
 internal class BIDIronSourceSDK(

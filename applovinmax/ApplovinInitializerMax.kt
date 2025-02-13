@@ -27,8 +27,7 @@ internal object ApplovinInitializerMax : IApplovinInitializer {
                  dispatch_main {
                      if (!success) {
                          startSDKWaiters.forEach {
-                             Log.d("mylog", "Applovin max not init")
-                             it.get()?.onInitializationComplete(
+                              it.get()?.onInitializationComplete(
                                  false,
                                  "ApplovinMAX isInitialized failed"
                              )

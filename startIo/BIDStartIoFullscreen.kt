@@ -78,7 +78,6 @@ internal class BIDStartIoFullscreen(
     }
 
     override fun destroy() {
-        startAppAd?.close()
         startAppAd?.setVideoListener(null)
         fullscreenAdListener = null
         startAppAd = null

@@ -72,8 +72,6 @@ internal class BIDApplovinMaxInterstitial(
     }
 
     override fun destroy() {
-        interstitialAd?.setListener(null)
-        interstitialAd?.destroy()
         interstitialAd = null
         interstitialAdListener = null
     }
